@@ -1,0 +1,4862 @@
+openapi: 3.0.3
+
+info:
+  title: MOVO API
+  description: "API per il servizio di car sharing elettrico MOVO, operativo a Trento."
+  version: 1.0.0
+  contact:
+    name: MOVO Tech
+    email: api@movotn.it
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Sviluppo locale
+  - url: https://api.movotn.it/v1
+    description: Produzione
+
+tags:
+  - name: Auth
+    description: Login, registrazione, logout, recupero password
+  - name: Profilo
+    description: Gestione profilo utente, GDPR, preferenze
+  - name: Veicoli
+    description: Visualizzazione e ricerca veicoli disponibili
+  - name: Prenotazioni
+    description: Prenotazione veicoli
+  - name: Noleggi
+    description: Noleggi attivi, sblocco, chiusura, storico
+  - name: Pagamenti
+    description: Metodi di pagamento, divisione costi, transazioni
+  - name: Abbonamenti
+    description: Abbonamenti e pacchetti
+  - name: Promozioni
+    description: Codici promozionali e sconti
+  - name: Segnalazioni
+    description: Segnalazione problemi e ticket
+  - name: Aree di sosta
+    description: Visualizzazione aree di sosta autorizzate
+  - name: Sanzioni
+    description: Visualizzazione sanzioni utente
+  - name: Notifiche
+    description: Preferenze e gestione notifiche
+  - name: Backoffice - Flotta
+    description: Gestione flotta veicoli (ruolo operatore)
+  - name: Backoffice - Utenti
+    description: Approvazione e gestione utenti (ruolo operatore)
+  - name: Backoffice - Ticket
+    description: Gestione segnalazioni (ruolo operatore)
+  - name: Backoffice - Manutenzione
+    description: Manutenzione programmata (ruolo operatore)
+  - name: Backoffice - Sanzioni
+    description: Gestione multe e sanzioni (ruolo operatore)
+  - name: Backoffice - Rimborsi
+    description: Elaborazione rimborsi (ruolo operatore)
+  - name: Backoffice - Riposizionamento
+    description: Riposizionamento veicoli (ruolo operatore)
+  - name: Backoffice - Ricarica
+    description: Gestione ricariche EV (ruolo operatore)
+  - name: Backoffice - Analytics
+    description: Report e statistiche (ruolo operatore)
+  - name: Backoffice - Anomalie
+    description: Gestione anomalie e alert (ruolo operatore)
+  - name: Backoffice - Config
+    description: Configurazione aree, tariffe, zone (ruolo operatore)
+  - name: Comune
+    description: Dashboard aggregata pubblica amministrazione
+
+security:
+  - BearerAuth: []
+
+paths:
+
+  # -----------------------------------------------------------------------------
+  # AUTH
+  # -----------------------------------------------------------------------------
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [Auth]
+      summary: Login con credenziali locali
+      description: Restituisce un JWT token per l'autenticazione delle richieste successive.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "mario.rossi@example.com"
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: "SecureP@ssw0rd"
+      responses:
+        "200":
+          description: Token generato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Credenziali non valide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /auth/login/google:
+    post:
+      operationId: loginWithGoogle
+      tags: [Auth]
+      summary: Login con Google OAuth2
+      description: Scambia l'authorization code Google per un token MOVO.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                  description: Authorization code ottenuto da Google OAuth2
+                  example: "4/0AX4XfWh..."
+                redirect_uri:
+                  type: string
+                  format: uri
+                  description: Deve corrispondere a quello usato nel flusso di autorizzazione
+                  example: "https://app.movotn.it/auth/callback"
+      responses:
+        "200":
+          description: Token generato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Authorization code non valido o scaduto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [Auth]
+      summary: Logout dispositivo corrente
+      description: Invalida il token JWT corrente.
+      responses:
+        "204":
+          description: Token invalidato
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/logout-all:
+    post:
+      operationId: logoutAll
+      tags: [Auth]
+      summary: Logout da tutti i dispositivi
+      description: Invalida tutti i token JWT dell'utente.
+      responses:
+        "204":
+          description: Tutti i token invalidati
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [Auth]
+      summary: Registrazione nuovo utente
+      description: |
+        Se `driving_license` non viene fornita, l'utente viene registrato come passeggero
+        (solo cost-splitting). Con patente, lo stato sarà `pending_approval` fino alla
+        verifica documenti da parte di un operatore.
+
+        Validazioni automatiche: unicità email/CF, età minima 18 anni se patente fornita.
+      security: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [email, password, first_name, last_name, date_of_birth, fiscal_code, phone, accept_terms, accept_privacy]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                first_name:
+                  type: string
+                  example: "Mario"
+                last_name:
+                  type: string
+                  example: "Rossi"
+                date_of_birth:
+                  type: string
+                  format: date
+                  example: "1995-03-15"
+                fiscal_code:
+                  type: string
+                  pattern: "^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$"
+                  example: "RSSMRA95C15L378X"
+                phone:
+                  type: string
+                  pattern: '^\+?[1-9]\d{1,14}$'
+                  example: "+393331234567"
+                address:
+                  type: string
+                  example: "Via Roma 10, Trento"
+                accept_terms:
+                  type: boolean
+                accept_privacy:
+                  type: boolean
+                accept_cookies:
+                  type: boolean
+                driving_license:
+                  type: string
+                  format: binary
+                  description: Immagine patente (fronte-retro). Opzionale.
+                identity_document:
+                  type: string
+                  format: binary
+                  description: Documento d'identità. Richiesto se driving_license presente.
+      responses:
+        "201":
+          description: Account creato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                  email:
+                    type: string
+                    format: email
+                  status:
+                    type: string
+                    enum: [active, pending_approval]
+                    description: "`active` se passeggero, `pending_approval` se in attesa verifica documenti"
+                  message:
+                    type: string
+                    example: "Registrazione completata. Email di conferma inviata."
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          description: Email o codice fiscale già registrato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /auth/password-reset/request:
+    post:
+      operationId: requestPasswordReset
+      tags: [Auth]
+      summary: Richiesta reset password
+      description: |
+        Invia un token di reset via email. Token valido 1 ora.
+
+        Rate limiting: 5 req/account/min, 10 req/IP/min.
+        Risposta sempre 200 per prevenire user enumeration.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                captcha_token:
+                  type: string
+                  description: Richiesto dopo tentativi ripetuti
+      responses:
+        "200":
+          description: Richiesta elaborata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /auth/password-reset/confirm:
+    post:
+      operationId: confirmPasswordReset
+      tags: [Auth]
+      summary: Conferma reset password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, new_password]
+              properties:
+                token:
+                  type: string
+                  description: Token ricevuto via email
+                new_password:
+                  type: string
+                  format: password
+                  minLength: 8
+      responses:
+        "200":
+          description: Password aggiornata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: Token scaduto o non valido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      tags: [Auth]
+      summary: Rinnova access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        "200":
+          description: Nuovo token generato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Refresh token non valido o scaduto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  # -----------------------------------------------------------------------------
+  # PROFILO UTENTE
+  # -----------------------------------------------------------------------------
+
+  /users/me:
+    get:
+      operationId: getProfile
+      tags: [Profilo]
+      summary: Profilo utente corrente
+      responses:
+        "200":
+          description: Dati profilo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    patch:
+      operationId: updateProfile
+      tags: [Profilo]
+      summary: Aggiorna profilo
+      description: Aggiorna solo i campi specificati. Email e codice fiscale non modificabili.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+                language:
+                  type: string
+                  enum: [it, en, de]
+      responses:
+        "200":
+          description: Profilo aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /users/me/documents:
+    post:
+      operationId: uploadDocuments
+      tags: [Profilo]
+      summary: Carica/aggiorna documenti
+      description: |
+        Per utenti passeggeri che vogliono abilitarsi alla guida,
+        o per aggiornare documenti in scadenza.
+
+        Dopo l'upload, lo status passa a `pending_approval`.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                driving_license:
+                  type: string
+                  format: binary
+                identity_document:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Documenti caricati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [pending_approval]
+                  message:
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /users/me/password:
+    put:
+      operationId: changePassword
+      tags: [Profilo]
+      summary: Cambia password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, new_password]
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                new_password:
+                  type: string
+                  format: password
+                  minLength: 8
+      responses:
+        "204":
+          description: Password aggiornata
+        "400":
+          description: Password non conforme ai requisiti
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          description: Password corrente errata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /users/me/delete:
+    post:
+      operationId: deleteAccount
+      tags: [Profilo]
+      summary: Elimina account (GDPR)
+      description: |
+        Elimina account e dati personali. Alcuni dati contabili conservati per obblighi fiscali.
+        Richiede conferma esplicita. Operazione irreversibile.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password, confirmation]
+              properties:
+                password:
+                  type: string
+                  format: password
+                confirmation:
+                  type: string
+                  enum: ["ELIMINA IL MIO ACCOUNT"]
+      responses:
+        "202":
+          description: Eliminazione programmata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  deletion_scheduled_at:
+                    type: string
+                    format: date-time
+        "400":
+          description: Conferma mancante o errata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Impossibile eliminare (noleggi attivi o pagamenti in sospeso)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /users/me/data-export:
+    get:
+      operationId: exportUserData
+      tags: [Profilo]
+      summary: Export dati GDPR
+      description: Export JSON di tutti i dati personali.
+      responses:
+        "200":
+          description: Export generato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/UserProfile"
+                  rentals:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Rental"
+                  payments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Payment"
+                  exported_at:
+                    type: string
+                    format: date-time
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # -----------------------------------------------------------------------------
+  # VEICOLI
+  # -----------------------------------------------------------------------------
+
+  /vehicles:
+    get:
+      operationId: listVehicles
+      tags: [Veicoli]
+      summary: Lista veicoli disponibili
+      description: |
+        Veicoli disponibili per la mappa. Posizioni aggiornate ogni ~30 secondi.
+        Accessibile senza autenticazione.
+      security: []
+      parameters:
+        - name: bounds
+          in: query
+          description: Bounding box mappa (formato `swLng,swLat,neLng,neLat`)
+          schema:
+            type: string
+            example: "11.10,46.05,11.15,46.08"
+        - name: min_battery
+          in: query
+          description: Filtra per batteria minima (%)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+            example: 20
+      responses:
+        "200":
+          description: Lista veicoli
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vehicles:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/VehicleMapItem"
+                  updated_at:
+                    type: string
+                    format: date-time
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /vehicles/{vehicleId}:
+    get:
+      operationId: getVehicle
+      tags: [Veicoli]
+      summary: Dettagli veicolo
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/vehicleId"
+      responses:
+        "200":
+          description: Dettagli veicolo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vehicle"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /vehicles/search:
+    get:
+      operationId: searchVehicles
+      tags: [Veicoli]
+      summary: Ricerca veicoli con filtri
+      description: Ricerca per distanza, batteria, modello, prezzo.
+      parameters:
+        - name: location
+          in: query
+          required: true
+          description: Coordinate utente (formato `lng,lat`)
+          schema:
+            type: string
+            example: "11.1257,46.0664"
+        - name: max_distance
+          in: query
+          description: Distanza massima in metri
+          schema:
+            type: integer
+            default: 5000
+            example: 1000
+        - name: min_battery
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+            default: 20
+        - name: model
+          in: query
+          schema:
+            type: string
+            example: "Fiat 500e"
+        - name: max_price_per_minute
+          in: query
+          description: Prezzo massimo in centesimi/minuto
+          schema:
+            type: integer
+            example: 35
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Risultati ordinati per distanza
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/VehicleSearchResult"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # -----------------------------------------------------------------------------
+  # PRENOTAZIONI
+  # -----------------------------------------------------------------------------
+
+  /bookings:
+    post:
+      operationId: createBooking
+      tags: [Prenotazioni]
+      summary: Crea prenotazione
+      description: |
+        Riserva un veicolo per 15 o 30 minuti.
+
+        Requisiti: utente abilitato alla guida, nessuna prenotazione/noleggio attivo,
+        veicolo disponibile, metodo di pagamento configurato.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vehicle_id, duration_minutes]
+              properties:
+                vehicle_id:
+                  type: string
+                  format: uuid
+                duration_minutes:
+                  type: integer
+                  enum: [15, 30]
+                  example: 15
+      responses:
+        "201":
+          description: Prenotazione creata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Utente non abilitato o prenotazione già attiva
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Veicolo non disponibile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+    get:
+      operationId: getActiveBooking
+      tags: [Prenotazioni]
+      summary: Prenotazione attiva
+      responses:
+        "200":
+          description: Prenotazione attiva
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Nessuna prenotazione attiva
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /bookings/{bookingId}:
+    delete:
+      operationId: cancelBooking
+      tags: [Prenotazioni]
+      summary: Cancella prenotazione
+      description: Possibile solo se il noleggio non è ancora iniziato.
+      parameters:
+        - $ref: "#/components/parameters/bookingId"
+      responses:
+        "204":
+          description: Prenotazione cancellata
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Noleggio già iniziato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # -----------------------------------------------------------------------------
+  # NOLEGGI
+  # -----------------------------------------------------------------------------
+
+  /rentals/unlock:
+    post:
+      operationId: unlockVehicle
+      tags: [Noleggi]
+      summary: Sblocca veicolo e inizia noleggio
+      description: |
+        Sblocca il veicolo prenotato e avvia il noleggio.
+        Richiede prossimità al veicolo (~50m).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [booking_id]
+              properties:
+                booking_id:
+                  type: string
+                  format: uuid
+                user_location:
+                  $ref: "#/components/schemas/GeoPoint"
+      responses:
+        "200":
+          description: Veicolo sbloccato, noleggio attivo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rental"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Utente troppo lontano dal veicolo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /rentals/active:
+    get:
+      operationId: getActiveRental
+      tags: [Noleggi]
+      summary: Noleggio attivo
+      responses:
+        "200":
+          description: Noleggio in corso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rental"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Nessun noleggio attivo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /rentals/{rentalId}/pause:
+    post:
+      operationId: pauseRental
+      tags: [Noleggi]
+      summary: Metti in pausa
+      description: Blocca il veicolo per sosta breve (max 30 min). Tariffa ridotta.
+      parameters:
+        - $ref: "#/components/parameters/rentalId"
+      responses:
+        "200":
+          description: Noleggio in pausa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rental"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Limite pause raggiunto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /rentals/{rentalId}/resume:
+    post:
+      operationId: resumeRental
+      tags: [Noleggi]
+      summary: Riprendi noleggio
+      parameters:
+        - $ref: "#/components/parameters/rentalId"
+      responses:
+        "200":
+          description: Noleggio ripreso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rental"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /rentals/{rentalId}/end:
+    post:
+      operationId: endRental
+      tags: [Noleggi]
+      summary: Termina noleggio
+      description: |
+        Chiude il noleggio. Il veicolo deve essere in un'area di sosta autorizzata.
+        Il costo finale viene addebitato sul metodo di pagamento predefinito.
+      parameters:
+        - $ref: "#/components/parameters/rentalId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                end_location:
+                  $ref: "#/components/schemas/GeoPoint"
+                photos:
+                  type: array
+                  maxItems: 4
+                  items:
+                    type: string
+                    format: byte
+      responses:
+        "200":
+          description: Noleggio concluso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RentalSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Veicolo non in area di sosta valida
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /rentals/history:
+    get:
+      operationId: getRentalHistory
+      tags: [Noleggi]
+      summary: Storico noleggi
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista noleggi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RentalSummary"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /rentals/{rentalId}:
+    get:
+      operationId: getRental
+      tags: [Noleggi]
+      summary: Dettaglio noleggio
+      parameters:
+        - $ref: "#/components/parameters/rentalId"
+      responses:
+        "200":
+          description: Dettagli noleggio
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RentalSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # -----------------------------------------------------------------------------
+  # PAGAMENTI
+  # -----------------------------------------------------------------------------
+
+  /payments/methods:
+    get:
+      operationId: listPaymentMethods
+      tags: [Pagamenti]
+      summary: Lista metodi di pagamento
+      responses:
+        "200":
+          description: Metodi salvati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  methods:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PaymentMethod"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      operationId: addPaymentMethod
+      tags: [Pagamenti]
+      summary: Aggiungi metodo di pagamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stripe_token]
+              properties:
+                stripe_token:
+                  type: string
+                  description: Token generato da Stripe.js
+                set_as_default:
+                  type: boolean
+                  default: false
+      responses:
+        "201":
+          description: Metodo aggiunto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentMethod"
+        "400":
+          description: Token non valido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /payments/methods/{methodId}:
+    delete:
+      operationId: deletePaymentMethod
+      tags: [Pagamenti]
+      summary: Rimuovi metodo di pagamento
+      parameters:
+        - name: methodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Metodo rimosso
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Impossibile rimuovere l'unico metodo con abbonamenti attivi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /payments/methods/{methodId}/default:
+    put:
+      operationId: setDefaultPaymentMethod
+      tags: [Pagamenti]
+      summary: Imposta metodo predefinito
+      parameters:
+        - name: methodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Metodo predefinito aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentMethod"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /payments/transactions:
+    get:
+      operationId: listTransactions
+      tags: [Pagamenti]
+      summary: Storico transazioni
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [rental, subscription, penalty, refund]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista transazioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Payment"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /payments/split-request:
+    post:
+      operationId: requestCostSplit
+      tags: [Pagamenti]
+      summary: Richiedi divisione costi
+      description: I partecipanti ricevono notifica push per accettare/rifiutare.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rental_id, participants]
+              properties:
+                rental_id:
+                  type: string
+                  format: uuid
+                participants:
+                  type: array
+                  minItems: 1
+                  maxItems: 4
+                  items:
+                    type: object
+                    required: [user_id, percentage]
+                    properties:
+                      user_id:
+                        type: string
+                        format: uuid
+                      percentage:
+                        type: number
+                        minimum: 1
+                        maximum: 99
+      responses:
+        "201":
+          description: Richiesta inviata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SplitRequest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /payments/split-request/{splitId}/respond:
+    post:
+      operationId: respondToSplit
+      tags: [Pagamenti]
+      summary: Rispondi a richiesta divisione
+      parameters:
+        - name: splitId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [accept]
+              properties:
+                accept:
+                  type: boolean
+      responses:
+        "200":
+          description: Risposta registrata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SplitRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Già risposto a questa richiesta
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  # -----------------------------------------------------------------------------
+  # ABBONAMENTI
+  # -----------------------------------------------------------------------------
+
+  /subscriptions:
+    get:
+      operationId: listSubscriptionPlans
+      tags: [Abbonamenti]
+      summary: Lista piani disponibili
+      security: []
+      responses:
+        "200":
+          description: Piani abbonamento
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SubscriptionPlan"
+
+    post:
+      operationId: subscribe
+      tags: [Abbonamenti]
+      summary: Attiva abbonamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plan_id]
+              properties:
+                plan_id:
+                  type: string
+                  format: uuid
+                auto_renew:
+                  type: boolean
+                  default: true
+      responses:
+        "201":
+          description: Abbonamento attivato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSubscription"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "402":
+          description: Pagamento fallito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "409":
+          description: Abbonamento già attivo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /subscriptions/active:
+    get:
+      operationId: getActiveSubscription
+      tags: [Abbonamenti]
+      summary: Abbonamento attivo
+      responses:
+        "200":
+          description: Dettagli abbonamento
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSubscription"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Nessun abbonamento attivo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /subscriptions/{subscriptionId}/auto-renew:
+    patch:
+      operationId: toggleAutoRenew
+      tags: [Abbonamenti]
+      summary: Modifica rinnovo automatico
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [auto_renew]
+              properties:
+                auto_renew:
+                  type: boolean
+      responses:
+        "200":
+          description: Impostazione aggiornata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSubscription"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /subscriptions/{subscriptionId}/cancel:
+    post:
+      operationId: cancelSubscription
+      tags: [Abbonamenti]
+      summary: Cancella abbonamento
+      description: Disdetta effettiva a fine periodo corrente.
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Cancellazione programmata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    enum: [cancelling]
+                  active_until:
+                    type: string
+                    format: date-time
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # -----------------------------------------------------------------------------
+  # PROMOZIONI
+  # -----------------------------------------------------------------------------
+
+  /promotions:
+    get:
+      operationId: listPromotions
+      tags: [Promozioni]
+      summary: Promozioni disponibili
+      responses:
+        "200":
+          description: Lista promozioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  promotions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Promotion"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /promotions/apply:
+    post:
+      operationId: applyPromoCode
+      tags: [Promozioni]
+      summary: Applica codice promozionale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [promo_code]
+              properties:
+                promo_code:
+                  type: string
+                  example: "WELCOME2025"
+      responses:
+        "200":
+          description: Codice applicato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Promotion"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Codice non valido o scaduto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "409":
+          description: Codice già utilizzato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  # -----------------------------------------------------------------------------
+  # SEGNALAZIONI
+  # -----------------------------------------------------------------------------
+
+  /issues:
+    post:
+      operationId: reportIssue
+      tags: [Segnalazioni]
+      summary: Segnala problema
+      description: Supporta upload fino a 5 foto.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [vehicle_id, category, description]
+              properties:
+                vehicle_id:
+                  type: string
+                  format: uuid
+                rental_id:
+                  type: string
+                  format: uuid
+                category:
+                  type: string
+                  enum: [technical, damage, cleanliness, other]
+                  example: "damage"
+                description:
+                  type: string
+                  minLength: 10
+                  example: "Specchietto retrovisore sinistro danneggiato"
+                photos:
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "201":
+          description: Segnalazione creata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          description: Troppi file o dimensioni eccessive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+    get:
+      operationId: listUserIssues
+      tags: [Segnalazioni]
+      summary: Lista segnalazioni utente
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, in_progress, resolved, closed]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        "200":
+          description: Lista segnalazioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Issue"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /issues/{issueId}:
+    get:
+      operationId: getIssue
+      tags: [Segnalazioni]
+      summary: Dettaglio segnalazione
+      parameters:
+        - name: issueId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Dettagli segnalazione
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # -----------------------------------------------------------------------------
+  # AREE DI SOSTA
+  # -----------------------------------------------------------------------------
+
+  /parking-areas:
+    get:
+      operationId: listParkingAreas
+      tags: [Aree di sosta]
+      summary: Lista aree di sosta
+      security: []
+      parameters:
+        - name: bounds
+          in: query
+          description: Bounding box (formato `swLng,swLat,neLng,neLat`)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Aree di sosta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  parking_areas:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ParkingArea"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /parking-areas/{areaId}:
+    get:
+      operationId: getParkingArea
+      tags: [Aree di sosta]
+      summary: Dettaglio area
+      security: []
+      parameters:
+        - name: areaId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Dettagli area
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParkingArea"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # -----------------------------------------------------------------------------
+  # SANZIONI
+  # -----------------------------------------------------------------------------
+
+  /penalties:
+    get:
+      operationId: listPenalties
+      tags: [Sanzioni]
+      summary: Lista sanzioni utente
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, paid, contested, cancelled]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        "200":
+          description: Lista sanzioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Penalty"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /penalties/{penaltyId}:
+    get:
+      operationId: getPenalty
+      tags: [Sanzioni]
+      summary: Dettaglio sanzione
+      parameters:
+        - name: penaltyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Dettagli sanzione
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Penalty"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /penalties/{penaltyId}/contest:
+    post:
+      operationId: contestPenalty
+      tags: [Sanzioni]
+      summary: Contesta sanzione
+      parameters:
+        - name: penaltyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  minLength: 20
+      responses:
+        "200":
+          description: Contestazione registrata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Penalty"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Sanzione già contestata o pagata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  # -----------------------------------------------------------------------------
+  # NOTIFICHE
+  # -----------------------------------------------------------------------------
+
+  /notifications/preferences:
+    get:
+      operationId: getNotificationPreferences
+      tags: [Notifiche]
+      summary: Preferenze notifiche
+      responses:
+        "200":
+          description: Preferenze attuali
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    put:
+      operationId: updateNotificationPreferences
+      tags: [Notifiche]
+      summary: Aggiorna preferenze notifiche
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationPreferences"
+      responses:
+        "200":
+          description: Preferenze salvate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - FLOTTA
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/vehicles:
+    get:
+      operationId: opListVehicles
+      tags: [Backoffice - Flotta]
+      summary: Lista completa veicoli
+      description: Richiede ruolo OPERATOR o superiore.
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [available, in_use, maintenance, offline, charging]
+        - name: min_battery
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista veicoli
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/VehicleOperator"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      operationId: opCreateVehicle
+      tags: [Backoffice - Flotta]
+      summary: Aggiungi veicolo alla flotta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vin, license_plate, model, year]
+              properties:
+                vin:
+                  type: string
+                  description: Vehicle Identification Number
+                  example: "WVWZZZ1JZXW386752"
+                license_plate:
+                  type: string
+                  example: "TN123AB"
+                model:
+                  type: string
+                  example: "Fiat 500e"
+                year:
+                  type: integer
+                  example: 2024
+                color:
+                  type: string
+                  example: "Bianco"
+                base_price_per_minute:
+                  type: number
+                  description: Centesimi/minuto
+                  example: 35
+                telematics_device_id:
+                  type: string
+      responses:
+        "201":
+          description: Veicolo creato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleOperator"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: VIN o targa già esistente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /operator/vehicles/{vehicleId}:
+    get:
+      operationId: opGetVehicle
+      tags: [Backoffice - Flotta]
+      summary: Dettagli veicolo completi
+      description: Include storico manutenzioni.
+      parameters:
+        - $ref: "#/components/parameters/vehicleId"
+      responses:
+        "200":
+          description: Dettagli veicolo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      operationId: opUpdateVehicle
+      tags: [Backoffice - Flotta]
+      summary: Aggiorna veicolo
+      parameters:
+        - $ref: "#/components/parameters/vehicleId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [available, maintenance, offline]
+                base_price_per_minute:
+                  type: number
+                location:
+                  $ref: "#/components/schemas/GeoPoint"
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Veicolo aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleOperator"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      operationId: opDeleteVehicle
+      tags: [Backoffice - Flotta]
+      summary: Rimuovi veicolo dalla flotta
+      description: Solo se nessun noleggio attivo.
+      parameters:
+        - $ref: "#/components/parameters/vehicleId"
+      responses:
+        "204":
+          description: Veicolo rimosso
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Noleggi attivi o storico presente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /operator/vehicles/dashboard:
+    get:
+      operationId: opGetFleetDashboard
+      tags: [Backoffice - Flotta]
+      summary: Dashboard monitoraggio flotta
+      description: Statistiche real-time, aggiornamento ogni 30 secondi.
+      responses:
+        "200":
+          description: Dashboard dati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_vehicles:
+                    type: integer
+                    example: 100
+                  available:
+                    type: integer
+                    example: 45
+                  in_use:
+                    type: integer
+                    example: 30
+                  maintenance:
+                    type: integer
+                    example: 15
+                  charging:
+                    type: integer
+                    example: 8
+                  offline:
+                    type: integer
+                    example: 2
+                  low_battery_count:
+                    type: integer
+                    description: Veicoli con batteria < 20%
+                  average_battery:
+                    type: number
+                    example: 67.5
+                  active_rentals:
+                    type: integer
+                  updated_at:
+                    type: string
+                    format: date-time
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - UTENTI
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/users:
+    get:
+      operationId: opListUsers
+      tags: [Backoffice - Utenti]
+      summary: Lista utenti
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending_approval, active, suspended, blocked]
+        - name: search
+          in: query
+          description: Cerca per nome, email, CF
+          schema:
+            type: string
+        - name: documents_expiring_within_days
+          in: query
+          description: Filtra utenti con documenti in scadenza
+          schema:
+            type: integer
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista utenti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserOperator"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/users/{userId}:
+    get:
+      operationId: opGetUser
+      tags: [Backoffice - Utenti]
+      summary: Dettagli utente
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Dettagli utente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/users/{userId}/approve:
+    post:
+      operationId: opApproveUser
+      tags: [Backoffice - Utenti]
+      summary: Approva documenti utente
+      description: Abilita l'utente alla guida.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Utente approvato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/users/{userId}/reject:
+    post:
+      operationId: opRejectUser
+      tags: [Backoffice - Utenti]
+      summary: Rifiuta documenti utente
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  minLength: 10
+      responses:
+        "200":
+          description: Documenti rifiutati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/users/{userId}/suspend:
+    post:
+      operationId: opSuspendUser
+      tags: [Backoffice - Utenti]
+      summary: Sospendi utente
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                duration_days:
+                  type: integer
+                  description: null = indefinita
+      responses:
+        "200":
+          description: Utente sospeso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/users/{userId}/reactivate:
+    post:
+      operationId: opReactivateUser
+      tags: [Backoffice - Utenti]
+      summary: Riattiva utente sospeso
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Utente riattivato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - TICKET
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/issues:
+    get:
+      operationId: opListIssues
+      tags: [Backoffice - Ticket]
+      summary: Lista segnalazioni
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, in_progress, resolved, closed]
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [technical, damage, cleanliness, other]
+        - name: assigned_to
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista segnalazioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IssueOperator"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/issues/{issueId}/assign:
+    post:
+      operationId: opAssignIssue
+      tags: [Backoffice - Ticket]
+      summary: Assegna segnalazione
+      parameters:
+        - name: issueId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [assignee_id]
+              properties:
+                assignee_id:
+                  type: string
+                  format: uuid
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Segnalazione assegnata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/issues/{issueId}/status:
+    patch:
+      operationId: opUpdateIssueStatus
+      tags: [Backoffice - Ticket]
+      summary: Aggiorna stato segnalazione
+      parameters:
+        - name: issueId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [in_progress, resolved, closed]
+                resolution_notes:
+                  type: string
+                  description: Richieste per resolved/closed
+      responses:
+        "200":
+          description: Stato aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueOperator"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - MANUTENZIONE
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/maintenance:
+    get:
+      operationId: opListMaintenance
+      tags: [Backoffice - Manutenzione]
+      summary: Lista manutenzioni programmate
+      parameters:
+        - name: vehicle_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, in_progress, completed, cancelled]
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista manutenzioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Maintenance"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      operationId: opCreateMaintenance
+      tags: [Backoffice - Manutenzione]
+      summary: Programma manutenzione
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vehicle_id, type, scheduled_date]
+              properties:
+                vehicle_id:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                  enum: [routine, repair, inspection]
+                scheduled_date:
+                  type: string
+                  format: date-time
+                description:
+                  type: string
+                  example: "Revisione periodica 20.000 km"
+                estimated_duration_hours:
+                  type: integer
+                  example: 4
+      responses:
+        "201":
+          description: Manutenzione programmata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Maintenance"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/maintenance/{maintenanceId}/complete:
+    post:
+      operationId: opCompleteMaintenance
+      tags: [Backoffice - Manutenzione]
+      summary: Completa manutenzione
+      parameters:
+        - name: maintenanceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [completion_notes]
+              properties:
+                completion_notes:
+                  type: string
+                  minLength: 10
+                actual_duration_hours:
+                  type: integer
+                cost:
+                  type: number
+                  description: Costo intervento (euro)
+      responses:
+        "200":
+          description: Manutenzione completata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Maintenance"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - SANZIONI
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/penalties:
+    get:
+      operationId: opListPenalties
+      tags: [Backoffice - Sanzioni]
+      summary: Lista sanzioni
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [unpaid, paid, contested, waived]
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista sanzioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PenaltyOperator"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      operationId: opCreatePenalty
+      tags: [Backoffice - Sanzioni]
+      summary: Crea sanzione
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [user_id, type, amount, reason]
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                rental_id:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                  enum: [parking_violation, geofence_exit, late_return, damage, other]
+                amount:
+                  type: number
+                  description: Importo (euro)
+                  example: 50.00
+                reason:
+                  type: string
+                  minLength: 10
+                evidence:
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "201":
+          description: Sanzione creata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PenaltyOperator"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/penalties/{penaltyId}/waive:
+    post:
+      operationId: opWaivePenalty
+      tags: [Backoffice - Sanzioni]
+      summary: Annulla sanzione
+      description: Annulla dopo contestazione accettata.
+      parameters:
+        - name: penaltyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  minLength: 10
+      responses:
+        "200":
+          description: Sanzione annullata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PenaltyOperator"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - RIMBORSI
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/refunds:
+    get:
+      operationId: opListRefunds
+      tags: [Backoffice - Rimborsi]
+      summary: Lista richieste rimborso
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected, processed]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista rimborsi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Refund"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/refunds/{refundId}/approve:
+    post:
+      operationId: opApproveRefund
+      tags: [Backoffice - Rimborsi]
+      summary: Approva rimborso
+      parameters:
+        - name: refundId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Rimborso approvato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/refunds/{refundId}/reject:
+    post:
+      operationId: opRejectRefund
+      tags: [Backoffice - Rimborsi]
+      summary: Rifiuta rimborso
+      parameters:
+        - name: refundId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  minLength: 10
+      responses:
+        "200":
+          description: Rimborso rifiutato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - RIPOSIZIONAMENTO
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/relocation/assignments:
+    get:
+      operationId: opListRelocationAssignments
+      tags: [Backoffice - Riposizionamento]
+      summary: Lista incarichi riposizionamento
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, in_progress, completed, cancelled]
+        - name: assigned_to
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista incarichi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RelocationAssignment"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      operationId: opCreateRelocationAssignment
+      tags: [Backoffice - Riposizionamento]
+      summary: Crea incarico riposizionamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vehicle_id, target_location, assigned_to]
+              properties:
+                vehicle_id:
+                  type: string
+                  format: uuid
+                target_location:
+                  $ref: "#/components/schemas/GeoPoint"
+                target_parking_area_id:
+                  type: string
+                  format: uuid
+                assigned_to:
+                  type: string
+                  format: uuid
+                priority:
+                  type: string
+                  enum: [low, medium, high]
+                  default: medium
+                deadline:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        "201":
+          description: Incarico creato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelocationAssignment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/relocation/assignments/{assignmentId}/complete:
+    post:
+      operationId: opCompleteRelocation
+      tags: [Backoffice - Riposizionamento]
+      summary: Completa riposizionamento
+      parameters:
+        - name: assignmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [final_location]
+              properties:
+                final_location:
+                  $ref: "#/components/schemas/GeoPoint"
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Riposizionamento completato
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelocationAssignment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - RICARICA
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/charging/sessions:
+    get:
+      operationId: opListChargingSessions
+      tags: [Backoffice - Ricarica]
+      summary: Lista sessioni ricarica
+      parameters:
+        - name: vehicle_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [charging, completed, interrupted]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista sessioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ChargingSession"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/charging/low-battery:
+    get:
+      operationId: opGetLowBatteryVehicles
+      tags: [Backoffice - Ricarica]
+      summary: Veicoli con batteria critica
+      description: Veicoli sotto soglia che richiedono ricarica.
+      parameters:
+        - name: threshold
+          in: query
+          description: Soglia batteria (default 20%)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Veicoli da ricaricare
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vehicles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vehicle_id:
+                          type: string
+                          format: uuid
+                        model:
+                          type: string
+                        license_plate:
+                          type: string
+                        battery_level:
+                          type: integer
+                        location:
+                          $ref: "#/components/schemas/GeoPoint"
+                        last_update:
+                          type: string
+                          format: date-time
+                  total_count:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - ANALYTICS
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/analytics/rentals:
+    get:
+      operationId: opGetRentalsReport
+      tags: [Backoffice - Analytics]
+      summary: Report noleggi
+      description: Statistiche aggregate. Export CSV/PDF disponibile.
+      parameters:
+        - name: from_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: group_by
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv, pdf]
+            default: json
+      responses:
+        "200":
+          description: Report generato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: object
+                    properties:
+                      from:
+                        type: string
+                        format: date
+                      to:
+                        type: string
+                        format: date
+                  total_rentals:
+                    type: integer
+                  total_revenue:
+                    type: number
+                  average_duration_minutes:
+                    type: number
+                  average_cost:
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        period:
+                          type: string
+                        rentals:
+                          type: integer
+                        revenue:
+                          type: number
+                        unique_users:
+                          type: integer
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/analytics/vehicles:
+    get:
+      operationId: opGetVehiclesReport
+      tags: [Backoffice - Analytics]
+      summary: Report utilizzo veicoli
+      parameters:
+        - name: from_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv, pdf]
+            default: json
+      responses:
+        "200":
+          description: Report veicoli
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vehicles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vehicle_id:
+                          type: string
+                          format: uuid
+                        model:
+                          type: string
+                        license_plate:
+                          type: string
+                        total_rentals:
+                          type: integer
+                        total_revenue:
+                          type: number
+                        total_hours:
+                          type: number
+                        average_battery_level:
+                          type: number
+                        utilization_rate:
+                          type: number
+                          description: Percentuale 0-100
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - ANOMALIE
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/anomalies:
+    get:
+      operationId: opListAnomalies
+      tags: [Backoffice - Anomalie]
+      summary: Lista alert e anomalie
+      description: |
+        Anomalie rilevate automaticamente: uscita area, batteria critica,
+        noleggio >24h, accesso non autorizzato, danni.
+      parameters:
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, acknowledged, resolved]
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [geofence_exit, battery_critical, rental_overtime, unauthorized_access, damage_detected]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Lista anomalie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Anomaly"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/anomalies/{anomalyId}/acknowledge:
+    post:
+      operationId: opAcknowledgeAnomaly
+      tags: [Backoffice - Anomalie]
+      summary: Prendi in carico anomalia
+      parameters:
+        - name: anomalyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assignee_id:
+                  type: string
+                  format: uuid
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Anomalia presa in carico
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Anomaly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/anomalies/{anomalyId}/resolve:
+    post:
+      operationId: opResolveAnomaly
+      tags: [Backoffice - Anomalie]
+      summary: Risolvi anomalia
+      parameters:
+        - name: anomalyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resolution_notes]
+              properties:
+                resolution_notes:
+                  type: string
+                  minLength: 10
+      responses:
+        "200":
+          description: Anomalia risolta
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Anomaly"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # BACKOFFICE - CONFIG
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /operator/config/parking-areas:
+    get:
+      operationId: opListParkingAreasConfig
+      tags: [Backoffice - Config]
+      summary: Lista aree di sosta (gestione)
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Aree di sosta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ParkingAreaConfig"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      operationId: opCreateParkingArea
+      tags: [Backoffice - Config]
+      summary: Crea area di sosta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, geometry, type]
+              properties:
+                name:
+                  type: string
+                  example: "Parcheggio Piazza Dante"
+                geometry:
+                  $ref: "#/components/schemas/GeoPolygon"
+                type:
+                  type: string
+                  enum: [public, dedicated, charging_station]
+                capacity:
+                  type: integer
+                  example: 10
+                is_active:
+                  type: boolean
+                  default: true
+      responses:
+        "201":
+          description: Area creata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParkingAreaConfig"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/config/parking-areas/{areaId}:
+    patch:
+      operationId: opUpdateParkingArea
+      tags: [Backoffice - Config]
+      summary: Modifica area di sosta
+      parameters:
+        - name: areaId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                geometry:
+                  $ref: "#/components/schemas/GeoPolygon"
+                is_active:
+                  type: boolean
+                capacity:
+                  type: integer
+      responses:
+        "200":
+          description: Area aggiornata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParkingAreaConfig"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      operationId: opDeleteParkingArea
+      tags: [Backoffice - Config]
+      summary: Elimina area di sosta
+      parameters:
+        - name: areaId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Area eliminata
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/config/tariffs:
+    get:
+      operationId: opGetTariffs
+      tags: [Backoffice - Config]
+      summary: Visualizza tariffe
+      responses:
+        "200":
+          description: Tariffe configurate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TariffConfig"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    patch:
+      operationId: opUpdateTariffs
+      tags: [Backoffice - Config]
+      summary: Aggiorna tariffe
+      description: Modifiche registrate in audit log.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_price_per_minute:
+                  type: number
+                  description: Centesimi/minuto
+                  example: 35
+                minimum_rental_duration_minutes:
+                  type: integer
+                  example: 30
+                maximum_daily_rentals:
+                  type: integer
+                  example: 3
+                time_restrictions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      day_of_week:
+                        type: integer
+                        minimum: 0
+                        maximum: 6
+                      start_time:
+                        type: string
+                        example: "22:00"
+                      end_time:
+                        type: string
+                        example: "06:00"
+                      surcharge_percentage:
+                        type: number
+                        example: 20.0
+      responses:
+        "200":
+          description: Tariffe aggiornate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TariffConfig"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/config/operational-areas:
+    get:
+      operationId: opGetOperationalAreas
+      tags: [Backoffice - Config]
+      summary: Visualizza aree operative
+      description: Zone geografiche dove il servizio è attivo.
+      responses:
+        "200":
+          description: Aree operative
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  areas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                          example: "Trento Centro"
+                        geometry:
+                          $ref: "#/components/schemas/GeoPolygon"
+                        is_active:
+                          type: boolean
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      operationId: opCreateOperationalArea
+      tags: [Backoffice - Config]
+      summary: Crea area operativa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, geometry]
+              properties:
+                name:
+                  type: string
+                  example: "Trento Nord"
+                geometry:
+                  $ref: "#/components/schemas/GeoPolygon"
+                is_active:
+                  type: boolean
+                  default: true
+      responses:
+        "201":
+          description: Area creata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  geometry:
+                    $ref: "#/components/schemas/GeoPolygon"
+                  is_active:
+                    type: boolean
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # COMUNE
+  # ═══════════════════════════════════════════════════════════════════════════════
+
+  /municipal/dashboard:
+    get:
+      operationId: municipalGetDashboard
+      tags: [Comune]
+      summary: Dashboard aggregata
+      description: |
+        Dati anonimi aggregati per il Comune: flussi origine-destinazione,
+        orari di punta, copertura vs trasporto pubblico, indicatori ambientali.
+      parameters:
+        - name: from_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Dashboard dati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: object
+                    properties:
+                      from:
+                        type: string
+                        format: date
+                      to:
+                        type: string
+                        format: date
+                  total_trips:
+                    type: integer
+                  unique_users:
+                    type: integer
+                    description: Utenti unici (anonimizzati)
+                  total_distance_km:
+                    type: number
+                  co2_saved_kg:
+                    type: number
+                    description: CO2 risparmiata vs auto tradizionale
+                  peak_hours:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        hour:
+                          type: integer
+                        trip_count:
+                          type: integer
+                  origin_destination_flows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        origin_zone:
+                          type: string
+                        destination_zone:
+                          type: string
+                        trip_count:
+                          type: integer
+                  intermodal_usage:
+                    type: object
+                    properties:
+                      total_intermodal_trips:
+                        type: integer
+                      percentage_of_total:
+                        type: number
+                  student_usage:
+                    type: object
+                    properties:
+                      total_student_trips:
+                        type: integer
+                      percentage_of_total:
+                        type: number
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /municipal/config/zones:
+    post:
+      operationId: municipalCreateZone
+      tags: [Comune]
+      summary: Configura zone speciali
+      description: Zone incentivate, eventi temporanei o restrizioni.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, geometry, type, valid_from, valid_to]
+              properties:
+                name:
+                  type: string
+                  example: "Mercatino Natale - Piazza Duomo"
+                geometry:
+                  $ref: "#/components/schemas/GeoPolygon"
+                type:
+                  type: string
+                  enum: [incentivized, event, blackout]
+                  description: |
+                    `incentivized`: tariffe ridotte
+                    `event`: stalli aggiuntivi temporanei
+                    `blackout`: parcheggi disabilitati
+                tariff_adjustment_percentage:
+                  type: number
+                  description: Sconto % (negativo per incentivi)
+                  example: -20.0
+                valid_from:
+                  type: string
+                  format: date-time
+                valid_to:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        "201":
+          description: Zona configurata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  geometry:
+                    $ref: "#/components/schemas/GeoPolygon"
+                  valid_from:
+                    type: string
+                    format: date-time
+                  valid_to:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# COMPONENTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+components:
+
+  parameters:
+    vehicleId:
+      name: vehicleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    bookingId:
+      name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    rentalId:
+      name: rentalId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT ottenuto da /auth/login o /auth/login/google
+
+    OAuth2Google:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth
+          tokenUrl: https://oauth2.googleapis.com/token
+          scopes:
+            email: Accesso email utente
+            profile: Accesso dati profilo base
+
+  schemas:
+
+    # ── Auth ---------------------------------------------------------------───
+
+    AuthResponse:
+      type: object
+      required: [access_token, token_type, expires_in, user]
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          enum: [Bearer]
+        expires_in:
+          type: integer
+          description: Secondi alla scadenza
+          example: 3600
+        refresh_token:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+              format: email
+            role:
+              type: string
+              enum: [user, operator, admin]
+            status:
+              type: string
+              enum: [active, pending_approval, suspended, blocked]
+
+    # ── User ---------------------------------------------------------------───
+
+    UserProfile:
+      type: object
+      required: [id, email, first_name, last_name, role, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
+        fiscal_code:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        language:
+          type: string
+          enum: [it, en, de]
+          default: it
+        role:
+          type: string
+          enum: [user, operator, admin]
+        status:
+          type: string
+          enum: [active, pending_approval, suspended, blocked]
+        driving_enabled:
+          type: boolean
+        driving_license_verified:
+          type: boolean
+        driving_license_expiry:
+          type: string
+          format: date
+          nullable: true
+        identity_document_expiry:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserOperator:
+      allOf:
+        - $ref: "#/components/schemas/UserProfile"
+        - type: object
+          properties:
+            total_rentals:
+              type: integer
+            total_spent:
+              type: number
+            penalties_count:
+              type: integer
+            documents:
+              type: object
+              properties:
+                driving_license_url:
+                  type: string
+                  format: uri
+                  nullable: true
+                identity_document_url:
+                  type: string
+                  format: uri
+                  nullable: true
+
+    # ── Geo ---------------------------------------------------------------────
+
+    GeoPoint:
+      type: object
+      required: [type, coordinates]
+      description: GeoJSON Point (RFC 7946)
+      properties:
+        type:
+          type: string
+          enum: [Point]
+        coordinates:
+          type: array
+          description: "[longitude, latitude]"
+          minItems: 2
+          maxItems: 2
+          items:
+            type: number
+            format: double
+          example: [11.1257, 46.0664]
+
+    GeoPolygon:
+      type: object
+      required: [type, coordinates]
+      description: GeoJSON Polygon (RFC 7946)
+      properties:
+        type:
+          type: string
+          enum: [Polygon]
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              minItems: 2
+              maxItems: 2
+              items:
+                type: number
+                format: double
+
+    # ── Vehicles --------------------------------------------------------──────
+
+    VehicleMapItem:
+      type: object
+      required: [id, model, license_plate, location, battery_level, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        model:
+          type: string
+          example: "Fiat 500e"
+        license_plate:
+          type: string
+          example: "TN123AB"
+        location:
+          $ref: "#/components/schemas/GeoPoint"
+        battery_level:
+          type: integer
+          minimum: 0
+          maximum: 100
+        status:
+          type: string
+          enum: [available, reserved, in_use]
+        base_price_per_minute:
+          type: number
+          description: Centesimi/minuto
+          example: 35
+
+    Vehicle:
+      allOf:
+        - $ref: "#/components/schemas/VehicleMapItem"
+        - type: object
+          properties:
+            year:
+              type: integer
+              example: 2024
+            color:
+              type: string
+              example: "Bianco"
+            features:
+              type: array
+              items:
+                type: string
+              example: ["Aria condizionata", "Bluetooth", "Navigatore"]
+            range_km:
+              type: integer
+              description: Autonomia stimata
+              example: 180
+            last_maintenance_at:
+              type: string
+              format: date-time
+              nullable: true
+
+    VehicleSearchResult:
+      allOf:
+        - $ref: "#/components/schemas/Vehicle"
+        - type: object
+          required: [distance_meters]
+          properties:
+            distance_meters:
+              type: integer
+              example: 350
+
+    VehicleOperator:
+      allOf:
+        - $ref: "#/components/schemas/Vehicle"
+        - type: object
+          properties:
+            vin:
+              type: string
+            telematics_device_id:
+              type: string
+            odometer_km:
+              type: integer
+            total_rentals:
+              type: integer
+            total_revenue:
+              type: number
+            average_rating:
+              type: number
+              minimum: 0
+              maximum: 5
+            maintenance_history:
+              type: array
+              items:
+                $ref: "#/components/schemas/Maintenance"
+
+    # ── Bookings --------------------------------------------------------──────
+
+    Booking:
+      type: object
+      required: [id, user_id, vehicle_id, duration_minutes, status, created_at, expires_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        vehicle_id:
+          type: string
+          format: uuid
+        vehicle:
+          $ref: "#/components/schemas/VehicleMapItem"
+        duration_minutes:
+          type: integer
+          enum: [15, 30]
+        status:
+          type: string
+          enum: [active, expired, converted_to_rental]
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+
+    # ── Rentals ---------------------------------------------------------------
+
+    Rental:
+      type: object
+      required: [id, user_id, vehicle_id, status, started_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        vehicle_id:
+          type: string
+          format: uuid
+        vehicle:
+          $ref: "#/components/schemas/VehicleMapItem"
+        status:
+          type: string
+          enum: [active, paused, completed]
+        started_at:
+          type: string
+          format: date-time
+        start_location:
+          $ref: "#/components/schemas/GeoPoint"
+        current_cost_cents:
+          type: integer
+        paused_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    RentalSummary:
+      allOf:
+        - $ref: "#/components/schemas/Rental"
+        - type: object
+          properties:
+            ended_at:
+              type: string
+              format: date-time
+            end_location:
+              $ref: "#/components/schemas/GeoPoint"
+            duration_minutes:
+              type: integer
+            distance_km:
+              type: number
+            total_cost_cents:
+              type: integer
+            discount_applied_cents:
+              type: integer
+            final_cost_cents:
+              type: integer
+
+    # ── Payments --------------------------------------------------------──────
+
+    PaymentMethod:
+      type: object
+      required: [id, type, last_four, is_default]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [card, paypal, apple_pay, google_pay]
+        brand:
+          type: string
+          example: "Visa"
+        last_four:
+          type: string
+          example: "4242"
+        expiry_month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        expiry_year:
+          type: integer
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Payment:
+      type: object
+      required: [id, type, amount_cents, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [rental, subscription, penalty, refund]
+        rental_id:
+          type: string
+          format: uuid
+          nullable: true
+        subscription_id:
+          type: string
+          format: uuid
+          nullable: true
+        penalty_id:
+          type: string
+          format: uuid
+          nullable: true
+        amount_cents:
+          type: integer
+        status:
+          type: string
+          enum: [pending, completed, failed, refunded]
+        payment_method_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    SplitRequest:
+      type: object
+      required: [id, rental_id, status, participants]
+      properties:
+        id:
+          type: string
+          format: uuid
+        rental_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, accepted, rejected, expired]
+        participants:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: string
+                format: uuid
+              percentage:
+                type: number
+              amount_cents:
+                type: integer
+              status:
+                type: string
+                enum: [pending, accepted, rejected]
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+
+    # ── Subscriptions --------------------------------------------------------─
+
+    SubscriptionPlan:
+      type: object
+      required: [id, name, price_cents, billing_period]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "MOVO Plus"
+        description:
+          type: string
+        price_cents:
+          type: integer
+          example: 1990
+        billing_period:
+          type: string
+          enum: [monthly, yearly]
+        included_minutes:
+          type: integer
+          nullable: true
+        discount_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        features:
+          type: array
+          items:
+            type: string
+
+    UserSubscription:
+      type: object
+      required: [id, plan_id, status, started_at, current_period_end]
+      properties:
+        id:
+          type: string
+          format: uuid
+        plan:
+          $ref: "#/components/schemas/SubscriptionPlan"
+        plan_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [active, cancelling, cancelled, expired]
+        auto_renew:
+          type: boolean
+        started_at:
+          type: string
+          format: date-time
+        current_period_start:
+          type: string
+          format: date-time
+        current_period_end:
+          type: string
+          format: date-time
+        minutes_used:
+          type: integer
+        minutes_remaining:
+          type: integer
+          nullable: true
+
+    # ── Promotions --------------------------------------------------------────
+
+    Promotion:
+      type: object
+      required: [id, code, type, value]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: "WELCOME2025"
+        type:
+          type: string
+          enum: [percentage, fixed_amount, free_minutes]
+        value:
+          type: number
+        description:
+          type: string
+        valid_from:
+          type: string
+          format: date-time
+        valid_until:
+          type: string
+          format: date-time
+          nullable: true
+        min_rental_minutes:
+          type: integer
+          nullable: true
+        max_uses:
+          type: integer
+          nullable: true
+        uses_remaining:
+          type: integer
+          nullable: true
+
+    # ── Issues ---------------------------------------------------------------─
+
+    Issue:
+      type: object
+      required: [id, vehicle_id, category, description, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehicle_id:
+          type: string
+          format: uuid
+        rental_id:
+          type: string
+          format: uuid
+          nullable: true
+        category:
+          type: string
+          enum: [technical, damage, cleanliness, other]
+        description:
+          type: string
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        resolution_notes:
+          type: string
+          nullable: true
+
+    IssueOperator:
+      allOf:
+        - $ref: "#/components/schemas/Issue"
+        - type: object
+          properties:
+            user_id:
+              type: string
+              format: uuid
+            assigned_to:
+              type: string
+              format: uuid
+              nullable: true
+            resolved_at:
+              type: string
+              format: date-time
+              nullable: true
+
+    # ── Parking ---------------------------------------------------------------
+
+    ParkingArea:
+      type: object
+      required: [id, name, geometry, type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Stazione FS Trento"
+        geometry:
+          $ref: "#/components/schemas/GeoPolygon"
+        type:
+          type: string
+          enum: [standard, bonus, restricted]
+        bonus_minutes:
+          type: integer
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        capacity:
+          type: integer
+          nullable: true
+        current_vehicles:
+          type: integer
+          nullable: true
+
+    ParkingAreaConfig:
+      allOf:
+        - $ref: "#/components/schemas/ParkingArea"
+        - type: object
+          properties:
+            is_active:
+              type: boolean
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+
+    # ── Penalties --------------------------------------------------------─────
+
+    Penalty:
+      type: object
+      required: [id, type, amount_cents, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        rental_id:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          enum: [parking_violation, damage, traffic_fine, late_return, other]
+        description:
+          type: string
+        amount_cents:
+          type: integer
+        status:
+          type: string
+          enum: [pending, paid, contested, cancelled]
+        evidence_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+        contest_reason:
+          type: string
+          nullable: true
+        resolution_notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        due_date:
+          type: string
+          format: date
+        paid_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    PenaltyOperator:
+      allOf:
+        - $ref: "#/components/schemas/Penalty"
+        - type: object
+          properties:
+            user_id:
+              type: string
+              format: uuid
+            created_by:
+              type: string
+              format: uuid
+
+    # ── Notifications --------------------------------------------------------─
+
+    NotificationPreferences:
+      type: object
+      properties:
+        promotional:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            channels:
+              type: array
+              items:
+                type: string
+                enum: [push, email, sms]
+        transactional:
+          type: object
+          properties:
+            channels:
+              type: array
+              items:
+                type: string
+                enum: [push, email, sms]
+        booking_reminders:
+          type: boolean
+        rental_alerts:
+          type: boolean
+
+    # ── Operator Schemas -------------------------------------------------─────
+
+    Maintenance:
+      type: object
+      required: [id, vehicle_id, type, status, scheduled_date]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehicle_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [routine, repair, inspection]
+        status:
+          type: string
+          enum: [scheduled, in_progress, completed, cancelled]
+        description:
+          type: string
+        scheduled_date:
+          type: string
+          format: date-time
+        estimated_duration_hours:
+          type: integer
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        actual_duration_hours:
+          type: integer
+          nullable: true
+        cost:
+          type: number
+          nullable: true
+        completion_notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Refund:
+      type: object
+      required: [id, user_id, payment_id, amount, reason, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        payment_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        reason:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected, processed]
+        requested_at:
+          type: string
+          format: date-time
+        processed_at:
+          type: string
+          format: date-time
+          nullable: true
+        processed_by:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    RelocationAssignment:
+      type: object
+      required: [id, vehicle_id, target_location, assigned_to, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehicle_id:
+          type: string
+          format: uuid
+        target_location:
+          $ref: "#/components/schemas/GeoPoint"
+        target_parking_area_id:
+          type: string
+          format: uuid
+          nullable: true
+        assigned_to:
+          type: string
+          format: uuid
+        priority:
+          type: string
+          enum: [low, medium, high]
+        status:
+          type: string
+          enum: [pending, in_progress, completed, cancelled]
+        deadline:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        final_location:
+          $ref: "#/components/schemas/GeoPoint"
+          nullable: true
+
+    ChargingSession:
+      type: object
+      required: [id, vehicle_id, status, started_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehicle_id:
+          type: string
+          format: uuid
+        charging_station_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [charging, completed, interrupted]
+        battery_level_start:
+          type: integer
+        battery_level_end:
+          type: integer
+          nullable: true
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        energy_kwh:
+          type: number
+          nullable: true
+        cost:
+          type: number
+          nullable: true
+
+    Anomaly:
+      type: object
+      required: [id, type, priority, status, detected_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [geofence_exit, battery_critical, rental_overtime, unauthorized_access, damage_detected]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+        status:
+          type: string
+          enum: [open, acknowledged, resolved]
+        vehicle_id:
+          type: string
+          format: uuid
+          nullable: true
+        rental_id:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+        detected_at:
+          type: string
+          format: date-time
+        acknowledged_at:
+          type: string
+          format: date-time
+          nullable: true
+        acknowledged_by:
+          type: string
+          format: uuid
+          nullable: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        resolution_notes:
+          type: string
+          nullable: true
+
+    TariffConfig:
+      type: object
+      properties:
+        base_price_per_minute:
+          type: number
+          description: Centesimi/minuto
+          example: 35
+        minimum_rental_duration_minutes:
+          type: integer
+          example: 30
+        maximum_daily_rentals:
+          type: integer
+          example: 3
+        time_restrictions:
+          type: array
+          items:
+            type: object
+            properties:
+              day_of_week:
+                type: integer
+                minimum: 0
+                maximum: 6
+              start_time:
+                type: string
+              end_time:
+                type: string
+              surcharge_percentage:
+                type: number
+        updated_at:
+          type: string
+          format: date-time
+        updated_by:
+          type: string
+          format: uuid
+
+    # ── Pagination & Errors -------------------------------------------------──
+
+    CursorPagination:
+      type: object
+      required: [has_more, limit]
+      properties:
+        next_cursor:
+          type: string
+          nullable: true
+        has_more:
+          type: boolean
+        limit:
+          type: integer
+
+    ProblemDetails:
+      type: object
+      required: [type, title, status]
+      description: Formato errore RFC 7807
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://api.movotn.it/errors/validation-error"
+        title:
+          type: string
+          example: "Validation Error"
+        status:
+          type: integer
+          example: 400
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+
+  responses:
+    BadRequest:
+      description: Richiesta non valida
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+
+    Unauthorized:
+      description: Autenticazione richiesta o token non valido
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+
+    Forbidden:
+      description: Permessi insufficienti
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+
+    NotFound:
+      description: Risorsa non trovata
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+
+    TooManyRequests:
+      description: Rate limit superato
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+      headers:
+        Retry-After:
+          description: Secondi prima di poter riprovare
+          schema:
+            type: integer
