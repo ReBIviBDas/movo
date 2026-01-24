@@ -5,6 +5,8 @@ const swaggerUi = require('swagger-ui-express');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
+const authRoutes = require('./routes/auth');
+const tokenChecker = require('./middlewares/tokenChecker');
 require('dotenv').config();
 
 const app = express();
@@ -26,6 +28,17 @@ try {
 } catch (e) {
     console.error("⚠️  Warning: Could not load OpenAPI file. Check if openapi.yaml or oas3.yaml exists in backend/ folder.");
 }
+
+// Routes
+app.use('/api/v1/auth', authRoutes);
+
+// PROTECTED ROUTE EXAMPLE
+app.get('/api/v1/profile', tokenChecker, (req, res) => {
+    res.json({ 
+        message: 'You are seeing this because you are logged in!', 
+        yourData: req.loggedUser 
+    });
+});
 
 // 3. Database Connection
 // This connects to the URL you put in .env
