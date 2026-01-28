@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { API_BASE_URL } from '@/config/api'
-import { setLoggedUser } from '@/states/auth'
+import { setLoggedUser, authState } from '@/states/auth'
 
 const router = useRouter()
 
@@ -10,7 +10,17 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
+const isGoogleLoading = ref(false)
 const errorMessage = ref('')
+
+// Determine redirect based on role
+function redirectByRole(role) {
+  if (role === 'operator' || role === 'admin') {
+    router.push('/operator')
+  } else {
+    router.push('/dashboard')
+  }
+}
 
 // Handle login form submission
 async function handleLogin() {
@@ -40,8 +50,8 @@ async function handleLogin() {
     // Success - store token and user info
     setLoggedUser(data)
     
-    // Redirect to home
-    router.push('/')
+    // Redirect based on role
+    redirectByRole(data.user.role)
     
   } catch (err) {
     console.error('Login error:', err)
@@ -50,6 +60,91 @@ async function handleLogin() {
     isLoading.value = false
   }
 }
+
+// Google OAuth Configuration
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+
+// Handle Google Sign-In callback
+async function handleGoogleCallback(response) {
+  isGoogleLoading.value = true
+  errorMessage.value = ''
+  
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/login/google`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        credential: response.credential
+      })
+    })
+    
+    const data = await res.json()
+    
+    if (!res.ok) {
+      errorMessage.value = data.detail || 'Google login failed.'
+      return
+    }
+    
+    // Success
+    setLoggedUser(data)
+    redirectByRole(data.user.role)
+    
+  } catch (err) {
+    console.error('Google login error:', err)
+    errorMessage.value = 'Error during Google authentication.'
+  } finally {
+    isGoogleLoading.value = false
+  }
+}
+
+// Initialize Google Sign-In when component mounts
+function initGoogleSignIn() {
+  if (!GOOGLE_CLIENT_ID) {
+    console.warn('Google Client ID not configured')
+    return
+  }
+  
+  // Load Google Identity Services script
+  if (!window.google) {
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.defer = true
+    script.onload = renderGoogleButton
+    document.head.appendChild(script)
+  } else {
+    renderGoogleButton()
+  }
+}
+
+function renderGoogleButton() {
+  if (!window.google || !GOOGLE_CLIENT_ID) return
+  
+  window.google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleCallback
+  })
+  
+  window.google.accounts.id.renderButton(
+    document.getElementById('google-signin-button'),
+    { 
+      theme: 'outline', 
+      size: 'large',
+      width: '100%',
+      text: 'signin_with'
+    }
+  )
+}
+
+// Initialize on mount
+import { onMounted } from 'vue'
+onMounted(() => {
+  initGoogleSignIn()
+})
+
+const showGoogleButton = computed(() => !!GOOGLE_CLIENT_ID)
 </script>
 
 <template>
@@ -67,6 +162,17 @@ async function handleLogin() {
           </svg>
           <span>{{ errorMessage }}</span>
         </div>
+
+        <!-- Google Sign In Button -->
+        <div v-if="showGoogleButton" class="mb-4">
+          <div id="google-signin-button" class="flex justify-center"></div>
+          <div v-if="isGoogleLoading" class="text-center mt-2">
+            <span class="loading loading-spinner loading-sm"></span>
+            <span class="ml-2">Accesso con Google...</span>
+          </div>
+        </div>
+
+        <div v-if="showGoogleButton" class="divider">oppure</div>
         
         <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-4">
@@ -104,9 +210,9 @@ async function handleLogin() {
             <button 
               type="submit" 
               class="btn btn-primary w-full"
-              :class="{ 'loading': isLoading }"
               :disabled="isLoading"
             >
+              <span v-if="isLoading" class="loading loading-spinner loading-sm"></span>
               <span v-if="!isLoading">Accedi</span>
               <span v-else>Accesso in corso...</span>
             </button>

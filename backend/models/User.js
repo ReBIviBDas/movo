@@ -44,7 +44,10 @@ const userSchema = new Schema({
     driving_license: { type: String }, // Link to file
     driving_license_expiry: { type: Date },
     identity_document: { type: String }, // Link to file  
-    identity_document_expiry: { type: Date }
+    identity_document_expiry: { type: Date },
+
+    // OAuth
+    google_id: { type: String, sparse: true }
 }, {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });

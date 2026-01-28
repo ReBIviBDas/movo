@@ -3,6 +3,19 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { sendRegistrationConfirmation } = require('../services/emailService');
+
+// Helper function to calculate age
+function calculateAge(dateOfBirth) {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
 
 // POST /api/v1/auth/register
 // Follows OpenAPI spec for request/response format
@@ -19,7 +32,17 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 2. Check if user with this email or fiscal_code already exists
+        // 2. Age verification - must be 18+ to register
+        const age = calculateAge(date_of_birth);
+        if (age < 18) {
+            return res.status(400).json({ 
+                type: 'validation_error',
+                title: 'Bad Request',
+                detail: 'Devi avere almeno 18 anni per registrarti'
+            });
+        }
+
+        // 3. Check if user with this email or fiscal_code already exists
         let user = await User.findOne({ 
             $or: [{ email }, { fiscal_code }] 
         });
@@ -32,16 +55,16 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 3. Hash the password (Security RNF5)
+        // 4. Hash the password (Security RNF5)
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 4. Determine status based on whether driving_license is provided
+        // 5. Determine status based on whether driving_license is provided
         // If documents are uploaded, status is pending_approval; otherwise active (passenger only)
         const hasDrivingLicense = req.body.driving_license ? true : false;
         const accountStatus = hasDrivingLicense ? 'pending_approval' : 'active';
 
-        // 5. Create the new user
+        // 6. Create the new user
         let newUser = new User({
             first_name,
             last_name,
@@ -49,7 +72,7 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
             phone,
             date_of_birth: new Date(date_of_birth),
-            fiscal_code,
+            fiscal_code: fiscal_code.toUpperCase(), // Normalize fiscal code
             address: req.body.address || '',
             accept_terms,
             accept_privacy,
@@ -57,10 +80,13 @@ router.post('/register', async (req, res) => {
             status: accountStatus
         });
 
-        // 6. Save to DB
+        // 7. Save to DB
         await newUser.save();
 
-        // 7. Respond (matching OpenAPI spec)
+        // 8. Send confirmation email (mock)
+        await sendRegistrationConfirmation(newUser);
+
+        // 9. Respond (matching OpenAPI spec)
         res.status(201).json({ 
             user_id: newUser._id,
             email: newUser.email,
@@ -126,6 +152,8 @@ router.post('/login', async (req, res) => {
             user: {
                 id: user._id,
                 email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
                 role: user.role,
                 status: user.status
             }
@@ -137,6 +165,90 @@ router.post('/login', async (req, res) => {
             type: 'server_error',
             title: 'Internal Server Error',
             detail: 'Server error during login'
+        });
+    }
+});
+
+// POST /api/v1/auth/login/google
+// Handle Google OAuth - receives authorization code from frontend
+router.post('/login/google', async (req, res) => {
+    try {
+        const { credential } = req.body;
+        
+        if (!credential) {
+            return res.status(400).json({
+                type: 'validation_error',
+                title: 'Bad Request',
+                detail: 'Google credential token is required'
+            });
+        }
+
+        // Decode the Google ID token (in production, verify with Google API)
+        // For now, we'll decode the JWT payload
+        const base64Payload = credential.split('.')[1];
+        const payload = JSON.parse(Buffer.from(base64Payload, 'base64').toString());
+
+        const { email, given_name, family_name, sub: googleId } = payload;
+
+        // Check if user exists
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Create new user from Google data
+            // Generate a random password (user won't need it for Google login)
+            const randomPassword = require('crypto').randomBytes(32).toString('hex');
+            const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+            user = new User({
+                first_name: given_name || 'Google',
+                last_name: family_name || 'User',
+                email,
+                password: hashedPassword,
+                phone: '',
+                date_of_birth: new Date('2000-01-01'), // Placeholder, user should update
+                fiscal_code: `GOOGLE${googleId.substring(0, 10).toUpperCase()}`,
+                accept_terms: true,
+                accept_privacy: true,
+                status: 'active',
+                google_id: googleId
+            });
+
+            await user.save();
+            await sendRegistrationConfirmation(user);
+        }
+
+        // Generate JWT token
+        const jwtPayload = { 
+            id: user._id, 
+            email: user.email,
+            role: user.role 
+        };
+
+        const expiresInSeconds = 86400;
+        const token = jwt.sign(jwtPayload, process.env.SUPER_SECRET, {
+            expiresIn: expiresInSeconds
+        });
+
+        res.status(200).json({
+            access_token: token,
+            token_type: 'Bearer',
+            expires_in: expiresInSeconds,
+            user: {
+                id: user._id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                role: user.role,
+                status: user.status
+            }
+        });
+
+    } catch (err) {
+        console.error('Google login error:', err);
+        res.status(500).json({ 
+            type: 'server_error',
+            title: 'Internal Server Error',
+            detail: 'Server error during Google authentication'
         });
     }
 });

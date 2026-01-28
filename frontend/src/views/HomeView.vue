@@ -1,12 +1,13 @@
 <script setup>
 import { authState, isAuthenticated } from '@/states/auth'
 import { RouterLink } from 'vue-router'
+import VehicleMap from '@/components/VehicleMap.vue'
 </script>
 
 <template>
-  <div class="min-h-[70vh] flex flex-col items-center justify-center">
-    <!-- Hero Section -->
-    <div class="hero bg-base-100 rounded-box shadow-xl p-8 max-w-4xl">
+  <div class="min-h-[70vh] flex flex-col items-center">
+    <!-- Hero Section (for guests) -->
+    <div v-if="!isAuthenticated" class="hero bg-base-100 rounded-box shadow-xl p-8 max-w-4xl my-8">
       <div class="hero-content text-center">
         <div class="max-w-md">
           <h1 class="text-5xl font-bold text-primary">⚡ MOVO</h1>
@@ -15,8 +16,7 @@ import { RouterLink } from 'vue-router'
             Prenota, sblocca e guida in pochi minuti.
           </p>
           
-          <!-- Not authenticated -->
-          <div v-if="!isAuthenticated" class="flex gap-4 justify-center">
+          <div class="flex gap-4 justify-center">
             <RouterLink to="/register" class="btn btn-primary btn-lg">
               Inizia Ora
             </RouterLink>
@@ -24,32 +24,53 @@ import { RouterLink } from 'vue-router'
               Accedi
             </RouterLink>
           </div>
-          
-          <!-- Authenticated -->
-          <div v-else class="space-y-4">
-            <div class="alert alert-success">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Benvenuto, <strong>{{ authState.user?.email }}</strong>!</span>
-            </div>
-            <div class="stats shadow">
-              <div class="stat">
-                <div class="stat-title">Ruolo</div>
-                <div class="stat-value text-primary capitalize">{{ authState.user?.role }}</div>
-              </div>
-              <div class="stat">
-                <div class="stat-title">Stato</div>
-                <div class="stat-value text-secondary capitalize">{{ authState.user?.status }}</div>
-              </div>
-            </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Authenticated User View with Map -->
+    <div v-else class="w-full max-w-6xl px-4 py-6">
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <h1 class="text-3xl font-bold">Trova un Veicolo</h1>
+          <p class="text-base-content/60">Clicca su un marker per vedere i dettagli e prenotare</p>
+        </div>
+        <div class="flex gap-2">
+          <RouterLink to="/dashboard" class="btn btn-outline btn-sm">
+            📊 Dashboard
+          </RouterLink>
+        </div>
+      </div>
+      
+      <!-- Vehicle Map -->
+      <VehicleMap />
+      
+      <!-- Quick Actions -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body">
+            <h3 class="card-title text-lg">📍 Veicoli Vicini</h3>
+            <p class="text-sm text-base-content/70">Trova auto, scooter e bici elettriche nella tua zona</p>
+          </div>
+        </div>
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body">
+            <h3 class="card-title text-lg">🔋 100% Elettrico</h3>
+            <p class="text-sm text-base-content/70">Guida sostenibile con la nostra flotta green</p>
+          </div>
+        </div>
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body">
+            <h3 class="card-title text-lg">💳 Paga per Minuto</h3>
+            <p class="text-sm text-base-content/70">Da €0.15/min per bici a €0.35/min per auto</p>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Features Section -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl">
+    
+    <!-- Features Section (for guests) -->
+    <div v-if="!isAuthenticated" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl px-4">
       <div class="card bg-base-100 shadow-md">
         <div class="card-body items-center text-center">
           <span class="text-4xl">🔋</span>

@@ -6,6 +6,9 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 const authRoutes = require('./routes/auth');
+const usersRoutes = require('./routes/users');
+const vehiclesRoutes = require('./routes/vehicles');
+const fleetRoutes = require('./routes/fleet');
 const tokenChecker = require('./middlewares/tokenChecker');
 require('dotenv').config();
 
@@ -15,6 +18,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+// Serve uploaded files statically (for document preview)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 2. Swagger / OpenAPI Setup
 // We try to load the file named 'openapi.yaml' or 'oas3.yaml'
@@ -31,8 +37,11 @@ try {
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', usersRoutes);
+app.use('/api/v1/vehicles', vehiclesRoutes);
+app.use('/api/v1/fleet', fleetRoutes);
 
-// PROTECTED ROUTE EXAMPLE
+// PROTECTED ROUTE EXAMPLE (deprecated - use /users/me instead)
 app.get('/api/v1/profile', tokenChecker, (req, res) => {
     res.json({ 
         message: 'You are seeing this because you are logged in!', 

@@ -195,6 +195,29 @@ async function handleRegister() {
               title="Inserisci un codice fiscale valido (16 caratteri)"
             />
           </div>
+
+          <!-- Optional: Document Upload Section -->
+          <div class="collapse collapse-arrow bg-base-200 mt-4">
+            <input type="checkbox" /> 
+            <div class="collapse-title font-medium">
+              📄 Vuoi guidare? Carica i documenti (opzionale)
+            </div>
+            <div class="collapse-content">
+              <p class="text-sm mb-4 opacity-70">
+                Per poter noleggiare i veicoli MOVO, devi caricare patente e documento d'identità.
+                Puoi farlo ora o in seguito dal tuo profilo.
+              </p>
+              <div class="alert alert-info mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sm">I documenti verranno verificati da un operatore prima di abilitarti alla guida.</span>
+              </div>
+              <p class="text-sm text-center opacity-60">
+                Potrai caricare i documenti dopo la registrazione dalla sezione Profilo.
+              </p>
+            </div>
+          </div>
           
           <!-- Terms Checkboxes -->
           <div class="space-y-2 mt-4">
