@@ -8,6 +8,9 @@ import RegisterView from '@/views/RegisterView.vue'
 
 // User views
 import UserDashboardView from '@/views/user/DashboardView.vue'
+import WalletView from '@/views/user/WalletView.vue'
+import ActiveBookingView from '@/views/user/ActiveBookingView.vue'
+import ActiveRentalView from '@/views/user/ActiveRentalView.vue'
 
 // Operator views
 import OperatorDashboardView from '@/views/operator/DashboardView.vue'
@@ -45,6 +48,24 @@ const router = createRouter({
       path: '/dashboard',
       name: 'user-dashboard',
       component: UserDashboardView,
+      beforeEnter: requireAuth
+    },
+    {
+      path: '/wallet',
+      name: 'wallet',
+      component: WalletView,
+      beforeEnter: requireAuth
+    },
+    {
+      path: '/booking',
+      name: 'booking',
+      component: ActiveBookingView,
+      beforeEnter: requireAuth
+    },
+    {
+      path: '/rental',
+      name: 'rental',
+      component: ActiveRentalView,
       beforeEnter: requireAuth
     },
 

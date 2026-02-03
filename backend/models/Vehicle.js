@@ -22,7 +22,7 @@ const vehicleSchema = new Schema({
     // Status
     status: {
         type: String,
-        enum: ['available', 'rented', 'maintenance', 'charging'],
+        enum: ['available', 'booked', 'rented', 'maintenance', 'charging'],
         default: 'available'
     },
     

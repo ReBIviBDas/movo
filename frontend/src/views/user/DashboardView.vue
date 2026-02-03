@@ -28,7 +28,7 @@ import { authState } from '@/states/auth'
           <h2 class="card-title">Trova un Veicolo</h2>
           <p>Cerca veicoli disponibili sulla mappa</p>
           <div class="card-actions justify-end mt-4">
-            <RouterLink to="/map" class="btn btn-primary">
+            <RouterLink to="/" class="btn btn-primary">
               Apri Mappa
             </RouterLink>
           </div>
@@ -42,7 +42,7 @@ import { authState } from '@/states/auth'
           <h2 class="card-title">I Miei Noleggi</h2>
           <p>Visualizza storico e noleggi attivi</p>
           <div class="card-actions justify-end mt-4">
-            <RouterLink to="/rentals" class="btn btn-outline">
+            <RouterLink to="/rental" class="btn btn-outline">
               Vedi Noleggi
             </RouterLink>
           </div>

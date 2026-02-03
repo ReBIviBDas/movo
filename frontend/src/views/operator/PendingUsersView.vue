@@ -151,7 +151,7 @@ function formatDate(dateStr) {
             <td>
               <div class="flex gap-2">
                 <a v-if="user.driving_license" 
-                   :href="`http://localhost:3000/${user.driving_license}`" 
+                   :href="`${API_BASE_URL.replace('/api/v1', '')}/${user.driving_license}`" 
                    target="_blank" 
                    class="btn btn-xs btn-outline">
                   📄 Patente
@@ -159,7 +159,7 @@ function formatDate(dateStr) {
                 <span v-else class="badge badge-ghost">No patente</span>
                 
                 <a v-if="user.identity_document" 
-                   :href="`http://localhost:3000/${user.identity_document}`" 
+                   :href="`${API_BASE_URL.replace('/api/v1', '')}/${user.identity_document}`" 
                    target="_blank" 
                    class="btn btn-xs btn-outline">
                   📄 Documento

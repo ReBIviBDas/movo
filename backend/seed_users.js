@@ -41,8 +41,8 @@ async function seed() {
       fiscal_code: 'OPERATOR123',
       role: 'operator',
       status: 'active',
-      privacy_accepted: true,
-      terms_accepted: true
+      accept_privacy: true,
+      accept_terms: true
     });
     await operator.save();
     console.log('Operator created.');
@@ -56,10 +56,11 @@ async function seed() {
       phone: '0987654321',
       date_of_birth: new Date('1995-05-05'),
       fiscal_code: 'RSSMRA95E05H501Z',
-      role: 'user', // Default
-      status: 'pending_approval', // Default
-      privacy_accepted: true,
-      terms_accepted: true
+      role: 'user',
+      status: 'active', // Active so they can test bookings
+      accept_privacy: true,
+      accept_terms: true,
+      driving_enabled: true // Enable driving for testing
     });
     await user.save();
     console.log('User created.');

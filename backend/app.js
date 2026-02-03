@@ -9,6 +9,9 @@ const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const vehiclesRoutes = require('./routes/vehicles');
 const fleetRoutes = require('./routes/fleet');
+const paymentMethodsRoutes = require('./routes/payment-methods');
+const bookingsRoutes = require('./routes/bookings');
+const rentalsRoutes = require('./routes/rentals');
 const tokenChecker = require('./middlewares/tokenChecker');
 require('dotenv').config();
 
@@ -40,6 +43,9 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/vehicles', vehiclesRoutes);
 app.use('/api/v1/fleet', fleetRoutes);
+app.use('/api/v1/payment-methods', paymentMethodsRoutes);
+app.use('/api/v1/bookings', bookingsRoutes);
+app.use('/api/v1/rentals', rentalsRoutes);
 
 // PROTECTED ROUTE EXAMPLE (deprecated - use /users/me instead)
 app.get('/api/v1/profile', tokenChecker, (req, res) => {

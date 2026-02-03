@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { LMap, LTileLayer, LMarker, LPopup, LIcon } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { API_BASE_URL } from '@/config/api'
 import { authState } from '@/states/auth'
+
+const router = useRouter()
 
 // Trento center coordinates
 const TRENTO_CENTER = [46.0677, 11.1219]
@@ -15,6 +18,7 @@ const vehicles = ref([])
 const isLoading = ref(true)
 const error = ref('')
 const selectedVehicle = ref(null)
+const isBooking = ref(false)
 
 // Vehicle type icons (emoji-based for simplicity)
 const vehicleIcons = {
@@ -61,9 +65,40 @@ function getBatteryColor(level) {
   return 'text-error'
 }
 
-// Reserve vehicle (placeholder for now)
-function reserveVehicle(vehicleId) {
-  alert(`Prenotazione veicolo ${vehicleId} - Funzionalità in arrivo!`)
+// Reserve vehicle
+async function reserveVehicle(vehicleId) {
+  isBooking.value = true
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/bookings`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authState.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ vehicle_id: vehicleId })
+    })
+    
+    const data = await response.json()
+    
+    if (!response.ok) {
+      if (data.type === 'payment_required') {
+        if (confirm('Devi aggiungere un metodo di pagamento. Vuoi farlo ora?')) {
+          router.push('/wallet')
+        }
+      } else {
+        alert(data.detail || 'Errore durante la prenotazione')
+      }
+      return
+    }
+    
+    // Success - redirect to booking page
+    router.push('/booking')
+  } catch (err) {
+    alert('Errore di connessione')
+  } finally {
+    isBooking.value = false
+  }
 }
 
 onMounted(() => {
@@ -138,7 +173,9 @@ onMounted(() => {
             <button
               @click="reserveVehicle(vehicle.id)"
               class="btn btn-primary btn-sm w-full mt-3"
+              :disabled="isBooking"
             >
+              <span v-if="isBooking" class="loading loading-spinner loading-xs"></span>
               Prenota
             </button>
           </div>
