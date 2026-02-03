@@ -225,8 +225,6 @@ onMounted(() => {
       <select v-model="filter.type" @change="fetchFleet" class="select select-bordered select-sm">
         <option value="">Tutti i tipi</option>
         <option value="car">Auto</option>
-        <option value="scooter">Scooter</option>
-        <option value="bike">Bici</option>
       </select>
       <button @click="fetchFleet" class="btn btn-outline btn-sm">🔄 Aggiorna</button>
     </div>
@@ -267,7 +265,7 @@ onMounted(() => {
           <tr v-for="vehicle in vehicles" :key="vehicle.id">
             <td class="font-mono font-bold">{{ vehicle.plate }}</td>
             <td>{{ vehicle.model }}</td>
-            <td class="capitalize">{{ vehicle.type === 'car' ? '🚗' : vehicle.type === 'scooter' ? '🛵' : '🚲' }} {{ vehicle.type }}</td>
+            <td class="capitalize">🚗 Auto</td>
             <td>
               <span class="badge" :class="getStatusBadge(vehicle.status)">
                 {{ vehicle.status }}
@@ -309,10 +307,8 @@ onMounted(() => {
           </div>
           <div class="form-control">
             <label class="label"><span class="label-text">Tipo</span></label>
-            <select v-model="form.type" class="select select-bordered">
+            <select v-model="form.type" class="select select-bordered" disabled>
               <option value="car">Auto</option>
-              <option value="scooter">Scooter</option>
-              <option value="bike">Bici</option>
             </select>
           </div>
           <div class="grid grid-cols-2 gap-4">

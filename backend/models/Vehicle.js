@@ -15,7 +15,7 @@ const vehicleSchema = new Schema({
     },
     type: {
         type: String,
-        enum: ['car', 'scooter', 'bike'],
+        enum: ['car'],
         default: 'car'
     },
     

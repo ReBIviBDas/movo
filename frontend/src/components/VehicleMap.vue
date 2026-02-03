@@ -20,12 +20,8 @@ const error = ref('')
 const selectedVehicle = ref(null)
 const isBooking = ref(false)
 
-// Vehicle type icons (emoji-based for simplicity)
-const vehicleIcons = {
-  car: '🚗',
-  scooter: '🛵',
-  bike: '🚲'
-}
+// Vehicle type icon (cars only)
+const vehicleIcon = '🚗'
 
 // Fetch vehicles from API
 async function fetchVehicles() {
@@ -146,7 +142,7 @@ onMounted(() => {
         <LPopup>
           <div class="min-w-[200px] p-2">
             <div class="flex items-center gap-2 mb-2">
-              <span class="text-2xl">{{ vehicleIcons[vehicle.type] || '🚗' }}</span>
+              <span class="text-2xl">{{ vehicleIcon }}</span>
               <div>
                 <h3 class="font-bold text-base">{{ vehicle.model }}</h3>
                 <p class="text-xs text-gray-500">{{ vehicle.plate }}</p>
@@ -187,9 +183,7 @@ onMounted(() => {
     <div class="absolute bottom-4 left-4 z-[1000] bg-base-100 rounded-lg p-3 shadow-md">
       <div class="text-xs font-semibold mb-2">Legenda</div>
       <div class="flex gap-3 text-sm">
-        <span>🚗 Auto</span>
-        <span>🛵 Scooter</span>
-        <span>🚲 Bici</span>
+        <span>🚗 Auto Elettriche</span>
       </div>
     </div>
     

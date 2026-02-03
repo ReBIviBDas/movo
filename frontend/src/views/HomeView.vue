@@ -51,7 +51,7 @@ import VehicleMap from '@/components/VehicleMap.vue'
         <div class="card bg-base-100 shadow-md">
           <div class="card-body">
             <h3 class="card-title text-lg">📍 Veicoli Vicini</h3>
-            <p class="text-sm text-base-content/70">Trova auto, scooter e bici elettriche nella tua zona</p>
+            <p class="text-sm text-base-content/70">Trova auto elettriche nella tua zona</p>
           </div>
         </div>
         <div class="card bg-base-100 shadow-md">
@@ -63,7 +63,7 @@ import VehicleMap from '@/components/VehicleMap.vue'
         <div class="card bg-base-100 shadow-md">
           <div class="card-body">
             <h3 class="card-title text-lg">💳 Paga per Minuto</h3>
-            <p class="text-sm text-base-content/70">Da €0.15/min per bici a €0.35/min per auto</p>
+            <p class="text-sm text-base-content/70">Solo €0.35/min per le nostre auto elettriche</p>
           </div>
         </div>
       </div>

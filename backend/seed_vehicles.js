@@ -35,25 +35,7 @@ const mockVehicles = [
         range_km: 120
     },
     {
-        plate: 'TN004SC',
-        model: 'Vespa Elettrica',
-        type: 'scooter',
-        status: 'available',
-        battery_level: 95,
-        location: { type: 'Point', coordinates: [11.1231, 46.0698] }, // Via Belenzani
-        range_km: 80
-    },
-    {
-        plate: 'TN005SC',
-        model: 'NIU NQi GTS',
-        type: 'scooter',
-        status: 'available',
-        battery_level: 67,
-        location: { type: 'Point', coordinates: [11.1175, 46.0662] }, // Castello Buonconsiglio
-        range_km: 60
-    },
-    {
-        plate: 'TN006EV',
+        plate: 'TN004EV',
         model: 'VW ID.3',
         type: 'car',
         status: 'charging',
@@ -62,7 +44,7 @@ const mockVehicles = [
         range_km: 50
     },
     {
-        plate: 'TN007EV',
+        plate: 'TN005EV',
         model: 'Fiat 500e',
         type: 'car',
         status: 'available',
@@ -71,27 +53,7 @@ const mockVehicles = [
         range_km: 210
     },
     {
-        plate: 'TN008BK',
-        model: 'Cowboy C4',
-        type: 'bike',
-        status: 'available',
-        battery_level: 88,
-        location: { type: 'Point', coordinates: [11.1142, 46.0683] }, // Park area
-        range_km: 60,
-        price_per_minute: 0.15
-    },
-    {
-        plate: 'TN009BK',
-        model: 'VanMoof S3',
-        type: 'bike',
-        status: 'available',
-        battery_level: 72,
-        location: { type: 'Point', coordinates: [11.1278, 46.0702] }, // East side
-        range_km: 50,
-        price_per_minute: 0.15
-    },
-    {
-        plate: 'TN010EV',
+        plate: 'TN006EV',
         model: 'Tesla Model 3',
         type: 'car',
         status: 'maintenance',
