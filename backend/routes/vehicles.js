@@ -3,10 +3,74 @@ const router = express.Router();
 const Vehicle = require('../models/Vehicle');
 
 // ============================================================================
-// PUBLIC ROUTES (Available to all authenticated users)
+// PUBLIC ROUTES (No authentication required)
 // ============================================================================
 
-// GET /api/v1/vehicles - List available vehicles
+// GET /api/v1/vehicles/public - Public list of available vehicles (no auth)
+router.get('/public', async (req, res) => {
+    try {
+        const { lat, lng, radius } = req.query;
+        
+        // Only show available vehicles
+        const query = { status: 'available' };
+        
+        let vehicles;
+        
+        // If location provided, use geospatial query
+        if (lat && lng) {
+            const radiusKm = parseFloat(radius) || 5;
+            const radiusMeters = radiusKm * 1000;
+            
+            vehicles = await Vehicle.find({
+                ...query,
+                location: {
+                    $near: {
+                        $geometry: {
+                            type: 'Point',
+                            coordinates: [parseFloat(lng), parseFloat(lat)]
+                        },
+                        $maxDistance: radiusMeters
+                    }
+                }
+            }).limit(50);
+        } else {
+            vehicles = await Vehicle.find(query)
+                .sort({ last_updated: -1 })
+                .limit(50);
+        }
+        
+        res.json({
+            count: vehicles.length,
+            vehicles: vehicles.map(v => ({
+                id: v._id,
+                model: v.model,
+                type: v.type,
+                status: v.status,
+                battery_level: v.battery_level,
+                range_km: v.range_km,
+                price_per_minute: v.price_per_minute,
+                location: {
+                    lat: v.location.coordinates[1],
+                    lng: v.location.coordinates[0]
+                }
+                // Note: No plate for public view (privacy)
+            }))
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            type: 'server_error',
+            title: 'Internal Server Error',
+            detail: 'Error fetching vehicles'
+        });
+    }
+});
+
+// ============================================================================
+// AUTHENTICATED ROUTES (Available to logged-in users)
+// ============================================================================
+
+// GET /api/v1/vehicles - List available vehicles (authenticated)
 router.get('/', async (req, res) => {
     try {
         const { type, min_battery, lat, lng, radius } = req.query;

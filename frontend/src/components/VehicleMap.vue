@@ -1,16 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { LMap, LTileLayer, LMarker, LPopup, LIcon } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { API_BASE_URL } from '@/config/api'
-import { authState } from '@/states/auth'
+import { authState, isAuthenticated } from '@/states/auth'
 
 const router = useRouter()
+
+// Props - isPublic mode for guests
+const props = defineProps({
+  isPublic: {
+    type: Boolean,
+    default: false
+  }
+})
 
 // Trento center coordinates
 const TRENTO_CENTER = [46.0677, 11.1219]
 const DEFAULT_ZOOM = 14
+const REFRESH_INTERVAL = 30000 // 30 seconds
 
 const zoom = ref(DEFAULT_ZOOM)
 const center = ref(TRENTO_CENTER)
@@ -19,21 +28,33 @@ const isLoading = ref(true)
 const error = ref('')
 const selectedVehicle = ref(null)
 const isBooking = ref(false)
+const searchQuery = ref('')
+const isSearching = ref(false)
+
+let refreshInterval = null
 
 // Vehicle type icon (cars only)
 const vehicleIcon = '🚗'
 
 // Fetch vehicles from API
 async function fetchVehicles() {
-  isLoading.value = true
+  // Don't show loading on refresh, only initial load
+  if (vehicles.value.length === 0) {
+    isLoading.value = true
+  }
   error.value = ''
   
   try {
-    const response = await fetch(`${API_BASE_URL}/vehicles`, {
-      headers: {
-        'Authorization': `Bearer ${authState.token}`
-      }
-    })
+    // Use public or authenticated endpoint based on mode
+    const endpoint = props.isPublic 
+      ? `${API_BASE_URL}/vehicles/public`
+      : `${API_BASE_URL}/vehicles`
+    
+    const headers = props.isPublic 
+      ? {} 
+      : { 'Authorization': `Bearer ${authState.token}` }
+    
+    const response = await fetch(endpoint, { headers })
     
     if (!response.ok) {
       throw new Error('Failed to fetch vehicles')
@@ -59,6 +80,33 @@ function getBatteryColor(level) {
   if (level >= 70) return 'text-success'
   if (level >= 30) return 'text-warning'
   return 'text-error'
+}
+
+// Address search using OpenStreetMap Nominatim
+async function searchAddress() {
+  if (!searchQuery.value.trim()) return
+  
+  isSearching.value = true
+  
+  try {
+    const query = encodeURIComponent(searchQuery.value + ', Trento, Italy')
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`
+    )
+    const results = await response.json()
+    
+    if (results.length > 0) {
+      center.value = [parseFloat(results[0].lat), parseFloat(results[0].lon)]
+      zoom.value = 16
+    } else {
+      alert('Indirizzo non trovato')
+    }
+  } catch (err) {
+    console.error('Search error:', err)
+    alert('Errore nella ricerca')
+  } finally {
+    isSearching.value = false
+  }
 }
 
 // Reserve vehicle
@@ -99,11 +147,39 @@ async function reserveVehicle(vehicleId) {
 
 onMounted(() => {
   fetchVehicles()
+  // Auto-refresh every 30 seconds
+  refreshInterval = setInterval(fetchVehicles, REFRESH_INTERVAL)
+})
+
+onUnmounted(() => {
+  // Clean up interval on component destroy
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+  }
 })
 </script>
 
 <template>
   <div class="relative w-full h-[500px] rounded-xl overflow-hidden shadow-lg">
+    <!-- Search Bar -->
+    <div class="absolute top-4 left-4 z-[1000] flex gap-2">
+      <input
+        v-model="searchQuery"
+        @keyup.enter="searchAddress"
+        type="text"
+        placeholder="Cerca indirizzo..."
+        class="input input-bordered input-sm w-64 bg-base-100 shadow-md"
+      />
+      <button 
+        @click="searchAddress" 
+        class="btn btn-sm btn-primary shadow-md"
+        :disabled="isSearching"
+      >
+        <span v-if="isSearching" class="loading loading-spinner loading-xs"></span>
+        <span v-else>🔍</span>
+      </button>
+    </div>
+    
     <!-- Loading Overlay -->
     <div v-if="isLoading" class="absolute inset-0 z-[1000] bg-base-100/80 flex items-center justify-center">
       <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -145,7 +221,7 @@ onMounted(() => {
               <span class="text-2xl">{{ vehicleIcon }}</span>
               <div>
                 <h3 class="font-bold text-base">{{ vehicle.model }}</h3>
-                <p class="text-xs text-gray-500">{{ vehicle.plate }}</p>
+                <p v-if="vehicle.plate" class="text-xs text-gray-500">{{ vehicle.plate }}</p>
               </div>
             </div>
             
@@ -166,7 +242,9 @@ onMounted(() => {
               </div>
             </div>
             
+            <!-- Only show book button for authenticated users -->
             <button
+              v-if="isAuthenticated"
               @click="reserveVehicle(vehicle.id)"
               class="btn btn-primary btn-sm w-full mt-3"
               :disabled="isBooking"
@@ -174,6 +252,15 @@ onMounted(() => {
               <span v-if="isBooking" class="loading loading-spinner loading-xs"></span>
               Prenota
             </button>
+            
+            <!-- Login prompt for guests -->
+            <router-link
+              v-else
+              to="/login"
+              class="btn btn-outline btn-sm w-full mt-3"
+            >
+              Accedi per prenotare
+            </router-link>
           </div>
         </LPopup>
       </LMarker>
@@ -187,19 +274,10 @@ onMounted(() => {
       </div>
     </div>
     
-    <!-- Vehicle Count -->
+    <!-- Vehicle Count & Refresh Indicator -->
     <div class="absolute top-4 right-4 z-[1000] bg-base-100 rounded-lg px-3 py-2 shadow-md">
       <span class="font-semibold">{{ vehicles.length }}</span> veicoli disponibili
+      <div class="text-xs text-base-content/50 mt-1">Auto-refresh: 30s</div>
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Fix Leaflet z-index issues with DaisyUI */
-:deep(.leaflet-pane) {
-  z-index: 1;
-}
-:deep(.leaflet-control) {
-  z-index: 2;
-}
-</style>

@@ -6,32 +6,26 @@ import VehicleMap from '@/components/VehicleMap.vue'
 
 <template>
   <div class="min-h-[70vh] flex flex-col items-center">
-    <!-- Hero Section (for guests) -->
-    <div v-if="!isAuthenticated" class="hero bg-base-100 rounded-box shadow-xl p-8 max-w-4xl my-8">
-      <div class="hero-content text-center">
-        <div class="max-w-md">
-          <h1 class="text-5xl font-bold text-primary">⚡ MOVO</h1>
-          <p class="py-6 text-lg">
-            Car sharing elettrico al 100% a Trento. 
-            Prenota, sblocca e guida in pochi minuti.
-          </p>
-          
-          <div class="flex gap-4 justify-center">
-            <RouterLink to="/register" class="btn btn-primary btn-lg">
-              Inizia Ora
-            </RouterLink>
-            <RouterLink to="/login" class="btn btn-outline btn-lg">
-              Accedi
-            </RouterLink>
-          </div>
+    <!-- Header Section -->
+    <div class="w-full max-w-6xl px-4 py-6">
+      <!-- Guest Header -->
+      <div v-if="!isAuthenticated" class="text-center mb-6">
+        <h1 class="text-4xl font-bold text-primary mb-2">⚡ MOVO</h1>
+        <p class="text-lg text-base-content/70 mb-4">
+          Car sharing elettrico al 100% a Trento
+        </p>
+        <div class="flex gap-4 justify-center mb-6">
+          <RouterLink to="/register" class="btn btn-primary">
+            Inizia Ora
+          </RouterLink>
+          <RouterLink to="/login" class="btn btn-outline">
+            Accedi
+          </RouterLink>
         </div>
       </div>
-    </div>
-    
-    <!-- Authenticated User View with Map -->
-    <div v-else class="w-full max-w-6xl px-4 py-6">
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      
+      <!-- Authenticated Header -->
+      <div v-else class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h1 class="text-3xl font-bold">Trova un Veicolo</h1>
           <p class="text-base-content/60">Clicca su un marker per vedere i dettagli e prenotare</p>
@@ -43,10 +37,10 @@ import VehicleMap from '@/components/VehicleMap.vue'
         </div>
       </div>
       
-      <!-- Vehicle Map -->
-      <VehicleMap />
+      <!-- Vehicle Map (visible to everyone) -->
+      <VehicleMap :is-public="!isAuthenticated" />
       
-      <!-- Quick Actions -->
+      <!-- Info Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <div class="card bg-base-100 shadow-md">
           <div class="card-body">
@@ -67,29 +61,29 @@ import VehicleMap from '@/components/VehicleMap.vue'
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Features Section (for guests) -->
-    <div v-if="!isAuthenticated" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl px-4">
-      <div class="card bg-base-100 shadow-md">
-        <div class="card-body items-center text-center">
-          <span class="text-4xl">🔋</span>
-          <h2 class="card-title">100% Elettrico</h2>
-          <p>Flotta completamente elettrica per una mobilità sostenibile.</p>
+      
+      <!-- Features for guests -->
+      <div v-if="!isAuthenticated" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body items-center text-center">
+            <span class="text-4xl">📱</span>
+            <h2 class="card-title">Facile da Usare</h2>
+            <p>Prenota e sblocca il veicolo direttamente dall'app.</p>
+          </div>
         </div>
-      </div>
-      <div class="card bg-base-100 shadow-md">
-        <div class="card-body items-center text-center">
-          <span class="text-4xl">📱</span>
-          <h2 class="card-title">Facile da Usare</h2>
-          <p>Prenota e sblocca il veicolo direttamente dall'app.</p>
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body items-center text-center">
+            <span class="text-4xl">🔓</span>
+            <h2 class="card-title">Sblocco Istantaneo</h2>
+            <p>Avvicinati al veicolo e sbloccalo con un tap.</p>
+          </div>
         </div>
-      </div>
-      <div class="card bg-base-100 shadow-md">
-        <div class="card-body items-center text-center">
-          <span class="text-4xl">💰</span>
-          <h2 class="card-title">Conveniente</h2>
-          <p>Paga solo per il tempo che usi, senza costi nascosti.</p>
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body items-center text-center">
+            <span class="text-4xl">💰</span>
+            <h2 class="card-title">Conveniente</h2>
+            <p>Paga solo per il tempo che usi, senza costi nascosti.</p>
+          </div>
         </div>
       </div>
     </div>
