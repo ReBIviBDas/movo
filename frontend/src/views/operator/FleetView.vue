@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { API_BASE_URL } from '@/config/api'
 import { authState } from '@/states/auth'
+
+const router = useRouter()
 
 const vehicles = ref([])
 const isLoading = ref(true)
@@ -11,6 +13,7 @@ const filter = ref({ status: '', type: '' })
 const showAddModal = ref(false)
 const showEditModal = ref(false)
 const editingVehicle = ref(null)
+const recentActivity = ref([])
 
 // Form data for add/edit
 const form = ref({
@@ -46,6 +49,8 @@ async function fetchFleet() {
     
     const data = await response.json()
     vehicles.value = data.vehicles
+    // Also fetch recent activity
+    fetchRecentActivity()
   } catch (err) {
     console.error('Error:', err)
     error.value = 'Errore nel caricamento della flotta'
@@ -79,6 +84,24 @@ async function addVehicle() {
   } catch (err) {
     console.error('Error:', err)
     alert('Errore di connessione')
+  }
+}
+
+// Fetch recent activity
+async function fetchRecentActivity() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/fleet/audit?limit=5`, {
+      headers: {
+        'Authorization': `Bearer ${authState.token}`
+      }
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      recentActivity.value = data.logs
+    }
+  } catch (err) {
+    console.error('Error fetching activity:', err)
   }
 }
 
@@ -192,6 +215,37 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleString('it-IT')
 }
 
+// Format relative time
+function formatRelativeTime(dateStr) {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diff = now - date
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  if (minutes < 60) return `${minutes} min fa`
+  if (hours < 24) return `${hours} ore fa`
+  return new Date(dateStr).toLocaleDateString('it-IT')
+}
+
+// Get action label
+function getActionLabel(action) {
+  const labels = {
+    created: 'Creato',
+    updated: 'Aggiornato',
+    deleted: 'Eliminato',
+    status_changed: 'Stato cambiato',
+    maintenance_started: 'Manutenzione iniziata',
+    maintenance_completed: 'Manutenzione completata'
+  }
+  return labels[action] || action
+}
+
+// Navigate to vehicle detail
+function goToVehicle(id) {
+  router.push(`/operator/fleet/${id}`)
+}
+
 onMounted(() => {
   fetchFleet()
 })
@@ -262,8 +316,8 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="vehicle in vehicles" :key="vehicle.id">
-            <td class="font-mono font-bold">{{ vehicle.plate }}</td>
+          <tr v-for="vehicle in vehicles" :key="vehicle.id" class="hover cursor-pointer" @click="goToVehicle(vehicle.id)">
+            <td class="font-mono font-bold text-primary">{{ vehicle.plate }}</td>
             <td>{{ vehicle.model }}</td>
             <td class="capitalize">🚗 Auto</td>
             <td>
@@ -290,6 +344,35 @@ onMounted(() => {
           </tr>
         </tbody>
       </table>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div v-if="recentActivity.length > 0" class="mt-6">
+      <div class="card bg-base-100 shadow-md">
+        <div class="card-body">
+          <h2 class="card-title text-lg">📋 Attività Recente</h2>
+          <div class="overflow-x-auto">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Quando</th>
+                  <th>Veicolo</th>
+                  <th>Azione</th>
+                  <th>Operatore</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="log in recentActivity" :key="log.id">
+                  <td class="text-sm">{{ formatRelativeTime(log.timestamp) }}</td>
+                  <td class="font-mono">{{ log.vehicle_plate }}</td>
+                  <td>{{ getActionLabel(log.action) }}</td>
+                  <td class="text-sm">{{ log.performed_by }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- Add Vehicle Modal -->

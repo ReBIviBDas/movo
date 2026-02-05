@@ -89,6 +89,12 @@ const router = createRouter({
       name: 'operator-fleet',
       component: FleetView,
       beforeEnter: [requireAuth, requireRole('operator', 'admin')]
+    },
+    {
+      path: '/operator/fleet/:id',
+      name: 'vehicle-detail',
+      component: () => import('@/views/operator/VehicleDetailView.vue'),
+      beforeEnter: [requireAuth, requireRole('operator', 'admin')]
     }
   ]
 })
