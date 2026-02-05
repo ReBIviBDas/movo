@@ -126,6 +126,20 @@ onMounted(async () => {
           </div>
         </div>
       </div>
+
+      <!-- Reports Management -->
+      <div class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow border-l-4 border-error">
+        <div class="card-body">
+          <div class="text-4xl mb-2">🎫</div>
+          <h2 class="card-title">Segnalazioni</h2>
+          <p>Gestisci le segnalazioni degli utenti</p>
+          <div class="card-actions justify-end mt-4">
+            <RouterLink to="/operator/reports" class="btn btn-error">
+              Gestisci
+            </RouterLink>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

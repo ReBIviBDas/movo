@@ -68,6 +68,18 @@ const router = createRouter({
       component: ActiveRentalView,
       beforeEnter: requireAuth
     },
+    {
+      path: '/report',
+      name: 'report-problem',
+      component: () => import('@/views/user/ReportProblemView.vue'),
+      beforeEnter: requireAuth
+    },
+    {
+      path: '/my-reports',
+      name: 'my-reports',
+      component: () => import('@/views/user/MyReportsView.vue'),
+      beforeEnter: requireAuth
+    },
 
     // ========================================
     // OPERATOR ROUTES (Operators and Admins only)
@@ -94,6 +106,18 @@ const router = createRouter({
       path: '/operator/fleet/:id',
       name: 'vehicle-detail',
       component: () => import('@/views/operator/VehicleDetailView.vue'),
+      beforeEnter: [requireAuth, requireRole('operator', 'admin')]
+    },
+    {
+      path: '/operator/reports',
+      name: 'operator-reports',
+      component: () => import('@/views/operator/ReportsView.vue'),
+      beforeEnter: [requireAuth, requireRole('operator', 'admin')]
+    },
+    {
+      path: '/operator/reports/:id',
+      name: 'report-detail',
+      component: () => import('@/views/operator/ReportDetailView.vue'),
       beforeEnter: [requireAuth, requireRole('operator', 'admin')]
     }
   ]

@@ -62,6 +62,34 @@ import { authState } from '@/states/auth'
           </div>
         </div>
       </div>
+
+      <!-- Report Problem -->
+      <div class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow">
+        <div class="card-body">
+          <div class="text-4xl mb-2">📝</div>
+          <h2 class="card-title">Segnala un Problema</h2>
+          <p>Hai riscontrato un problema? Segnalalo qui</p>
+          <div class="card-actions justify-end mt-4">
+            <RouterLink to="/report" class="btn btn-warning">
+              Segnala
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Reports -->
+      <div class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow">
+        <div class="card-body">
+          <div class="text-4xl mb-2">📋</div>
+          <h2 class="card-title">Le Mie Segnalazioni</h2>
+          <p>Visualizza lo stato delle tue segnalazioni</p>
+          <div class="card-actions justify-end mt-4">
+            <RouterLink to="/my-reports" class="btn btn-outline">
+              Visualizza
+            </RouterLink>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Account Status -->
