@@ -44,9 +44,10 @@ function handleLogout() {
               </svg>
             </div>
             <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow text-base-content">
-              <li><a>Profilo</a></li>
-              <li><a>I miei noleggi</a></li>
-              <li class="border-t mt-2 pt-2"><a @click="handleLogout" class="text-error">Logout</a></li>
+              <li><RouterLink to="/dashboard">📊 Dashboard</RouterLink></li>
+              <li><RouterLink to="/rental">🚗 I miei noleggi</RouterLink></li>
+              <li><RouterLink to="/my-reports">📝 Le mie segnalazioni</RouterLink></li>
+              <li class="border-t mt-2 pt-2"><a @click="handleLogout" class="text-error cursor-pointer">🚪 Logout</a></li>
             </ul>
           </div>
         </template>

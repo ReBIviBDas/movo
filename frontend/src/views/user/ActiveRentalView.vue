@@ -79,9 +79,21 @@ const formattedDuration = computed(() => {
 
 // End rental
 async function endRental() {
-  if (!confirm(`Confermi la fine del noleggio?\nCosto stimato: €${currentCost.value.toFixed(2)}`)) return
+  console.log('endRental called, rental:', rental.value)
+  
+  if (!rental.value || !rental.value.id) {
+    console.error('No rental or rental ID found')
+    alert('Errore: impossibile trovare il noleggio attivo')
+    return
+  }
+  
+  if (!confirm(`Confermi la fine del noleggio?\nCosto stimato: €${currentCost.value.toFixed(2)}`)) {
+    console.log('User cancelled confirmation')
+    return
+  }
   
   isEnding.value = true
+  console.log('Sending end rental request for ID:', rental.value.id)
   
   try {
     const response = await fetch(`${API_BASE_URL}/rentals/${rental.value.id}/end`, {
@@ -95,7 +107,9 @@ async function endRental() {
       })
     })
     
+    console.log('Response status:', response.status)
     const data = await response.json()
+    console.log('Response data:', data)
     
     if (!response.ok) {
       if (data.type === 'invalid_parking') {
@@ -112,6 +126,7 @@ async function endRental() {
     rental.value = null
     if (costInterval) clearInterval(costInterval)
   } catch (err) {
+    console.error('End rental error:', err)
     alert('Errore di connessione')
   } finally {
     isEnding.value = false
