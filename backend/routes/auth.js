@@ -184,9 +184,15 @@ router.post('/login/google', async (req, res) => {
         }
 
         // Decode the Google ID token (in production, verify with Google API)
-        // For now, we'll decode the JWT payload
+        // Google uses base64url encoding, need to convert to standard base64
         const base64Payload = credential.split('.')[1];
-        const payload = JSON.parse(Buffer.from(base64Payload, 'base64').toString());
+        // Replace base64url chars with standard base64 chars
+        const base64 = base64Payload.replace(/-/g, '+').replace(/_/g, '/');
+        // Add padding if needed
+        const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
+        const payload = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+        
+        console.log('Google login payload decoded:', { email: payload.email, sub: payload.sub });
 
         const { email, given_name, family_name, sub: googleId } = payload;
 
@@ -204,7 +210,7 @@ router.post('/login/google', async (req, res) => {
                 last_name: family_name || 'User',
                 email,
                 password: hashedPassword,
-                phone: '',
+                phone: '+39000000000', // Placeholder for Google users
                 date_of_birth: new Date('2000-01-01'), // Placeholder, user should update
                 fiscal_code: `GOOGLE${googleId.substring(0, 10).toUpperCase()}`,
                 accept_terms: true,
