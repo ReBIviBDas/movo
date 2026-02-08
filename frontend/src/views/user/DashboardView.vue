@@ -35,15 +35,29 @@ import { authState } from '@/states/auth'
         </div>
       </div>
 
-      <!-- My Rentals -->
+      <!-- Active Rental/Booking -->
+      <div class="card bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-md hover:shadow-xl transition-shadow">
+        <div class="card-body">
+          <div class="text-4xl mb-2">🔑</div>
+          <h2 class="card-title text-white">Noleggio Attivo</h2>
+          <p class="opacity-90">Gestisci il tuo noleggio o prenotazione in corso</p>
+          <div class="card-actions justify-end mt-4">
+            <RouterLink to="/rental" class="btn btn-white text-green-700">
+              Vai al Noleggio
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Rentals History -->
       <div class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow">
         <div class="card-body">
           <div class="text-4xl mb-2">📋</div>
           <h2 class="card-title">I Miei Noleggi</h2>
-          <p>Visualizza storico e noleggi attivi</p>
+          <p>Visualizza lo storico dei tuoi noleggi</p>
           <div class="card-actions justify-end mt-4">
-            <RouterLink to="/rental" class="btn btn-outline">
-              Vedi Noleggi
+            <RouterLink to="/rentals" class="btn btn-outline">
+              Vedi Storico
             </RouterLink>
           </div>
         </div>

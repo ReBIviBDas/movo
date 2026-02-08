@@ -299,15 +299,36 @@ router.get('/history', async (req, res) => {
             status: 'completed' 
         });
         
-        res.json({
-            rentals: rentals.map(r => ({
+        // Populate vehicle data if snapshot is incomplete
+        const rentalsWithVehicles = await Promise.all(rentals.map(async (r) => {
+            let vehicleData = r.vehicle_snapshot;
+            
+            // If snapshot is missing plate or model, fetch from Vehicle collection
+            if (!vehicleData?.plate || !vehicleData?.model) {
+                const vehicle = await Vehicle.findById(r.vehicle_id);
+                if (vehicle) {
+                    vehicleData = {
+                        plate: vehicle.plate,
+                        model: vehicle.model,
+                        type: vehicle.type,
+                        battery_level: vehicleData?.battery_level || vehicle.battery_level
+                    };
+                }
+            }
+            
+            return {
                 id: r._id,
-                vehicle: r.vehicle_snapshot,
+                vehicle_id: r.vehicle_id,
+                vehicle: vehicleData,
                 started_at: r.started_at,
                 ended_at: r.ended_at,
                 duration_minutes: r.duration_minutes,
                 total_cost: r.total_cost
-            })),
+            };
+        }));
+        
+        res.json({
+            rentals: rentalsWithVehicles,
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),

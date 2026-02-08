@@ -69,6 +69,12 @@ const router = createRouter({
       beforeEnter: requireAuth
     },
     {
+      path: '/rentals',
+      name: 'rental-history',
+      component: () => import('@/views/user/RentalHistoryView.vue'),
+      beforeEnter: requireAuth
+    },
+    {
       path: '/report',
       name: 'report-problem',
       component: () => import('@/views/user/ReportProblemView.vue'),

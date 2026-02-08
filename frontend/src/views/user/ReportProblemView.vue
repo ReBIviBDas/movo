@@ -69,7 +69,7 @@
               <select v-model="form.vehicle_id" class="select select-bordered w-full">
                 <option value="">-- Nessun veicolo specifico --</option>
                 <option v-for="rental in recentRentals" :key="rental.id" :value="rental.vehicle_id">
-                  {{ rental.vehicle_plate }} - {{ rental.vehicle_model }} ({{ formatDate(rental.ended_at) }})
+                  {{ rental.vehicle?.plate || 'N/D' }} - {{ rental.vehicle?.model || 'Veicolo' }} ({{ formatDate(rental.ended_at) }})
                 </option>
               </select>
             </div>

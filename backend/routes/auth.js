@@ -245,10 +245,19 @@ router.post('/login/google', async (req, res) => {
 
     } catch (err) {
         console.error('Google login error:', err);
+        
+        // Provide more specific error messages
+        let detail = 'Server error during Google authentication';
+        if (err.message && err.message.includes('JSON')) {
+            detail = 'Invalid Google credential format';
+        } else if (err.message && err.message.includes('base64')) {
+            detail = 'Unable to decode Google credential';
+        }
+        
         res.status(500).json({ 
             type: 'server_error',
             title: 'Internal Server Error',
-            detail: 'Server error during Google authentication'
+            detail: detail
         });
     }
 });
