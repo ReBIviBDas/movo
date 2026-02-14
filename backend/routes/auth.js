@@ -1,11 +1,41 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { sendRegistrationConfirmation } = require('../services/emailService');
 
-// Helper function to calculate age
+const pendingUploadDir = path.join(__dirname, '../uploads/pending');
+if (!fs.existsSync(pendingUploadDir)) fs.mkdirSync(pendingUploadDir, { recursive: true });
+
+const registrationStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const requestDir = path.join(pendingUploadDir, `reg-${Date.now()}`);
+        if (!fs.existsSync(requestDir)) fs.mkdirSync(requestDir, { recursive: true });
+        req._uploadDir = requestDir;
+        cb(null, requestDir);
+    },
+    filename: function (req, file, cb) {
+        const ext = path.extname(file.originalname);
+        cb(null, `${file.fieldname}${ext}`);
+    }
+});
+
+const registrationFileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Invalid file type. Only JPEG, PNG, and WebP images are allowed.'), false);
+};
+
+const registrationUpload = multer({
+    storage: registrationStorage,
+    fileFilter: registrationFileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }
+});
+
 function calculateAge(dateOfBirth) {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -17,12 +47,24 @@ function calculateAge(dateOfBirth) {
     return age;
 }
 
-// POST /api/v1/auth/register
-// Follows OpenAPI spec for request/response format
-router.post('/register', async (req, res) => {
+function parseBoolean(value) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') return value.toLowerCase() === 'true';
+    return Boolean(value);
+}
+
+// POST /api/v1/auth/register (multipart/form-data)
+router.post('/register',
+    registrationUpload.fields([
+        { name: 'driving_license', maxCount: 1 },
+        { name: 'identity_document', maxCount: 1 }
+    ]),
+    async (req, res) => {
     try {
-        // 1. Check required fields
-        const { email, password, first_name, last_name, date_of_birth, fiscal_code, phone, accept_terms, accept_privacy } = req.body;
+        const { email, password, first_name, last_name, date_of_birth, fiscal_code, phone } = req.body;
+        const accept_terms = parseBoolean(req.body.accept_terms);
+        const accept_privacy = parseBoolean(req.body.accept_privacy);
+        const accept_cookies = parseBoolean(req.body.accept_cookies);
 
         if (!accept_terms || !accept_privacy) {
             return res.status(400).json({ 
@@ -32,7 +74,6 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 2. Age verification - must be 18+ to register
         const age = calculateAge(date_of_birth);
         if (age < 18) {
             return res.status(400).json({ 
@@ -42,9 +83,8 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 3. Check if user with this email or fiscal_code already exists
         let user = await User.findOne({ 
-            $or: [{ email }, { fiscal_code }] 
+            $or: [{ email }, { fiscal_code: fiscal_code.toUpperCase() }] 
         });
 
         if (user) {
@@ -55,16 +95,22 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // 4. Hash the password (Security RNF5)
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 5. Determine status based on whether driving_license is provided
-        // If documents are uploaded, status is pending_approval; otherwise active (passenger only)
-        const hasDrivingLicense = req.body.driving_license ? true : false;
+        const hasDrivingLicense = req.files && req.files['driving_license'] && req.files['driving_license'].length > 0;
+        const hasIdentityDocument = req.files && req.files['identity_document'] && req.files['identity_document'].length > 0;
+
+        if (hasDrivingLicense && !hasIdentityDocument) {
+            return res.status(400).json({
+                type: 'validation_error',
+                title: 'Bad Request',
+                detail: 'Identity document is required when providing a driving license'
+            });
+        }
+
         const accountStatus = hasDrivingLicense ? 'pending_approval' : 'active';
 
-        // 6. Create the new user
         let newUser = new User({
             first_name,
             last_name,
@@ -72,21 +118,42 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
             phone,
             date_of_birth: new Date(date_of_birth),
-            fiscal_code: fiscal_code.toUpperCase(), // Normalize fiscal code
+            fiscal_code: fiscal_code.toUpperCase(),
             address: req.body.address || '',
             accept_terms,
             accept_privacy,
-            accept_cookies: req.body.accept_cookies || false,
+            accept_cookies,
             status: accountStatus
         });
 
-        // 7. Save to DB
         await newUser.save();
 
-        // 8. Send confirmation email (mock)
+        if (req.files && Object.keys(req.files).length > 0) {
+            const userDir = path.join(__dirname, '../uploads', newUser._id.toString());
+            if (!fs.existsSync(userDir)) fs.mkdirSync(userDir, { recursive: true });
+
+            if (req.files['driving_license']) {
+                const src = req.files['driving_license'][0].path;
+                const dest = path.join(userDir, req.files['driving_license'][0].filename);
+                fs.renameSync(src, dest);
+                newUser.driving_license = `uploads/${newUser._id}/${req.files['driving_license'][0].filename}`;
+            }
+            if (req.files['identity_document']) {
+                const src = req.files['identity_document'][0].path;
+                const dest = path.join(userDir, req.files['identity_document'][0].filename);
+                fs.renameSync(src, dest);
+                newUser.identity_document = `uploads/${newUser._id}/${req.files['identity_document'][0].filename}`;
+            }
+
+            await newUser.save();
+
+            if (req._uploadDir && fs.existsSync(req._uploadDir)) {
+                fs.rmSync(req._uploadDir, { recursive: true, force: true });
+            }
+        }
+
         await sendRegistrationConfirmation(newUser);
 
-        // 9. Respond (matching OpenAPI spec)
         res.status(201).json({ 
             user_id: newUser._id,
             email: newUser.email,
