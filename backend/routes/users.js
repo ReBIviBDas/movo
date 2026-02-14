@@ -34,7 +34,7 @@ router.get('/me', async (req, res) => {
 });
 
 // POST /api/v1/users/me/documents - Upload driving license and/or ID
-router.post('/me/documents', 
+router.post('/me/documents',
     upload.fields([
         { name: 'driving_license', maxCount: 1 },
         { name: 'identity_document', maxCount: 1 }
@@ -52,10 +52,10 @@ router.post('/me/documents',
 
             // Update document paths
             if (req.files['driving_license']) {
-                user.driving_license = req.files['driving_license'][0].path;
+                user.driving_license = `uploads/${req.loggedUser.id}/${req.files['driving_license'][0].filename}`;
             }
             if (req.files['identity_document']) {
-                user.identity_document = req.files['identity_document'][0].path;
+                user.identity_document = `uploads/${req.loggedUser.id}/${req.files['identity_document'][0].filename}`;
             }
 
             // If documents uploaded, set status to pending_approval
