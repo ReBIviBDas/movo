@@ -15,6 +15,8 @@ const rentalsRoutes = require('./routes/rentals');
 const issuesRoutes = require('./routes/issues');
 const operatorIssuesRoutes = require('./routes/operator-issues');
 const operatorUsersRoutes = require('./routes/operator-users');
+const operatorRoutes = require('./routes/operator');
+const paymentsRoutes = require('./routes/payments');
 const tokenChecker = require('./middlewares/tokenChecker');
 require('dotenv').config();
 
@@ -52,12 +54,14 @@ app.use('/api/v1/rentals', rentalsRoutes);
 app.use('/api/v1/issues', issuesRoutes);
 app.use('/api/v1/operator/issues', operatorIssuesRoutes);
 app.use('/api/v1/operator/users', operatorUsersRoutes);
+app.use('/api/v1/operator', operatorRoutes);
+app.use('/api/v1/payments', paymentsRoutes);
 
 // PROTECTED ROUTE EXAMPLE (deprecated - use /users/me instead)
 app.get('/api/v1/profile', tokenChecker, (req, res) => {
-    res.json({ 
-        message: 'You are seeing this because you are logged in!', 
-        yourData: req.loggedUser 
+    res.json({
+        message: 'You are seeing this because you are logged in!',
+        yourData: req.loggedUser
     });
 });
 
