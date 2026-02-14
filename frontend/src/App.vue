@@ -30,7 +30,7 @@ function handleLogout() {
     <nav class="navbar bg-primary text-primary-content shadow-lg">
       <div class="flex-1">
         <RouterLink :to="isOperator ? '/operator' : '/'" class="btn btn-ghost text-xl font-bold">
-          ⚡ MOVO
+          MOVO
         </RouterLink>
       </div>
       <div class="flex-none gap-2">
@@ -52,7 +52,7 @@ function handleLogout() {
             </div>
             
             <!-- Operator Menu -->
-            <ul v-if="isOperator" tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-2 shadow text-base-content">
+            <ul v-if="isOperator" tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1001] w-56 p-2 shadow text-base-content">
               <li><RouterLink to="/operator">📊 Dashboard Operatore</RouterLink></li>
               <li><RouterLink to="/operator/fleet">🚗 Gestione Flotta</RouterLink></li>
               <li><RouterLink to="/operator/pending">👥 Utenti in Attesa</RouterLink></li>
@@ -61,7 +61,7 @@ function handleLogout() {
             </ul>
             
             <!-- User Menu -->
-            <ul v-else tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow text-base-content">
+            <ul v-else tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1001] w-52 p-2 shadow text-base-content">
               <li><RouterLink to="/dashboard">📊 Dashboard</RouterLink></li>
               <li><RouterLink to="/rentals">🚗 I miei noleggi</RouterLink></li>
               <li><RouterLink to="/my-reports">📝 Le mie segnalazioni</RouterLink></li>
@@ -77,12 +77,7 @@ function handleLogout() {
       <RouterView />
     </main>
 
-    <!-- Footer -->
-    <footer class="footer footer-center p-4 bg-base-300 text-base-content mt-8">
-      <aside>
-        <p>MOVO © 2026 - Car Sharing Elettrico Trento</p>
-      </aside>
-    </footer>
+
   </div>
 </template>
 

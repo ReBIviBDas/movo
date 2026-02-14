@@ -10,7 +10,7 @@ import VehicleMap from '@/components/VehicleMap.vue'
     <div class="w-full max-w-6xl px-4 py-6">
       <!-- Guest Header -->
       <div v-if="!isAuthenticated" class="text-center mb-6">
-        <h1 class="text-4xl font-bold text-primary mb-2">⚡ MOVO</h1>
+        <h1 class="text-4xl font-bold text-primary mb-2">MOVO</h1>
         <p class="text-lg text-base-content/70 mb-4">
           Car sharing elettrico al 100% a Trento
         </p>

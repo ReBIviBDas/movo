@@ -36,51 +36,11 @@ onMounted(async () => {
           <h1 class="text-3xl font-bold">
             Dashboard Operatore 🛠️
           </h1>
-          <p class="py-4 text-lg opacity-80">
-            Benvenuto, {{ authState.user?.first_name || 'Operatore' }}
-          </p>
         </div>
       </div>
     </div>
 
-    <!-- Stats Overview -->
-    <div class="stats shadow w-full mb-6">
-      <div class="stat">
-        <div class="stat-figure text-warning">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="stat-title">In Attesa di Approvazione</div>
-        <div class="stat-value text-warning">
-          <span v-if="isLoading" class="loading loading-spinner loading-sm"></span>
-          <span v-else>{{ pendingCount }}</span>
-        </div>
-        <div class="stat-desc">Utenti da verificare</div>
-      </div>
-      
-      <div class="stat">
-        <div class="stat-figure text-success">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="stat-title">Veicoli Disponibili</div>
-        <div class="stat-value text-success">--</div>
-        <div class="stat-desc">Flotta attiva</div>
-      </div>
 
-      <div class="stat">
-        <div class="stat-figure text-info">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <div class="stat-title">Noleggi Attivi</div>
-        <div class="stat-value text-info">--</div>
-        <div class="stat-desc">In questo momento</div>
-      </div>
-    </div>
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

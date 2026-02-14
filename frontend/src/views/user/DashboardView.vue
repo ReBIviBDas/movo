@@ -1,6 +1,44 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import { authState } from '@/states/auth'
+import { ref, onMounted } from 'vue'
+import { API_BASE_URL } from '@/config/api'
+
+const hasActiveRental = ref(false)
+const isCheckingRental = ref(true)
+
+// Check if user has an active rental or booking
+onMounted(async () => {
+  try {
+    // Check for active rental
+    const rentalRes = await fetch(`${API_BASE_URL}/rentals/active`, {
+      headers: { 'Authorization': `Bearer ${authState.token}` }
+    })
+    if (rentalRes.ok) {
+      const rentalData = await rentalRes.json()
+      if (rentalData.active_rental) {
+        hasActiveRental.value = true
+        isCheckingRental.value = false
+        return
+      }
+    }
+
+    // Check for active booking
+    const bookingRes = await fetch(`${API_BASE_URL}/bookings/active`, {
+      headers: { 'Authorization': `Bearer ${authState.token}` }
+    })
+    if (bookingRes.ok) {
+      const bookingData = await bookingRes.json()
+      if (bookingData.active_booking) {
+        hasActiveRental.value = true
+      }
+    }
+  } catch (err) {
+    console.error('Error checking rental status:', err)
+  } finally {
+    isCheckingRental.value = false
+  }
+})
 </script>
 
 <template>
@@ -10,7 +48,7 @@ import { authState } from '@/states/auth'
       <div class="hero-content text-center py-8">
         <div>
           <h1 class="text-3xl font-bold">
-            Benvenuto, {{ authState.user?.first_name || 'Utente' }}! 👋
+            Benvenuto, {{ authState.user?.first_name || 'Utente' }}
           </h1>
           <p class="py-4 text-lg opacity-70">
             Cosa vuoi fare oggi?
@@ -36,16 +74,33 @@ import { authState } from '@/states/auth'
       </div>
 
       <!-- Active Rental/Booking -->
-      <div class="card bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-md hover:shadow-xl transition-shadow">
+      <div
+        class="card shadow-md hover:shadow-xl transition-shadow"
+        :class="hasActiveRental
+          ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white'
+          : 'bg-base-300 text-base-content'"
+      >
         <div class="card-body">
           <div class="text-4xl mb-2">🔑</div>
-          <h2 class="card-title text-white">Noleggio Attivo</h2>
-          <p class="opacity-90">Gestisci il tuo noleggio o prenotazione in corso</p>
-          <div class="card-actions justify-end mt-4">
-            <RouterLink to="/rental" class="btn btn-white text-green-700">
-              Vai al Noleggio
-            </RouterLink>
-          </div>
+          <template v-if="isCheckingRental">
+            <h2 class="card-title">
+              <span class="loading loading-spinner loading-sm"></span>
+              Controllo...
+            </h2>
+          </template>
+          <template v-else-if="hasActiveRental">
+            <h2 class="card-title text-white">Noleggio Attivo</h2>
+            <p class="opacity-90">Gestisci il tuo noleggio o prenotazione in corso</p>
+            <div class="card-actions justify-end mt-4">
+              <RouterLink to="/rental" class="btn btn-white text-green-700">
+                Vai al Noleggio
+              </RouterLink>
+            </div>
+          </template>
+          <template v-else>
+            <h2 class="card-title">Noleggio non attivo</h2>
+            <p class="opacity-70">Nessun noleggio o prenotazione in corso</p>
+          </template>
         </div>
       </div>
 
@@ -94,7 +149,7 @@ import { authState } from '@/states/auth'
       <!-- My Reports -->
       <div class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow">
         <div class="card-body">
-          <div class="text-4xl mb-2">📋</div>
+          <div class="text-4xl mb-2">🔔</div>
           <h2 class="card-title">Le Mie Segnalazioni</h2>
           <p>Visualizza lo stato delle tue segnalazioni</p>
           <div class="card-actions justify-end mt-4">
