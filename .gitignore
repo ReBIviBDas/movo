@@ -3,3 +3,4 @@ node_modules
 coverage
 course_context
 mongodb-credentials.txt
+backend/uploads/

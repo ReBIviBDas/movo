@@ -55,7 +55,8 @@ function handleLogout() {
             <ul v-if="isOperator" tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1001] w-56 p-2 shadow text-base-content">
               <li><RouterLink to="/operator">📊 Dashboard Operatore</RouterLink></li>
               <li><RouterLink to="/operator/fleet">🚗 Gestione Flotta</RouterLink></li>
-              <li><RouterLink to="/operator/pending">👥 Utenti in Attesa</RouterLink></li>
+              <li><RouterLink to="/operator/users">👥 Gestione Utenti</RouterLink></li>
+              <li><RouterLink to="/operator/pending">⏳ Utenti in Attesa</RouterLink></li>
               <li><RouterLink to="/operator/reports">📋 Segnalazioni</RouterLink></li>
               <li class="border-t mt-2 pt-2"><a @click="handleLogout" class="text-error cursor-pointer">🚪 Logout</a></li>
             </ul>
@@ -63,6 +64,7 @@ function handleLogout() {
             <!-- User Menu -->
             <ul v-else tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1001] w-52 p-2 shadow text-base-content">
               <li><RouterLink to="/dashboard">📊 Dashboard</RouterLink></li>
+              <li><RouterLink to="/profile">👤 Il mio profilo</RouterLink></li>
               <li><RouterLink to="/rentals">🚗 I miei noleggi</RouterLink></li>
               <li><RouterLink to="/my-reports">📝 Le mie segnalazioni</RouterLink></li>
               <li class="border-t mt-2 pt-2"><a @click="handleLogout" class="text-error cursor-pointer">🚪 Logout</a></li>

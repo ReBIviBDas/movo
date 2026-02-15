@@ -126,7 +126,11 @@ async function reserveVehicle(vehicleId) {
     const data = await response.json()
     
     if (!response.ok) {
-      if (data.type === 'payment_required') {
+      if (data.type === 'documents_required') {
+        if (confirm('Devi caricare e far approvare i tuoi documenti prima di prenotare. Vuoi andare al profilo?')) {
+          router.push('/profile')
+        }
+      } else if (data.type === 'payment_required') {
         if (confirm('Devi aggiungere un metodo di pagamento. Vuoi farlo ora?')) {
           router.push('/wallet')
         }

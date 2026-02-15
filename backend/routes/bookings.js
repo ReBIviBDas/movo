@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
 const Vehicle = require('../models/Vehicle');
+const User = require('../models/User');
 const PaymentMethod = require('../models/PaymentMethod');
 const tokenChecker = require('../middlewares/tokenChecker');
 
@@ -69,6 +70,15 @@ router.post('/', async (req, res) => {
         
         if (!vehicle_id) {
             return res.status(400).json({ type: 'validation_error', detail: 'vehicle_id is required' });
+        }
+        
+        // Check if user has approved documents
+        const user = await User.findById(req.loggedUser.id);
+        if (!user || !user.driving_enabled) {
+            return res.status(403).json({
+                type: 'documents_required',
+                detail: 'Devi caricare e far approvare i tuoi documenti prima di prenotare un veicolo'
+            });
         }
         
         // Check if user has payment method

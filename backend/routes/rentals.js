@@ -3,6 +3,7 @@ const router = express.Router();
 const Rental = require('../models/Rental');
 const Booking = require('../models/Booking');
 const Vehicle = require('../models/Vehicle');
+const User = require('../models/User');
 const PaymentMethod = require('../models/PaymentMethod');
 const paymentService = require('../services/paymentService');
 const locationService = require('../services/locationService');
@@ -62,6 +63,15 @@ router.post('/unlock', async (req, res) => {
         
         if (!booking_id) {
             return res.status(400).json({ type: 'validation_error', detail: 'booking_id is required' });
+        }
+        
+        // Check if user has approved documents
+        const user = await User.findById(req.loggedUser.id);
+        if (!user || !user.driving_enabled) {
+            return res.status(403).json({
+                type: 'documents_required',
+                detail: 'Devi caricare e far approvare i tuoi documenti prima di noleggiare un veicolo'
+            });
         }
         
         // Check if user already has active rental
