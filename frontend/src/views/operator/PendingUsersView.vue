@@ -18,7 +18,7 @@ async function fetchPendingUsers() {
   error.value = ''
   
   try {
-    const response = await fetch(`${API_BASE_URL}/users/pending`, {
+    const response = await fetch(`${API_BASE_URL}/operator/users/pending`, {
       headers: {
         'Authorization': `Bearer ${authState.token}`
       }
@@ -42,7 +42,7 @@ async function approveUser(userId) {
   if (!confirm('Sei sicuro di voler approvare questo utente?')) return
   
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/approve`, {
+    const response = await fetch(`${API_BASE_URL}/operator/users/${userId}/approve`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authState.token}`
@@ -67,7 +67,7 @@ async function rejectUser(userId) {
   if (reason === null) return // User cancelled
   
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/reject`, {
+    const response = await fetch(`${API_BASE_URL}/operator/users/${userId}/reject`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authState.token}`,

@@ -37,7 +37,7 @@ async function fetchFleet() {
     if (filter.value.status) params.append('status', filter.value.status)
     if (filter.value.type) params.append('type', filter.value.type)
     
-    const response = await fetch(`${API_BASE_URL}/fleet?${params}`, {
+    const response = await fetch(`${API_BASE_URL}/operator/vehicles?${params}`, {
       headers: {
         'Authorization': `Bearer ${authState.token}`
       }
@@ -62,7 +62,7 @@ async function fetchFleet() {
 // Add new vehicle
 async function addVehicle() {
   try {
-    const response = await fetch(`${API_BASE_URL}/fleet`, {
+    const response = await fetch(`${API_BASE_URL}/operator/vehicles`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authState.token}`,
@@ -90,7 +90,7 @@ async function addVehicle() {
 // Fetch recent activity
 async function fetchRecentActivity() {
   try {
-    const response = await fetch(`${API_BASE_URL}/fleet/audit?limit=5`, {
+    const response = await fetch(`${API_BASE_URL}/operator/vehicles/audit?limit=5`, {
       headers: {
         'Authorization': `Bearer ${authState.token}`
       }
@@ -108,7 +108,7 @@ async function fetchRecentActivity() {
 // Update vehicle
 async function updateVehicle() {
   try {
-    const response = await fetch(`${API_BASE_URL}/fleet/${editingVehicle.value.id}`, {
+    const response = await fetch(`${API_BASE_URL}/operator/vehicles/${editingVehicle.value.id}`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${authState.token}`,
@@ -143,7 +143,7 @@ async function deleteVehicle(id) {
   if (!confirm('Sei sicuro di voler eliminare questo veicolo?')) return
   
   try {
-    const response = await fetch(`${API_BASE_URL}/fleet/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/operator/vehicles/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${authState.token}`

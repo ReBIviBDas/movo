@@ -55,8 +55,8 @@ router.get('/active', async (req, res) => {
     }
 });
 
-// POST /api/v1/rentals/start - Unlock vehicle and start rental
-router.post('/start', async (req, res) => {
+// POST /api/v1/rentals/unlock - Unlock vehicle and start rental
+router.post('/unlock', async (req, res) => {
     try {
         const { booking_id, user_location } = req.body;
         

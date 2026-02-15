@@ -212,7 +212,7 @@ async function fetchReports() {
     if (categoryFilter.value) params.append('category', categoryFilter.value)
     if (priorityFilter.value) params.append('priority', priorityFilter.value)
     
-    const response = await fetch(`${API_BASE_URL}/reports?${params}`, {
+    const response = await fetch(`${API_BASE_URL}/operator/issues?${params}`, {
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     
@@ -236,7 +236,7 @@ async function fetchReports() {
 
 async function takeReport(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/reports/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/operator/issues/${id}`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${authState.token}`,

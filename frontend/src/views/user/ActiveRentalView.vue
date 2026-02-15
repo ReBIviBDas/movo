@@ -33,7 +33,7 @@ async function fetchRental() {
     
     if (!data.active_rental) {
       // No active rental, check for active booking
-      const bookingRes = await fetch(`${API_BASE_URL}/bookings/active`, {
+      const bookingRes = await fetch(`${API_BASE_URL}/bookings`, {
         headers: { 'Authorization': `Bearer ${authState.token}` }
       })
       const bookingData = await bookingRes.json()

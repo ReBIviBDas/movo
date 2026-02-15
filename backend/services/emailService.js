@@ -1,7 +1,6 @@
 /**
- * Mock Email Service
- * Logs emails to console instead of actually sending them.
- * Replace with real email service (SendGrid, Nodemailer) in production.
+ * Email Service
+ * Mock implementation for development - logs emails to console
  */
 
 const sendEmail = async ({ to, subject, body, html }) => {
@@ -16,7 +15,6 @@ const sendEmail = async ({ to, subject, body, html }) => {
     }
     console.log('📧 ═══════════════════════════════════════════════════\n');
     
-    // Simulate async operation
     return Promise.resolve({ success: true, messageId: `mock-${Date.now()}` });
 };
 

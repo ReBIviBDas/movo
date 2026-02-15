@@ -42,7 +42,7 @@ async function fetchPaymentMethods() {
   error.value = ''
   
   try {
-    const response = await fetch(`${API_BASE_URL}/payment-methods`, {
+    const response = await fetch(`${API_BASE_URL}/payments/methods`, {
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     
@@ -63,7 +63,7 @@ async function addPaymentMethod() {
   isSubmitting.value = true
   
   try {
-    const response = await fetch(`${API_BASE_URL}/payment-methods`, {
+    const response = await fetch(`${API_BASE_URL}/payments/methods`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authState.token}`,
@@ -98,8 +98,8 @@ async function addPaymentMethod() {
 // Set as default
 async function setDefault(methodId) {
   try {
-    const response = await fetch(`${API_BASE_URL}/payment-methods/${methodId}/default`, {
-      method: 'PATCH',
+    const response = await fetch(`${API_BASE_URL}/payments/methods/${methodId}/default`, {
+      method: 'PUT',
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     
@@ -116,7 +116,7 @@ async function deleteMethod(methodId) {
   if (!confirm('Sei sicuro di voler eliminare questo metodo di pagamento?')) return
   
   try {
-    const response = await fetch(`${API_BASE_URL}/payment-methods/${methodId}`, {
+    const response = await fetch(`${API_BASE_URL}/payments/methods/${methodId}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })

@@ -204,7 +204,7 @@ async function fetchReports() {
     params.append('limit', 10)
     if (statusFilter.value) params.append('status', statusFilter.value)
     
-    const response = await fetch(`${API_BASE_URL}/reports/mine?${params}`, {
+    const response = await fetch(`${API_BASE_URL}/issues?${params}`, {
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     
@@ -224,7 +224,7 @@ async function fetchReports() {
 
 async function viewReport(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/reports/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/issues/${id}`, {
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     

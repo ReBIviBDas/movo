@@ -25,7 +25,7 @@ const fetchVehicleDetails = async () => {
     isLoading.value = true
     error.value = ''
     
-    const response = await fetch(`${API_BASE_URL}/fleet/${route.params.id}`, {
+    const response = await fetch(`${API_BASE_URL}/operator/vehicles/${route.params.id}`, {
       headers: {
         'Authorization': `Bearer ${authState.token}`
       }
@@ -51,7 +51,7 @@ const handleMaintenance = async () => {
   try {
     isSubmitting.value = true
     
-    const response = await fetch(`${API_BASE_URL}/fleet/${route.params.id}/maintenance`, {
+    const response = await fetch(`${API_BASE_URL}/operator/vehicles/${route.params.id}/maintenance`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -649,6 +649,52 @@ paths:
         "400":
           $ref: "#/components/responses/BadRequest"
 
+  /vehicles/public:
+    get:
+      operationId: listVehiclesPublic
+      tags: [Veicoli]
+      summary: Lista veicoli pubblici (senza autenticazione)
+      description: |
+        Restituisce i veicoli disponibili per la mappa pubblica.
+        Non include informazioni sensibili come la targa.
+      security: []
+      parameters:
+        - name: lat
+          in: query
+          description: Latitudine centro ricerca
+          schema:
+            type: number
+            format: float
+            example: 46.0677
+        - name: lng
+          in: query
+          description: Longitudine centro ricerca
+          schema:
+            type: number
+            format: float
+            example: 11.1219
+        - name: radius
+          in: query
+          description: Raggio di ricerca in km
+          schema:
+            type: number
+            format: float
+            default: 5
+      responses:
+        "200":
+          description: Lista veicoli pubblici
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vehicles:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/VehicleMapItem"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
   /vehicles/{vehicleId}:
     get:
       operationId: getVehicle
@@ -2024,6 +2070,138 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+
+  /operator/vehicles/{vehicleId}/maintenance:
+    post:
+      operationId: opToggleMaintenance
+      tags: [Backoffice - Manutenzione]
+      summary: Attiva/disattiva manutenzione veicolo
+      description: Cambia lo stato del veicolo tra manutenzione e disponibile.
+      parameters:
+        - $ref: "#/components/parameters/vehicleId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [start, end]
+                  description: Azione da eseguire (start = inizio manutenzione, end = fine manutenzione)
+                notes:
+                  type: string
+                  description: Note sulla manutenzione
+      responses:
+        "200":
+          description: Stato manutenzione aggiornato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  vehicle:
+                    $ref: "#/components/schemas/VehicleOperator"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /operator/vehicles/audit:
+    get:
+      operationId: opListFleetAudit
+      tags: [Backoffice - Flotta]
+      summary: Log audit flotta
+      description: Restituisce il log delle operazioni sulla flotta.
+      parameters:
+        - name: limit
+          in: query
+          description: Numero massimo di log da restituire
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Lista log audit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        vehicle_plate:
+                          type: string
+                        action:
+                          type: string
+                          enum: [created, updated, deleted, status_changed, maintenance_started, maintenance_completed]
+                        performed_by:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+                        changes:
+                          type: object
+                        notes:
+                          type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /operator/vehicles/{vehicleId}/audit:
+    get:
+      operationId: opGetVehicleAudit
+      tags: [Backoffice - Flotta]
+      summary: Log audit singolo veicolo
+      description: Restituisce il log delle operazioni su un veicolo specifico.
+      parameters:
+        - $ref: "#/components/parameters/vehicleId"
+      responses:
+        "200":
+          description: Lista log audit veicolo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        action:
+                          type: string
+                        performed_by:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+                        changes:
+                          type: object
+                        notes:
+                          type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /operator/vehicles/dashboard:
     get:
@@ -3813,6 +3991,29 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+
+
+  /health:
+    get:
+      operationId: healthCheck
+      tags: [Auth]
+      summary: Verifica stato del server
+      description: Restituisce lo stato di salute del backend.
+      security: []
+      responses:
+        "200":
+          description: Server attivo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+                  message:
+                    type: string
+                    example: MOVO Backend is running
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPONENTS

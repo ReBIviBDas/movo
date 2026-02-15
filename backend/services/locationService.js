@@ -1,17 +1,9 @@
 /**
- * Location Service - Abstraction layer for GPS/geolocation operations
- * 
- * MOCK IMPLEMENTATION: Simulates location checks for course project
- * TO SWITCH TO REAL: Set USE_MOCK = false and implement real GPS checks
+ * Location Service
+ * Mock implementation for development
  */
 
-// ============================================================================
-// CONFIGURATION
-// ============================================================================
-const USE_MOCK = true; // Set to false for real GPS validation
-
 // Trento authorized parking zones (GeoJSON polygons)
-// In production, these would come from database
 const AUTHORIZED_ZONES = [
     {
         name: 'Centro Storico',
@@ -28,10 +20,6 @@ const AUTHORIZED_ZONES = [
         ]
     }
 ];
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
 
 /**
  * Calculate distance between two points using Haversine formula
@@ -71,112 +59,50 @@ function pointInPolygon(point, polygon) {
     return inside;
 }
 
-// ============================================================================
-// MOCK SERVICE FUNCTIONS
-// ============================================================================
-
-const mockService = {
-    /**
-     * Check if user is within proximity of vehicle
-     * @param {Object} userLocation { lat, lng }
-     * @param {Object} vehicleLocation { lat, lng }
-     * @param {number} maxDistance Maximum allowed distance in meters
-     * @returns {Object} { withinRange: boolean, distance: number }
-     */
-    checkProximity: async (userLocation, vehicleLocation, maxDistance = 30) => {
-        // MOCK: Always return within range for testing
-        // In production: use real GPS coordinates
-        return {
-            withinRange: true,
-            distance: Math.floor(Math.random() * maxDistance), // Simulated distance
-            message: 'Mock: Proximity check passed'
-        };
-    },
-    
-    /**
-     * Validate that vehicle is in authorized parking zone
-     * @param {Object} location { lat, lng }
-     * @returns {Object} { valid: boolean, zoneName?: string, nearestZone?: Object }
-     */
-    validateParkingZone: async (location) => {
-        // MOCK: Always return valid for testing
-        return {
-            valid: true,
-            zoneName: 'Centro Storico (Mock)',
-            message: 'Mock: Parking zone validated'
-        };
-    },
-    
-    /**
-     * Get nearest authorized parking zones
-     * @param {Object} location { lat, lng }
-     * @returns {Array} List of nearby zones with distances
-     */
-    getNearestZones: async (location) => {
-        return AUTHORIZED_ZONES.map(zone => ({
-            name: zone.name,
-            distance: Math.floor(Math.random() * 500) + 100 // Mock distance
-        }));
-    }
+/**
+ * Check if user is within proximity of vehicle
+ * @param {Object} userLocation { lat, lng }
+ * @param {Object} vehicleLocation { lat, lng }
+ * @param {number} maxDistance Maximum allowed distance in meters
+ * @returns {Object} { withinRange: boolean, distance: number }
+ */
+const checkProximity = async (userLocation, vehicleLocation, maxDistance = 30) => {
+    // Mock: Always return within range for testing
+    return {
+        withinRange: true,
+        distance: Math.floor(Math.random() * maxDistance),
+        message: 'Mock: Proximity check passed'
+    };
 };
 
-// ============================================================================
-// REAL SERVICE FUNCTIONS
-// ============================================================================
-
-const realService = {
-    checkProximity: async (userLocation, vehicleLocation, maxDistance = 30) => {
-        const distance = haversineDistance(
-            userLocation.lat, userLocation.lng,
-            vehicleLocation.lat, vehicleLocation.lng
-        );
-        
-        return {
-            withinRange: distance <= maxDistance,
-            distance: Math.round(distance),
-            message: distance <= maxDistance 
-                ? 'You are close enough to unlock'
-                : `Move ${Math.round(distance - maxDistance)}m closer to the vehicle`
-        };
-    },
-    
-    validateParkingZone: async (location) => {
-        const point = [location.lng, location.lat];
-        
-        for (const zone of AUTHORIZED_ZONES) {
-            if (pointInPolygon(point, zone.polygon)) {
-                return {
-                    valid: true,
-                    zoneName: zone.name
-                };
-            }
-        }
-        
-        return {
-            valid: false,
-            message: 'Vehicle is not in an authorized parking zone',
-            nearestZones: await realService.getNearestZones(location)
-        };
-    },
-    
-    getNearestZones: async (location) => {
-        return AUTHORIZED_ZONES.map(zone => {
-            // Calculate distance to center of zone
-            const centerLng = zone.polygon.reduce((sum, p) => sum + p[0], 0) / zone.polygon.length;
-            const centerLat = zone.polygon.reduce((sum, p) => sum + p[1], 0) / zone.polygon.length;
-            const distance = haversineDistance(location.lat, location.lng, centerLat, centerLng);
-            
-            return {
-                name: zone.name,
-                distance: Math.round(distance),
-                center: { lat: centerLat, lng: centerLng }
-            };
-        }).sort((a, b) => a.distance - b.distance);
-    }
+/**
+ * Validate that vehicle is in authorized parking zone
+ * @param {Object} location { lat, lng }
+ * @returns {Object} { valid: boolean, zoneName?: string, nearestZone?: Object }
+ */
+const validateParkingZone = async (location) => {
+    // Mock: Always return valid for testing
+    return {
+        valid: true,
+        zoneName: 'Centro Storico (Mock)',
+        message: 'Mock: Parking zone validated'
+    };
 };
 
-// ============================================================================
-// EXPORT ACTIVE SERVICE
-// ============================================================================
+/**
+ * Get nearest authorized parking zones
+ * @param {Object} location { lat, lng }
+ * @returns {Array} List of nearby zones with distances
+ */
+const getNearestZones = async (location) => {
+    return AUTHORIZED_ZONES.map(zone => ({
+        name: zone.name,
+        distance: Math.floor(Math.random() * 500) + 100
+    }));
+};
 
-module.exports = USE_MOCK ? mockService : realService;
+module.exports = {
+    checkProximity,
+    validateParkingZone,
+    getNearestZones
+};
