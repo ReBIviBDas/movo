@@ -6,7 +6,18 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest"
+    "test": "jest --coverage --forceExit --detectOpenHandles"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "routes/**/*.js",
+      "middlewares/**/*.js",
+      "services/**/*.js"
+    ],
+    "coverageReporters": ["text", "html"],
+    "testTimeout": 30000
   },
   "keywords": [],
   "author": "",
@@ -26,6 +37,7 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^11.0.1",
     "nodemon": "^3.1.0",
     "supertest": "^7.0.0"
   }
