@@ -64,6 +64,8 @@ import movo.composeapp.generated.resources.login_sign_up
 import movo.composeapp.generated.resources.login_subtitle
 import movo.composeapp.generated.resources.login_welcome_title
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import it.movo.app.ui.theme.MovoTheme
 
 @Composable
 fun LoginScreen(
@@ -81,6 +83,31 @@ fun LoginScreen(
         }
     }
 
+    LoginContent(
+        uiState = uiState,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+        onLogin = viewModel::login,
+        onLoginWithGoogle = viewModel::loginWithGoogle,
+        onNavigateToRegister = onNavigateToRegister,
+        onNavigateToForgotPassword = onNavigateToForgotPassword,
+        onNavigateBack = onNavigateBack
+    )
+}
+
+@Composable
+private fun LoginContent(
+    uiState: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onLogin: () -> Unit,
+    onLoginWithGoogle: () -> Unit,
+    onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
+    onNavigateBack: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -150,7 +177,7 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = uiState.email,
-            onValueChange = viewModel::onEmailChange,
+            onValueChange = onEmailChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(stringResource(Res.string.login_email_placeholder)) },
             singleLine = true,
@@ -183,7 +210,7 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = uiState.password,
-            onValueChange = viewModel::onPasswordChange,
+            onValueChange = onPasswordChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(stringResource(Res.string.login_password_placeholder)) },
             singleLine = true,
@@ -193,7 +220,7 @@ fun LoginScreen(
                 imeAction = ImeAction.Done
             ),
             trailingIcon = {
-                IconButton(onClick = viewModel::togglePasswordVisibility) {
+                IconButton(onClick = onTogglePasswordVisibility) {
                     Icon(
                         imageVector = if (uiState.passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                         contentDescription = if (uiState.passwordVisible) "Hide password" else "Show password"
@@ -237,7 +264,7 @@ fun LoginScreen(
 
         if (uiState.errorMessage != null) {
             Text(
-                text = uiState.errorMessage!!,
+                text = uiState.errorMessage,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.fillMaxWidth(),
@@ -247,7 +274,7 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = viewModel::login,
+            onClick = onLogin,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -300,7 +327,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedButton(
-            onClick = viewModel::loginWithGoogle,
+            onClick = onLoginWithGoogle,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -342,6 +369,27 @@ fun LoginScreen(
                 modifier = Modifier.clickable(onClick = onNavigateToRegister)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun LoginScreenPreview() {
+    MovoTheme {
+        LoginContent(
+            uiState = LoginUiState(
+                email = "mario.rossi@email.com",
+                password = "password123"
+            ),
+            onEmailChange = {},
+            onPasswordChange = {},
+            onTogglePasswordVisibility = {},
+            onLogin = {},
+            onLoginWithGoogle = {},
+            onNavigateToRegister = {},
+            onNavigateToForgotPassword = {},
+            onNavigateBack = {}
+        )
     }
 }
 

@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,7 +58,9 @@ import it.movo.app.ui.theme.MovoOutline
 import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
+import it.movo.app.ui.theme.MovoTheme
 import movo.composeapp.generated.resources.Res
+import androidx.compose.ui.tooling.preview.Preview
 import movo.composeapp.generated.resources.common_done
 import movo.composeapp.generated.resources.split_add_participant
 import movo.composeapp.generated.resources.split_cost_with_passengers
@@ -84,6 +87,30 @@ fun SplitPaymentScreen(
         viewModel.setRentalId(rentalId)
     }
 
+    SplitPaymentContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onAddParticipant = { viewModel.addParticipant() },
+        onRemoveParticipant = { viewModel.removeParticipant(it) },
+        onUpdateParticipantUserId = { index, userId -> viewModel.updateParticipantUserId(index, userId) },
+        onUpdateParticipantPercentage = { index, percentage -> viewModel.updateParticipantPercentage(index, percentage) },
+        onSplitEqually = { viewModel.splitEqually() },
+        onSendSplitRequest = { viewModel.sendSplitRequest() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SplitPaymentContent(
+    uiState: SplitPaymentUiState,
+    onNavigateBack: () -> Unit,
+    onAddParticipant: () -> Unit,
+    onRemoveParticipant: (Int) -> Unit,
+    onUpdateParticipantUserId: (Int, String) -> Unit,
+    onUpdateParticipantPercentage: (Int, String) -> Unit,
+    onSplitEqually: () -> Unit,
+    onSendSplitRequest: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -189,16 +216,16 @@ fun SplitPaymentScreen(
                         index = index,
                         participant = participant,
                         canRemove = uiState.participants.size > 1,
-                        onUserIdChange = { viewModel.updateParticipantUserId(index, it) },
-                        onPercentageChange = { viewModel.updateParticipantPercentage(index, it) },
-                        onRemove = { viewModel.removeParticipant(index) }
+                        onUserIdChange = { onUpdateParticipantUserId(index, it) },
+                        onPercentageChange = { onUpdateParticipantPercentage(index, it) },
+                        onRemove = { onRemoveParticipant(index) }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
                 if (uiState.participants.size < 4) {
                     OutlinedButton(
-                        onClick = { viewModel.addParticipant() },
+                        onClick = onAddParticipant,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         border = BorderStroke(1.dp, MovoTeal)
@@ -220,7 +247,7 @@ fun SplitPaymentScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedButton(
-                    onClick = { viewModel.splitEqually() },
+                    onClick = onSplitEqually,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -233,7 +260,7 @@ fun SplitPaymentScreen(
                 if (uiState.errorMessage != null) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = uiState.errorMessage!!,
+                        text = uiState.errorMessage,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.fillMaxWidth(),
@@ -244,7 +271,7 @@ fun SplitPaymentScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { viewModel.sendSplitRequest() },
+                    onClick = onSendSplitRequest,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -356,5 +383,34 @@ private fun ParticipantCard(
                 )
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SplitPaymentScreenPreview() {
+    val mockParticipants = listOf(
+        ParticipantEntry(userId = "marco.rossi@email.com", percentage = "50"),
+        ParticipantEntry(userId = "laura.bianchi@email.com", percentage = "30"),
+        ParticipantEntry(userId = "giuseppe.verdi@email.com", percentage = "20")
+    )
+
+    MovoTheme {
+        SplitPaymentContent(
+            uiState = SplitPaymentUiState(
+                rentalId = "rental123",
+                participants = mockParticipants,
+                isLoading = false,
+                requestSent = false,
+                errorMessage = null
+            ),
+            onNavigateBack = {},
+            onAddParticipant = {},
+            onRemoveParticipant = {},
+            onUpdateParticipantUserId = { _, _ -> },
+            onUpdateParticipantPercentage = { _, _ -> },
+            onSplitEqually = {},
+            onSendSplitRequest = {}
+        )
     }
 }

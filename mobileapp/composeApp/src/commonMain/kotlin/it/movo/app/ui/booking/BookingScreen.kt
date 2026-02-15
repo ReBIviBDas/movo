@@ -53,6 +53,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import it.movo.app.ui.theme.MovoTheme
 import it.movo.app.data.model.VehicleMapItem
 import it.movo.app.ui.theme.MovoOnSurface
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
@@ -105,169 +107,186 @@ fun BookingScreen(
         }
     }
 
+    BookingContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onUnlockVehicle = viewModel::unlockVehicle,
+        onCancelBooking = viewModel::cancelBooking,
+        snackbarHostState = snackbarHostState
+    )
+}
+
+@Composable
+private fun BookingContent(
+    uiState: BookingUiState,
+    onNavigateBack: () -> Unit,
+    onUnlockVehicle: () -> Unit,
+    onCancelBooking: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-    Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.45f)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                MovoTeal.copy(alpha = 0.3f),
-                                MovoTeal.copy(alpha = 0.1f),
-                                MovoWhite
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.45f)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    MovoTeal.copy(alpha = 0.3f),
+                                    MovoTeal.copy(alpha = 0.1f),
+                                    MovoWhite
+                                )
                             )
                         )
-                    )
-            ) {
-                IconButton(
-                    onClick = onNavigateBack,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(16.dp)
-                        .clip(CircleShape)
-                        .background(MovoWhite)
-                        .size(40.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MovoOnSurface
-                    )
-                }
-
-                FloatingActionButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(16.dp)
-                        .size(40.dp),
-                    containerColor = MovoWhite,
-                    shape = CircleShape
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Navigation,
-                        contentDescription = "Navigate",
-                        tint = MovoTeal
-                    )
-                }
-
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = MovoTeal,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(64.dp)
-                )
-            }
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.55f),
-                color = MovoSurface,
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                shadowElevation = 8.dp
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                ) {
-                    Box(
+                    IconButton(
+                        onClick = onNavigateBack,
                         modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(MovoOutline)
-                            .align(Alignment.CenterHorizontally)
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Text(
-                        text = stringResource(Res.string.booking_reservation_active),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MovoOnSurfaceVariant,
-                        letterSpacing = 2.sp,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = uiState.timerText,
-                        style = MaterialTheme.typography.displayLarge,
-                        color = MovoTeal,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 56.sp,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-
-                    Text(
-                        text = stringResource(Res.string.booking_time_to_reach),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MovoOnSurfaceVariant,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    VehicleInfoCard(
-                        vehicle = uiState.booking?.vehicle,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    ChecklistSection(
-                        address = "Vehicle location",
-                        walkMinutes = 0,
-                        walkMeters = 0,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Button(
-                        onClick = { viewModel.unlockVehicle() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = !uiState.isProcessing && !uiState.isExpired
+                            .align(Alignment.TopStart)
+                            .padding(16.dp)
+                            .clip(CircleShape)
+                            .background(MovoWhite)
+                            .size(40.dp)
                     ) {
                         Icon(
-                            imageVector = if (uiState.isUnlocking) Icons.Default.LockOpen else Icons.Default.Lock,
-                            contentDescription = if (uiState.isUnlocking) "Unlocking vehicle" else "Unlock vehicle",
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(Res.string.booking_unlock_vehicle),
-                            style = MaterialTheme.typography.labelLarge
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MovoOnSurface
                         )
                     }
 
-                    TextButton(
-                        onClick = { viewModel.cancelBooking() },
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        enabled = !uiState.isProcessing
+                    FloatingActionButton(
+                        onClick = { },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                            .size(40.dp),
+                        containerColor = MovoWhite,
+                        shape = CircleShape
                     ) {
-                        Text(
-                            text = stringResource(Res.string.booking_cancel),
-                            color = MovoOnSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium
+                        Icon(
+                            imageVector = Icons.Default.Navigation,
+                            contentDescription = "Navigate",
+                            tint = MovoTeal
                         )
-    }
-    }
-}
+                    }
+
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        tint = MovoTeal,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(64.dp)
+                    )
+                }
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.55f),
+                    color = MovoSurface,
+                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                    shadowElevation = 8.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 24.dp, vertical = 16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(4.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(MovoOutline)
+                                .align(Alignment.CenterHorizontally)
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Text(
+                            text = stringResource(Res.string.booking_reservation_active),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MovoOnSurfaceVariant,
+                            letterSpacing = 2.sp,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = uiState.timerText,
+                            style = MaterialTheme.typography.displayLarge,
+                            color = MovoTeal,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 56.sp,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+
+                        Text(
+                            text = stringResource(Res.string.booking_time_to_reach),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MovoOnSurfaceVariant,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        VehicleInfoCard(
+                            vehicle = uiState.booking?.vehicle,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        ChecklistSection(
+                            address = "Vehicle location",
+                            walkMinutes = 0,
+                            walkMeters = 0,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Button(
+                            onClick = onUnlockVehicle,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = !uiState.isProcessing && !uiState.isExpired
+                        ) {
+                            Icon(
+                                imageVector = if (uiState.isUnlocking) Icons.Default.LockOpen else Icons.Default.Lock,
+                                contentDescription = if (uiState.isUnlocking) "Unlocking vehicle" else "Unlock vehicle",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(Res.string.booking_unlock_vehicle),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
+
+                        TextButton(
+                            onClick = onCancelBooking,
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            enabled = !uiState.isProcessing
+                        ) {
+                            Text(
+                                text = stringResource(Res.string.booking_cancel),
+                                color = MovoOnSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -345,8 +364,6 @@ private fun VehicleInfoCard(
                             color = MovoTeal
                         )
                     }
-
-
                 }
             }
         }
@@ -475,5 +492,20 @@ private fun ChecklistItem(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun BookingScreenPreview() {
+    MovoTheme {
+        BookingContent(
+            uiState = BookingUiState(
+                remainingSeconds = 899
+            ),
+            onNavigateBack = {},
+            onUnlockVehicle = {},
+            onCancelBooking = {}
+        )
     }
 }

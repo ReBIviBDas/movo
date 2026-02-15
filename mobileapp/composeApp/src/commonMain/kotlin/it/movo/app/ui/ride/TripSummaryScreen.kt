@@ -73,6 +73,8 @@ import movo.composeapp.generated.resources.trip_summary_title
 import movo.composeapp.generated.resources.retry
 import movo.composeapp.generated.resources.trip_view_breakdown
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import it.movo.app.ui.theme.MovoTheme
 
 @Composable
 fun TripSummaryScreen(
@@ -90,6 +92,27 @@ fun TripSummaryScreen(
         }
     }
 
+    TripSummaryContent(
+        uiState = uiState,
+        onDone = onDone,
+        onSplitPayment = onSplitPayment,
+        onSplitBillToggle = viewModel::onSplitBillToggle,
+        onRatingChange = viewModel::onRatingChange,
+        onRetry = viewModel::retry,
+        snackbarHostState = snackbarHostState
+    )
+}
+
+@Composable
+private fun TripSummaryContent(
+    uiState: TripSummaryUiState,
+    onDone: () -> Unit,
+    onSplitPayment: () -> Unit,
+    onSplitBillToggle: (Boolean) -> Unit,
+    onRatingChange: (Int) -> Unit,
+    onRetry: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     Scaffold(
         topBar = { TopBar(onClose = onDone) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -118,11 +141,11 @@ fun TripSummaryScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = uiState.errorMessage ?: "",
+                        text = uiState.errorMessage,
                         style = MaterialTheme.typography.bodyLarge
                     )
                     OutlinedButton(
-                        onClick = { viewModel.retry() }
+                        onClick = onRetry
                     ) {
                         Text(stringResource(Res.string.retry))
                     }
@@ -139,125 +162,125 @@ fun TripSummaryScreen(
                 .padding(paddingValues)
         ) {
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Vehicle name
-        if (uiState.vehicleName.isNotBlank()) {
+            // Vehicle name
+            if (uiState.vehicleName.isNotBlank()) {
+                Text(
+                    text = uiState.vehicleName,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Route map placeholder
+            RouteMapPlaceholder()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Total cost
             Text(
-                text = uiState.vehicleName,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
+                text = uiState.totalCostText,
+                fontSize = 48.sp,
+                fontWeight = FontWeight.Bold,
                 color = Color.Black,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            // View breakdown link
+            Row(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        // Route map placeholder
-        RouteMapPlaceholder()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Total cost
-        Text(
-            text = uiState.totalCostText,
-            fontSize = 48.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        // View breakdown link
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .clickable { },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(Res.string.trip_view_breakdown),
-                color = MovoTeal,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Icon(
-                imageVector = Icons.Filled.ArrowDropDown,
-                contentDescription = null,
-                tint = MovoTeal
-            )
-        }
-
-        // Cost breakdown
-        if (uiState.discountAppliedCents > 0 && uiState.discountAppliedCents <= uiState.totalCostCents) {
-            Spacer(modifier = Modifier.height(8.dp))
-            val totalEuros = uiState.totalCostCents / 100
-            val totalCents = uiState.totalCostCents % 100
-            val discountEuros = uiState.discountAppliedCents / 100
-            val discountCents = uiState.discountAppliedCents % 100
-            Column(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .clickable { },
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Subtotale: €${totalEuros}.${totalCents.toString().padStart(2, '0')}",
+                    text = stringResource(Res.string.trip_view_breakdown),
+                    color = MovoTeal,
                     fontSize = 14.sp,
-                    color = MovoOnSurfaceVariant
+                    fontWeight = FontWeight.Medium
                 )
-                Text(
-                    text = "Sconto: -€${discountEuros}.${discountCents.toString().padStart(2, '0')}",
-                    fontSize = 14.sp,
-                    color = MovoSuccess
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    tint = MovoTeal
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            // Cost breakdown
+            if (uiState.discountAppliedCents > 0 && uiState.discountAppliedCents <= uiState.totalCostCents) {
+                Spacer(modifier = Modifier.height(8.dp))
+                val totalEuros = uiState.totalCostCents / 100
+                val totalCents = uiState.totalCostCents % 100
+                val discountEuros = uiState.discountAppliedCents / 100
+                val discountCents = uiState.discountAppliedCents % 100
+                Column(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Subtotale: €${totalEuros}.${totalCents.toString().padStart(2, '0')}",
+                        fontSize = 14.sp,
+                        color = MovoOnSurfaceVariant
+                    )
+                    Text(
+                        text = "Sconto: -€${discountEuros}.${discountCents.toString().padStart(2, '0')}",
+                        fontSize = 14.sp,
+                        color = MovoSuccess
+                    )
+                }
+            }
 
-        // Stats cards
-        StatsCardsRow(uiState = uiState)
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+            // Stats cards
+            StatsCardsRow(uiState = uiState)
 
-        // Payment info card
-        PaymentInfoCard(
-            paymentMethod = uiState.paymentMethod,
-            paymentLabel = uiState.paymentLabel,
-            isPaid = uiState.isPaid,
-            splitBillEnabled = uiState.splitBillEnabled,
-            onSplitBillToggle = viewModel::onSplitBillToggle,
-            onSplitPaymentClick = onSplitPayment
-        )
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Rating section
-        RatingSection(
-            rating = uiState.rating,
-            onRatingChange = viewModel::onRatingChange
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Done button
-        Button(
-            onClick = onDone,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(
-                text = stringResource(Res.string.trip_done),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+            // Payment info card
+            PaymentInfoCard(
+                paymentMethod = uiState.paymentMethod,
+                paymentLabel = uiState.paymentLabel,
+                isPaid = uiState.isPaid,
+                splitBillEnabled = uiState.splitBillEnabled,
+                onSplitBillToggle = onSplitBillToggle,
+                onSplitPaymentClick = onSplitPayment
             )
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Rating section
+            RatingSection(
+                rating = uiState.rating,
+                onRatingChange = onRatingChange
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Done button
+            Button(
+                onClick = onDone,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = stringResource(Res.string.trip_done),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -593,5 +616,32 @@ private fun RatingSection(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TripSummaryScreenPreview() {
+    MovoTheme {
+        TripSummaryContent(
+            uiState = TripSummaryUiState(
+                vehicleName = "Fiat 500e",
+                totalCostCents = 1450,
+                finalCostCents = 1450,
+                durationMinutes = 32,
+                distanceKm = 8.5,
+                co2SavedGrams = 420,
+                paymentMethod = "Visa",
+                paymentLabel = "****4242",
+                isPaid = true,
+                splitBillEnabled = false,
+                rating = 4
+            ),
+            onDone = {},
+            onSplitPayment = {},
+            onSplitBillToggle = {},
+            onRatingChange = {},
+            onRetry = {}
+        )
     }
 }

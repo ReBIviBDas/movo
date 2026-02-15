@@ -119,6 +119,8 @@ import movo.composeapp.generated.resources.register_step_of
 import movo.composeapp.generated.resources.register_surname
 import movo.composeapp.generated.resources.register_title
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import it.movo.app.ui.theme.MovoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,11 +139,132 @@ fun RegisterScreen(
         }
     }
 
-    if (uiState.registrationSuccess) {
-        onRegistrationSuccess()
-        return
-    }
+    RegisterContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onBackClick = onNavigateBack,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+        onFirstNameChange = viewModel::onFirstNameChange,
+        onLastNameChange = viewModel::onLastNameChange,
+        onDateOfBirthChange = viewModel::onDateOfBirthChange,
+        onFiscalCodeChange = viewModel::onFiscalCodeChange,
+        onPhoneChange = viewModel::onPhoneChange,
+        onAddressChange = viewModel::onAddressChange,
+        onIdentityDocumentClick = viewModel::onIdentityDocumentClick,
+        onLicenseClick = viewModel::onDriverLicenseSelected,
+        onSkipLicense = viewModel::nextStep,
+        onAcceptTermsChange = viewModel::onAcceptTermsChange,
+        onAcceptPrivacyChange = viewModel::onAcceptPrivacyChange,
+        onAcceptCookiesChange = viewModel::onAcceptCookiesChange,
+        onNextStep = viewModel::nextStep,
+        onRegistrationSuccess = onRegistrationSuccess
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+private fun RegisterScreenStep1Preview() {
+    MovoTheme {
+        RegisterContent(
+            uiState = RegisterUiState(
+                currentStep = 1,
+                email = "mario.rossi@email.com",
+                password = "Password123!",
+                confirmPassword = "Password123!"
+            ),
+            onBackClick = {},
+            onEmailChange = {},
+            onPasswordChange = {},
+            onConfirmPasswordChange = {},
+            onTogglePasswordVisibility = {},
+            onFirstNameChange = {},
+            onLastNameChange = {},
+            onDateOfBirthChange = {},
+            onFiscalCodeChange = {},
+            onPhoneChange = {},
+            onAddressChange = {},
+            onIdentityDocumentClick = {},
+            onLicenseClick = {},
+            onSkipLicense = {},
+            onAcceptTermsChange = {},
+            onAcceptPrivacyChange = {},
+            onAcceptCookiesChange = {},
+            onNextStep = {},
+            onRegistrationSuccess = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+private fun RegisterScreenStep2Preview() {
+    MovoTheme {
+        RegisterContent(
+            uiState = RegisterUiState(
+                currentStep = 2,
+                email = "mario.rossi@email.com",
+                password = "Password123!",
+                confirmPassword = "Password123!",
+                firstName = "Mario",
+                lastName = "Rossi",
+                dateOfBirth = "15/03/1995",
+                fiscalCode = "RSSMRA95C15H501Z",
+                phone = "+39 333 1234567",
+                address = "Via Roma 1, Milano"
+            ),
+            onBackClick = {},
+            onEmailChange = {},
+            onPasswordChange = {},
+            onConfirmPasswordChange = {},
+            onTogglePasswordVisibility = {},
+            onFirstNameChange = {},
+            onLastNameChange = {},
+            onDateOfBirthChange = {},
+            onFiscalCodeChange = {},
+            onPhoneChange = {},
+            onAddressChange = {},
+            onIdentityDocumentClick = {},
+            onLicenseClick = {},
+            onSkipLicense = {},
+            onAcceptTermsChange = {},
+            onAcceptPrivacyChange = {},
+            onAcceptCookiesChange = {},
+            onNextStep = {},
+            onRegistrationSuccess = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RegisterContent(
+    uiState: RegisterUiState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onBackClick: () -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onFirstNameChange: (String) -> Unit,
+    onLastNameChange: (String) -> Unit,
+    onDateOfBirthChange: (String) -> Unit,
+    onFiscalCodeChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onAddressChange: (String) -> Unit,
+    onIdentityDocumentClick: () -> Unit,
+    onLicenseClick: () -> Unit,
+    onSkipLicense: () -> Unit,
+    onAcceptTermsChange: (Boolean) -> Unit,
+    onAcceptPrivacyChange: (Boolean) -> Unit,
+    onAcceptCookiesChange: (Boolean) -> Unit,
+    onNextStep: () -> Unit,
+    onRegistrationSuccess: () -> Unit
+) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -153,13 +276,7 @@ fun RegisterScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        if (uiState.currentStep > 1) {
-                            viewModel.previousStep()
-                        } else {
-                            onNavigateBack()
-                        }
-                    }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -179,7 +296,6 @@ fun RegisterScreen(
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Step indicator and progress
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -213,7 +329,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Animated content for each step
             AnimatedContent(
                 targetState = uiState.currentStep,
                 transitionSpec = {
@@ -233,10 +348,10 @@ fun RegisterScreen(
                         password = uiState.password,
                         confirmPassword = uiState.confirmPassword,
                         passwordVisible = uiState.passwordVisible,
-                        onEmailChange = viewModel::onEmailChange,
-                        onPasswordChange = viewModel::onPasswordChange,
-                        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
-                        onTogglePasswordVisibility = viewModel::togglePasswordVisibility
+                        onEmailChange = onEmailChange,
+                        onPasswordChange = onPasswordChange,
+                        onConfirmPasswordChange = onConfirmPasswordChange,
+                        onTogglePasswordVisibility = onTogglePasswordVisibility
                     )
                     2 -> Step2PersonalDetails(
                         firstName = uiState.firstName,
@@ -247,23 +362,23 @@ fun RegisterScreen(
                         address = uiState.address,
                         isUnder18 = uiState.isUnder18,
                         hasIdentityDocument = uiState.hasIdentityDocument,
-                        onIdentityDocumentClick = viewModel::onIdentityDocumentClick,
-                        onFirstNameChange = viewModel::onFirstNameChange,
-                        onLastNameChange = viewModel::onLastNameChange,
-                        onDateOfBirthChange = viewModel::onDateOfBirthChange,
-                        onFiscalCodeChange = viewModel::onFiscalCodeChange,
-                        onPhoneChange = viewModel::onPhoneChange,
-                        onAddressChange = viewModel::onAddressChange,
-                        onLicenseClick = viewModel::onDriverLicenseSelected,
-                        onSkipLicense = viewModel::nextStep
+                        onIdentityDocumentClick = onIdentityDocumentClick,
+                        onFirstNameChange = onFirstNameChange,
+                        onLastNameChange = onLastNameChange,
+                        onDateOfBirthChange = onDateOfBirthChange,
+                        onFiscalCodeChange = onFiscalCodeChange,
+                        onPhoneChange = onPhoneChange,
+                        onAddressChange = onAddressChange,
+                        onLicenseClick = onLicenseClick,
+                        onSkipLicense = onSkipLicense
                     )
                     3 -> Step3TermsAndPrivacy(
                         acceptTerms = uiState.acceptTerms,
                         acceptPrivacy = uiState.acceptPrivacy,
                         acceptCookies = uiState.acceptCookies,
-                        onAcceptTermsChange = viewModel::onAcceptTermsChange,
-                        onAcceptPrivacyChange = viewModel::onAcceptPrivacyChange,
-                        onAcceptCookiesChange = viewModel::onAcceptCookiesChange
+                        onAcceptTermsChange = onAcceptTermsChange,
+                        onAcceptPrivacyChange = onAcceptPrivacyChange,
+                        onAcceptCookiesChange = onAcceptCookiesChange
                     )
                     4 -> Step4Success()
                     else -> {}
@@ -272,10 +387,9 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Continue/Create Account button
             if (uiState.currentStep < 4) {
                 Button(
-                    onClick = viewModel::nextStep,
+                    onClick = onNextStep,
                     enabled = uiState.canProceed && !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()

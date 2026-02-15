@@ -35,12 +35,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import it.movo.app.data.model.GeoPoint
 import it.movo.app.data.model.RentalSummary
+import it.movo.app.data.model.VehicleMapItem
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
+import it.movo.app.ui.theme.MovoTheme
 import movo.composeapp.generated.resources.Res
+import androidx.compose.ui.tooling.preview.Preview
 import movo.composeapp.generated.resources.history_cost
 import movo.composeapp.generated.resources.history_date
 import movo.composeapp.generated.resources.history_duration
@@ -67,6 +71,24 @@ fun HistoryScreen(
         }
     }
 
+    HistoryContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onRetry = { viewModel.loadHistory() },
+        onRentalClick = onRentalClick,
+        onReportIssue = onReportIssue
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HistoryContent(
+    uiState: HistoryUiState,
+    snackbarHostState: SnackbarHostState,
+    onRetry: () -> Unit,
+    onRentalClick: (String) -> Unit,
+    onReportIssue: (String) -> Unit
+) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -96,11 +118,11 @@ fun HistoryScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = uiState.errorMessage ?: "",
+                            text = uiState.errorMessage,
                             style = MaterialTheme.typography.bodyLarge
                         )
                         OutlinedButton(
-                            onClick = { viewModel.loadHistory() }
+                            onClick = onRetry
                         ) {
                             Text(stringResource(Res.string.retry))
                         }
@@ -227,4 +249,73 @@ private fun formatCost(cents: Int): String {
     val euros = cents / 100
     val remainingCents = cents % 100
     return "$euros.${remainingCents.toString().padStart(2, '0')}"
+}
+
+@Preview
+@Composable
+private fun HistoryScreenPreview() {
+    val mockRentals = listOf(
+        RentalSummary(
+            id = "1",
+            userId = "user1",
+            vehicleId = "v1",
+            vehicle = VehicleMapItem(
+                id = "v1",
+                model = "Fiat 500e",
+                licensePlate = "AB123CD",
+                location = GeoPoint(coordinates = listOf(12.5, 41.9)),
+                batteryLevel = 85,
+                basePricePerMinute = 25
+            ),
+            startedAt = "2026-02-10T14:30:00Z",
+            durationMinutes = 45,
+            finalCostCents = 1125
+        ),
+        RentalSummary(
+            id = "2",
+            userId = "user1",
+            vehicleId = "v2",
+            vehicle = VehicleMapItem(
+                id = "v2",
+                model = "Vespa Elettrica",
+                licensePlate = "EF456GH",
+                location = GeoPoint(coordinates = listOf(12.6, 41.8)),
+                batteryLevel = 72,
+                basePricePerMinute = 20
+            ),
+            startedAt = "2026-02-08T09:15:00Z",
+            durationMinutes = 120,
+            finalCostCents = 2400
+        ),
+        RentalSummary(
+            id = "3",
+            userId = "user1",
+            vehicleId = "v3",
+            vehicle = VehicleMapItem(
+                id = "v3",
+                model = "Renault Zoe",
+                licensePlate = "IJ789KL",
+                location = GeoPoint(coordinates = listOf(12.4, 42.0)),
+                batteryLevel = 90,
+                basePricePerMinute = 28
+            ),
+            startedAt = "2026-02-05T16:45:00Z",
+            durationMinutes = 30,
+            finalCostCents = 840
+        )
+    )
+
+    MovoTheme {
+        HistoryContent(
+            uiState = HistoryUiState(
+                rentals = mockRentals,
+                isLoading = false,
+                errorMessage = null
+            ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onRetry = {},
+            onRentalClick = {},
+            onReportIssue = {}
+        )
+    }
 }

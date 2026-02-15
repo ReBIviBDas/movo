@@ -79,6 +79,8 @@ import movo.composeapp.generated.resources.ride_total_cost
 import movo.composeapp.generated.resources.ride_vehicle_locked
 import movo.composeapp.generated.resources.ride_vehicle_unlocked
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import it.movo.app.ui.theme.MovoTheme
 
 @Composable
 fun ActiveRideScreen(
@@ -103,6 +105,25 @@ fun ActiveRideScreen(
         return
     }
 
+    ActiveRideContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onToggleLock = viewModel::toggleLock,
+        onEndRental = viewModel::endRental,
+        onReportIssue = onReportIssue,
+        snackbarHostState = snackbarHostState
+    )
+}
+
+@Composable
+private fun ActiveRideContent(
+    uiState: ActiveRideUiState,
+    onNavigateBack: () -> Unit,
+    onToggleLock: () -> Unit,
+    onEndRental: () -> Unit,
+    onReportIssue: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
@@ -135,15 +156,15 @@ fun ActiveRideScreen(
                     if (uiState.isVehicleLocked) {
                         LockedStateContent(
                             uiState = uiState,
-                            onUnlockClick = viewModel::toggleLock,
-                            onEndRentalClick = viewModel::endRental,
+                            onUnlockClick = onToggleLock,
+                            onEndRentalClick = onEndRental,
                             onReportIssueClick = onReportIssue
                         )
                     } else {
                         UnlockedStateContent(
                             uiState = uiState,
-                            onLockClick = viewModel::toggleLock,
-                            onEndRentalClick = viewModel::endRental,
+                            onLockClick = onToggleLock,
+                            onEndRentalClick = onEndRental,
                             onReportIssueClick = onReportIssue
                         )
                     }
@@ -732,5 +753,28 @@ private fun MetricCard(
                 color = textColor
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ActiveRideScreenPreview() {
+    MovoTheme {
+        ActiveRideContent(
+            uiState = ActiveRideUiState(
+                isVehicleLocked = false,
+                vehicleName = "Fiat 500e",
+                vehicleId = "MV-1234",
+                batteryLevel = 72,
+                durationSeconds = 1834,
+                currentCostCents = 1250,
+                distanceKm = 5.3,
+                passengers = listOf("Mario", "Luigi")
+            ),
+            onNavigateBack = {},
+            onToggleLock = {},
+            onEndRental = {},
+            onReportIssue = {}
+        )
     }
 }

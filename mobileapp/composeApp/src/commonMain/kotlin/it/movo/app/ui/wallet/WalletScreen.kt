@@ -67,6 +67,7 @@ import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoWhite
+import it.movo.app.ui.theme.MovoTheme
 import movo.composeapp.generated.resources.Res
 import movo.composeapp.generated.resources.wallet_add_new_card
 import movo.composeapp.generated.resources.wallet_default
@@ -85,6 +86,7 @@ import movo.composeapp.generated.resources.wallet_expiry_date
 import movo.composeapp.generated.resources.wallet_save
 import movo.composeapp.generated.resources.wallet_view_transactions
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,118 +177,137 @@ fun WalletScreen(
             )
         }
     ) { paddingValues ->
-        if (uiState.isLoading && uiState.paymentMethods.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = MovoTeal)
+        WalletContent(
+            uiState = uiState,
+            paddingValues = paddingValues,
+            onSetDefault = viewModel::setDefaultMethod,
+            onDelete = viewModel::deleteMethod,
+            onViewTransactions = onViewTransactions,
+            onAddCard = viewModel::showAddCardDialog
+        )
+    }
+}
+
+@Composable
+private fun WalletContent(
+    uiState: WalletUiState,
+    paddingValues: androidx.compose.foundation.layout.PaddingValues,
+    onSetDefault: (String) -> Unit,
+    onDelete: (String) -> Unit,
+    onViewTransactions: () -> Unit,
+    onAddCard: () -> Unit
+) {
+    if (uiState.isLoading && uiState.paymentMethods.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MovoTeal)
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(Res.string.wallet_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MovoOnSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(Res.string.wallet_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MovoOnSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(Res.string.wallet_title),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MovoOnSurface
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(Res.string.wallet_subtitle),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MovoOnSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
 
-                    if (uiState.paymentMethods.isEmpty()) {
-                        item {
-                            EmptyWalletState()
-                        }
-                    } else {
-                        items(
-                            uiState.paymentMethods,
-                            key = { it.id }
-                        ) { method ->
-                            PaymentMethodCard(
-                                method = method,
-                                onSetDefault = { viewModel.setDefaultMethod(method.id) },
-                                onDelete = { viewModel.deleteMethod(method.id) }
-                            )
-                        }
-                    }
+            if (uiState.paymentMethods.isEmpty()) {
+                item {
+                    EmptyWalletState()
+                }
+            } else {
+                items(
+                    uiState.paymentMethods,
+                    key = { it.id }
+                ) { method ->
+                    PaymentMethodCard(
+                        method = method,
+                        onSetDefault = { onSetDefault(method.id) },
+                        onDelete = { onDelete(method.id) }
+                    )
+                }
+            }
 
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        TextButton(
-                            onClick = onViewTransactions,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.History,
-                                contentDescription = null,
-                                tint = MovoTeal,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(Res.string.wallet_view_transactions),
-                                color = MovoTeal,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                TextButton(
+                    onClick = onViewTransactions,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.History,
+                        contentDescription = null,
+                        tint = MovoTeal,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(Res.string.wallet_view_transactions),
+                        color = MovoTeal,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = null,
-                                tint = MovoOnSurfaceVariant,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(Res.string.wallet_payments_secured),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MovoOnSurfaceVariant
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MovoOnSurfaceVariant,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(Res.string.wallet_payments_secured),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MovoOnSurfaceVariant
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = { viewModel.showAddCardDialog() },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(
-                                text = stringResource(Res.string.wallet_add_new_card),
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(24.dp))
-                    }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onAddCard,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.wallet_add_new_card),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
@@ -438,5 +459,50 @@ private fun getMethodDisplayName(method: PaymentMethod): String {
         PaymentMethodType.PAYPAL -> "PayPal"
         PaymentMethodType.APPLE_PAY -> "Apple Pay"
         PaymentMethodType.GOOGLE_PAY -> "Google Pay"
+    }
+}
+
+@Preview
+@Composable
+private fun WalletScreenPreview() {
+    MovoTheme {
+        WalletContent(
+            uiState = WalletUiState(
+                paymentMethods = listOf(
+                    PaymentMethod(
+                        id = "pm_1",
+                        type = PaymentMethodType.CARD,
+                        brand = "visa",
+                        lastFour = "4242",
+                        expiryMonth = 12,
+                        expiryYear = 2027,
+                        isDefault = true
+                    ),
+                    PaymentMethod(
+                        id = "pm_2",
+                        type = PaymentMethodType.CARD,
+                        brand = "mastercard",
+                        lastFour = "8888",
+                        expiryMonth = 8,
+                        expiryYear = 2026,
+                        isDefault = false
+                    ),
+                    PaymentMethod(
+                        id = "pm_3",
+                        type = PaymentMethodType.PAYPAL,
+                        lastFour = "",
+                        isDefault = false
+                    )
+                ),
+                isLoading = false,
+                errorMessage = null,
+                showAddCardDialog = false
+            ),
+            paddingValues = androidx.compose.foundation.layout.PaddingValues(),
+            onSetDefault = {},
+            onDelete = {},
+            onViewTransactions = {},
+            onAddCard = {}
+        )
     }
 }

@@ -21,13 +21,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Lock
@@ -83,7 +81,6 @@ import it.movo.app.ui.theme.MovoWhite
 import movo.composeapp.generated.resources.Res
 import movo.composeapp.generated.resources.cancel
 import movo.composeapp.generated.resources.common_email
-import movo.composeapp.generated.resources.common_error
 import movo.composeapp.generated.resources.common_loading
 import movo.composeapp.generated.resources.delete
 import movo.composeapp.generated.resources.profile_change_password
@@ -119,6 +116,8 @@ import movo.composeapp.generated.resources.profile_logout_all
 import movo.composeapp.generated.resources.profile_export_data
 import movo.composeapp.generated.resources.save
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import it.movo.app.ui.theme.MovoTheme
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -132,18 +131,61 @@ fun ProfileScreen(
     onPenalty: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var deletePassword by remember { mutableStateOf("") }
-    var showPasswordDialog by remember { mutableStateOf(false) }
-    var currentPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
 
     LaunchedEffect(uiState.logoutSuccess) {
         if (uiState.logoutSuccess) {
             onLogout()
         }
     }
+
+    ProfileContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onNotificationSettings = onNotificationSettings,
+        onSubscription = onSubscription,
+        onPromotion = onPromotion,
+        onPenalty = onPenalty,
+        onFullNameChange = { viewModel.onFullNameChange(it) },
+        onPhoneChange = { viewModel.onPhoneChange(it) },
+        onAddressChange = { viewModel.onAddressChange(it) },
+        onPushToggle = { viewModel.onPushNotificationsToggle(it) },
+        onEmailToggle = { viewModel.onEmailUpdatesToggle(it) },
+        onExportData = { viewModel.exportData() },
+        onLogoutClick = { viewModel.logout() },
+        onLogoutAllClick = { viewModel.logoutAll() },
+        onDeleteAccount = { viewModel.deleteAccount(it) },
+        onUpdatePassword = { current, new -> viewModel.updatePassword(current, new) },
+        onSaveChanges = { viewModel.saveChanges() }
+    )
+}
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun ProfileContent(
+    uiState: ProfileUiState,
+    onNavigateBack: () -> Unit,
+    onNotificationSettings: () -> Unit,
+    onSubscription: () -> Unit,
+    onPromotion: () -> Unit,
+    onPenalty: () -> Unit,
+    onFullNameChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onAddressChange: (String) -> Unit,
+    onPushToggle: (Boolean) -> Unit,
+    onEmailToggle: (Boolean) -> Unit,
+    onExportData: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onLogoutAllClick: () -> Unit,
+    onDeleteAccount: (String) -> Unit,
+    onUpdatePassword: (String, String) -> Unit,
+    onSaveChanges: () -> Unit
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var deletePassword by remember { mutableStateOf("") }
+    var showPasswordDialog by remember { mutableStateOf(false) }
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -204,7 +246,6 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // MovoPoints Placeholder (RF44-47)
                 MovoPointsCard()
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -220,9 +261,9 @@ fun ProfileScreen(
                     address = uiState.address,
                     dateOfBirth = uiState.dateOfBirth,
                     fiscalCode = uiState.fiscalCode,
-                    onFullNameChange = { viewModel.onFullNameChange(it) },
-                    onPhoneChange = { viewModel.onPhoneChange(it) },
-                    onAddressChange = { viewModel.onAddressChange(it) }
+                    onFullNameChange = onFullNameChange,
+                    onPhoneChange = onPhoneChange,
+                    onAddressChange = onAddressChange
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -241,8 +282,8 @@ fun ProfileScreen(
                 NotificationCard(
                     pushEnabled = uiState.pushNotificationsEnabled,
                     emailEnabled = uiState.emailUpdatesEnabled,
-                    onPushToggle = { viewModel.onPushNotificationsToggle(it) },
-                    onEmailToggle = { viewModel.onEmailUpdatesToggle(it) }
+                    onPushToggle = onPushToggle,
+                    onEmailToggle = onEmailToggle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -280,13 +321,13 @@ fun ProfileScreen(
 
                 NavigationRow(
                     label = stringResource(Res.string.profile_export_data),
-                    onClick = { viewModel.exportData() }
+                    onClick = onExportData
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedButton(
-                    onClick = { viewModel.logout() },
+                    onClick = onLogoutClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -310,7 +351,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedButton(
-                    onClick = { viewModel.logoutAll() },
+                    onClick = onLogoutAllClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -380,7 +421,7 @@ fun ProfileScreen(
                         confirmButton = {
                             TextButton(
                                 onClick = {
-                                    viewModel.deleteAccount(deletePassword)
+                                    onDeleteAccount(deletePassword)
                                     showDeleteDialog = false
                                     deletePassword = ""
                                 }
@@ -444,7 +485,7 @@ fun ProfileScreen(
                         confirmButton = {
                             TextButton(
                                 onClick = {
-                                    viewModel.updatePassword(currentPassword, newPassword)
+                                    onUpdatePassword(currentPassword, newPassword)
                                     showPasswordDialog = false
                                     currentPassword = ""
                                     newPassword = ""
@@ -466,7 +507,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { viewModel.saveChanges() },
+                    onClick = onSaveChanges,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -1077,5 +1118,36 @@ private fun MovoPointsCard() {
     }
 }
 
-
-
+@Preview
+@Composable
+private fun ProfileScreenPreview() {
+    MovoTheme {
+        ProfileContent(
+            uiState = ProfileUiState(
+                fullName = "Mario Rossi",
+                email = "mario.rossi@email.com",
+                phone = "+39 333 1234567",
+                memberSince = "Gennaio 2024",
+                licenseVerified = true,
+                pushNotificationsEnabled = true,
+                isLoading = false
+            ),
+            onNavigateBack = {},
+            onNotificationSettings = {},
+            onSubscription = {},
+            onPromotion = {},
+            onPenalty = {},
+            onFullNameChange = {},
+            onPhoneChange = {},
+            onAddressChange = {},
+            onPushToggle = {},
+            onEmailToggle = {},
+            onExportData = {},
+            onLogoutClick = {},
+            onLogoutAllClick = {},
+            onDeleteAccount = {},
+            onUpdatePassword = { _, _ -> },
+            onSaveChanges = {}
+        )
+    }
+}
