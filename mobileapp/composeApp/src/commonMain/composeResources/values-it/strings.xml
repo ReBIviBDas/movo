@@ -1,0 +1,396 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">MOVO</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Annulla</string>
+    <string name="save">Salva</string>
+    <string name="delete">Elimina</string>
+    <string name="confirm">Conferma</string>
+    <string name="back">Indietro</string>
+    <string name="close">Chiudi</string>
+    <string name="retry">Riprova</string>
+    <string name="loading">Caricamento...</string>
+    <string name="common_loading">Caricamento…</string>
+    <string name="error_generic">Qualcosa è andato storto. Riprova.</string>
+    <string name="common_error">Si è verificato un errore</string>
+    <string name="error_network">Nessuna connessione internet. Controlla la rete.</string>
+    <string name="per_minute">/min</string>
+    <string name="currency_symbol">€</string>
+    <string name="common_email">Email</string>
+
+    <!-- Navigation -->
+    <string name="nav_explore">Esplora</string>
+    <string name="nav_trips">Viaggi</string>
+    <string name="nav_wallet">Portafoglio</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_history">Cronologia</string>
+    <string name="nav_profile">Profilo</string>
+
+    <!-- Login -->
+    <string name="login_title">Bentornato</string>
+    <string name="login_subtitle">Guida Verde a Trento</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Accedi</string>
+    <string name="login_forgot_password">Password dimenticata?</string>
+    <string name="login_google">Accedi con Google</string>
+    <string name="login_no_account">Non hai un account?</string>
+    <string name="login_register">Registrati</string>
+    <string name="login_error_invalid">Email o password non validi</string>
+    <string name="login_error_email_required">L\'email è obbligatoria</string>
+    <string name="login_error_password_required">La password è obbligatoria</string>
+    <string name="login_or_divider">oppure</string>
+    
+    <!-- New Login Screen Strings -->
+    <string name="login_welcome_title">Benvenuto in Movo</string>
+    <string name="login_subtitle_new">Guida Verde a Trento</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_email_placeholder">nome@esempio.com</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_password_placeholder">Inserisci la tua password</string>
+    <string name="login_or_continue">Oppure continua con</string>
+    <string name="login_sign_up">Registrati</string>
+
+    <!-- Register -->
+    <string name="register_title">Crea Account</string>
+    <string name="register_subtitle">Unisciti a MOVO oggi</string>
+    <string name="register_first_name">Nome</string>
+    <string name="register_surname">Cognome</string>
+    <string name="register_last_name">Cognome</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_confirm_password">Conferma Password</string>
+    <string name="register_phone">Numero di Telefono</string>
+    <string name="register_date_of_birth">Data di Nascita</string>
+    <string name="register_date_format">GG/MM/AAAA</string>
+    <string name="register_fiscal_code">Codice Fiscale</string>
+    <string name="register_address">Indirizzo</string>
+    <string name="register_accept_cookies">Accetto l\'uso dei cookie</string>
+    <string name="register_drivers_license">Patente di Guida</string>
+    <string name="register_driving_license">Patente di Guida</string>
+    <string name="register_license_front">Fronte della Patente</string>
+    <string name="register_license_tap">Tocca per scansionare o caricare foto</string>
+    <string name="register_license_hint">Assicurati che nome e foto siano chiaramente visibili senza riflessi.</string>
+    <string name="register_upload_license">Carica la tua patente</string>
+    <string name="register_upload_hint">Tocca per caricare o trascina</string>
+    <string name="register_accept_terms">Accetto i Termini di Servizio</string>
+    <string name="register_accept_privacy">Accetto l\'Informativa sulla Privacy</string>
+    <string name="register_button">Crea Account</string>
+    <string name="register_create_account">Crea Account</string>
+    <string name="register_has_account">Hai già un account?</string>
+    <string name="register_login">Accedi</string>
+    <string name="register_error_passwords_mismatch">Le password non coincidono</string>
+    <string name="register_continue">Continua</string>
+    <string name="register_get_started">Inizia</string>
+    <string name="register_step_of">Passaggio %d di %d</string>
+    <string name="register_completed">%d%% Completato</string>
+    <string name="register_step1_title">Crea il tuo account.</string>
+    <string name="register_step1_subtitle">Inserisci la tua email e crea una password sicura.</string>
+    <string name="register_step2_title">Prepariamoci a guidare.</string>
+    <string name="register_step2_subtitle">Inserisci i tuoi dati e carica una patente di guida valida.</string>
+    <string name="register_step3_title">Ci siamo quasi!</string>
+    <string name="register_step3_subtitle">Leggi e accetta i nostri termini per continuare.</string>
+    <string name="register_step4_title">Tutto pronto!</string>
+    <string name="register_step4_subtitle">Il tuo account è stato creato con successo.</string>
+
+    <!-- Forgot Password -->
+    <string name="forgot_title">Reimposta Password</string>
+    <string name="forgot_subtitle">Inserisci la tua email e ti invieremo un link per reimpostare la password</string>
+    <string name="forgot_email">Email</string>
+    <string name="forgot_button">Invia Link di Reset</string>
+    <string name="forgot_success">Email di reset password inviata. Controlla la tua casella.</string>
+    <string name="forgot_back_to_login">Torna all\'accesso</string>
+
+    <!-- Map / Explore -->
+    <string name="map_search_placeholder">Trova un'auto nelle vicinanze</string>
+    <string name="map_search_destination">Cerca destinazione</string>
+    <string name="map_filter_all">Tutti</string>
+    <string name="map_filter_nearby">Vicini</string>
+    <string name="map_filter_price">Prezzo</string>
+    <string name="map_filter_battery">Batteria</string>
+    <string name="map_filter_mixed">Trasporto misto</string>
+    <string name="map_filter_car">Auto</string>
+    <string name="map_filter_walk">A piedi</string>
+    <string name="map_no_vehicles">Nessun veicolo trovato in quest'area</string>
+
+    <!-- Vehicle Details -->
+    <string name="vehicle_details">Dettagli Veicolo</string>
+    <string name="vehicle_battery">%d%%</string>
+    <string name="vehicle_range">%dkm autonomia</string>
+    <string name="vehicle_price">Prezzo</string>
+    <string name="vehicle_features">Caratteristiche</string>
+    <string name="vehicle_book">Prenota Veicolo</string>
+    <string name="vehicle_book_now">Prenota ora</string>
+    <string name="vehicle_license_plate">Targa</string>
+    <string name="vehicle_km">km</string>
+    <string name="vehicle_available">Disponibile</string>
+    <string name="vehicle_price_per_min">€%.2f/min</string>
+    <string name="vehicle_range_label">Autonomia</string>
+    <string name="vehicle_distance_label">Distanza</string>
+    <string name="vehicle_seats_label">Posti</string>
+    <string name="vehicle_reserve_free">Prenota gratis</string>
+    <string name="vehicle_reserve_time">(%d min)</string>
+    <string name="vehicle_reserve_later">Prenota per dopo</string>
+    <string name="vehicle_split_friends">DIVIDI CON AMICI</string>
+    <string name="vehicle_split_you">Tu</string>
+    <string name="vehicle_split_add">Aggiungi</string>
+
+    <!-- Booking -->
+    <string name="booking_title">Prenotazione Confermata</string>
+    <string name="booking_timer_label">Tempo rimanente</string>
+    <string name="booking_cancel">Annulla Prenotazione</string>
+    <string name="booking_cancel_confirm">Sei sicuro di voler annullare questa prenotazione?</string>
+    <string name="booking_navigate">Naviga verso il Veicolo</string>
+    <string name="booking_expired">La prenotazione è scaduta</string>
+    <string name="booking_minutes">min</string>
+    <string name="booking_reservation_active">PRENOTAZIONE ATTIVA</string>
+    <string name="booking_time_to_reach">Tempo per raggiungere il veicolo</string>
+    <string name="booking_plate">Targa: %s</string>
+    <string name="booking_walk_to">Cammina verso %s</string>
+    <string name="booking_walk_time">~%d min a piedi (%dm)</string>
+    <string name="booking_check_damages">Controlla eventuali danni</string>
+    <string name="booking_unlock_app">Sblocca con l\'App</string>
+    <string name="booking_unlock_vehicle">Sblocca veicolo</string>
+
+    <!-- Active Ride -->
+    <string name="ride_unlock">Sblocca Veicolo</string>
+    <string name="ride_unlock_hint">Avvicinati al veicolo per sbloccarlo</string>
+    <string name="ride_duration">Durata</string>
+    <string name="ride_cost">Costo</string>
+    <string name="ride_total_cost">Costo Totale</string>
+    <string name="ride_distance">Distanza</string>
+    <string name="ride_end">Termina Noleggio</string>
+    <string name="ride_end_confirm">Sei sicuro di voler terminare questo noleggio?</string>
+    <string name="ride_pause">Pausa</string>
+    <string name="ride_resume">Riprendi</string>
+    <string name="ride_paused">Noleggio in Pausa</string>
+
+    <!-- Trip Summary -->
+    <string name="trip_summary_title">Riepilogo Viaggio</string>
+    <string name="trip_total_cost">Costo Totale</string>
+    <string name="trip_duration">Durata</string>
+    <string name="trip_distance">Distanza</string>
+    <string name="trip_payment_method">Metodo di Pagamento</string>
+    <string name="trip_split_bill">Dividi il Conto</string>
+    <string name="trip_done">Fatto</string>
+    <string name="trip_discount">Sconto</string>
+    <string name="trip_final_cost">Costo Finale</string>
+
+    <!-- Split Payment -->
+    <string name="split_title">Dividi Pagamento</string>
+    <string name="split_add_participant">Aggiungi Partecipante</string>
+    <string name="split_equal">Dividi Equamente</string>
+    <string name="split_custom">Divisione Personalizzata</string>
+    <string name="split_send_request">Invia Richiesta</string>
+    <string name="split_request_sent">Richiesta di divisione inviata!</string>
+    <string name="split_percentage">Percentuale</string>
+    <string name="split_amount">Importo</string>
+    <string name="split_participant">Partecipante %d</string>
+    <string name="split_remove">Rimuovi</string>
+    <string name="split_user_id_email">ID utente o Email</string>
+    <string name="split_cost_with_passengers">Dividi il costo con i tuoi passeggeri</string>
+
+    <!-- History -->
+    <string name="history_title">Cronologia Viaggi</string>
+    <string name="history_empty">Nessun viaggio</string>
+    <string name="history_empty_subtitle">I tuoi viaggi completati appariranno qui</string>
+    <string name="history_filter_all">Tutti</string>
+    <string name="history_filter_date">Data</string>
+    <string name="history_filter_cost">Costo</string>
+    <string name="history_date">Data</string>
+    <string name="history_cost">Costo</string>
+    <string name="history_duration">Durata</string>
+    <string name="history_distance">Distanza</string>
+    <string name="history_total_cost">Costo Totale</string>
+    <string name="history_minutes">%d min</string>
+    <string name="history_km">%.1f km</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profilo</string>
+    <string name="profile_edit">Modifica Profilo</string>
+    <string name="profile_personal_info">Informazioni Personali</string>
+    <string name="profile_personal_details">Dati Personali</string>
+    <string name="profile_full_name">Nome Completo</string>
+    <string name="profile_phone_number">Numero di Telefono</string>
+    <string name="profile_drivers_license">Patente di Guida</string>
+    <string name="profile_license_verified">VERIFICATA</string>
+    <string name="profile_license_valid_until">Valida fino a %s</string>
+    <string name="profile_member_since">Membro dal %s</string>
+    <string name="profile_push_notifications">Notifiche Push</string>
+    <string name="profile_push_subtitle">Aggiornamenti e avvisi sui viaggi</string>
+    <string name="profile_email_updates">Aggiornamenti Email</string>
+    <string name="profile_email_subtitle">Novità e promozioni</string>
+    <string name="profile_change_password">Cambia Password</string>
+    <string name="profile_notification_settings">Impostazioni Notifiche</string>
+    <string name="profile_save_changes">Salva Modifiche</string>
+    <string name="profile_notifications">Notifiche</string>
+    <string name="profile_payment_methods">Metodi di Pagamento</string>
+    <string name="profile_language">Lingua</string>
+    <string name="profile_help">Assistenza</string>
+    <string name="profile_about">Informazioni</string>
+    <string name="profile_logout">Esci</string>
+    <string name="profile_logout_confirm">Sei sicuro di voler uscire?</string>
+    <string name="profile_delete_account">Elimina Account</string>
+    <string name="profile_delete_confirm">Questa azione è irreversibile. Tutti i tuoi dati saranno eliminati definitivamente.</string>
+    <string name="profile_version">Versione</string>
+    <string name="profile_enter_password">Inserisci la tua password per confermare</string>
+    <string name="profile_current_password">Password Attuale</string>
+    <string name="profile_new_password">Nuova Password</string>
+
+    <!-- Wallet -->
+    <string name="wallet_title">Metodi di Pagamento</string>
+    <string name="wallet_subtitle">Gestisci le tue carte e portafogli digitali</string>
+    <string name="wallet_add_card">Aggiungi Metodo di Pagamento</string>
+    <string name="wallet_add_new_card">Aggiungi Nuova Carta</string>
+    <string name="wallet_default">Predefinito</string>
+    <string name="wallet_set_default">Imposta come Predefinito</string>
+    <string name="wallet_remove">Rimuovi</string>
+    <string name="wallet_remove_confirm">Rimuovere questo metodo di pagamento?</string>
+    <string name="wallet_empty">Nessun metodo di pagamento</string>
+    <string name="wallet_empty_subtitle">Aggiungi un metodo di pagamento per iniziare a noleggiare</string>
+    <string name="wallet_expires">Scadenza</string>
+    <string name="wallet_view_transactions">Visualizza Cronologia Transazioni</string>
+    <string name="wallet_payments_secured">Pagamenti protetti da Movo</string>
+    <string name="wallet_card_number">Numero Carta</string>
+    <string name="wallet_expiry_date">Data di Scadenza (MM/AA)</string>
+    <string name="wallet_cvv">CVV</string>
+    <string name="wallet_cancel">Annulla</string>
+    <string name="wallet_save">Salva</string>
+
+    <!-- Report Issue -->
+    <string name="report_title">Segnala un Problema</string>
+    <string name="report_category">Categoria</string>
+    <string name="report_category_technical">Problema Tecnico</string>
+    <string name="report_category_damage">Danno</string>
+    <string name="report_category_cleanliness">Pulizia</string>
+    <string name="report_category_battery">Batteria Scarica</string>
+    <string name="report_category_other">Altro</string>
+    <string name="report_description">Descrizione</string>
+    <string name="report_description_hint">Descrivi il problema...</string>
+    <string name="report_photos">Foto</string>
+    <string name="report_add_photo">Aggiungi Foto</string>
+    <string name="report_max_photos">Massimo 5 foto</string>
+    <string name="report_submit">Invia Segnalazione</string>
+    <string name="report_success">Segnalazione inviata con successo</string>
+    <string name="common_done">Fatto</string>
+    <string name="email_placeholder">nome@esempio.com</string>
+
+    <!-- Notification Settings -->
+    <string name="notifications_title">Preferenze Notifiche</string>
+    <string name="notifications_promotional">Promozionali</string>
+    <string name="notifications_transactional">Transazionali</string>
+    <string name="notifications_booking_reminders">Promemoria Prenotazioni</string>
+    <string name="notifications_rental_alerts">Avvisi Noleggio</string>
+    <string name="notifications_push">Push</string>
+    <string name="notifications_email">Email</string>
+    <string name="notifications_sms">SMS</string>
+    <string name="notification_alerts">Avvisi</string>
+    <string name="notifications_saved">Preferenze salvate!</string>
+
+    <!-- Active Ride Dashboard -->
+    <string name="ride_connected">CONNESSO</string>
+    <string name="ride_vehicle_locked">Veicolo bloccato</string>
+    <string name="ride_near_vehicle">Sei vicino al veicolo</string>
+    <string name="ride_swipe_unlock">Scorri per sbloccare</string>
+    <string name="ride_lock_car">Blocca auto</string>
+    <string name="ride_vehicle_unlocked">Veicolo sbloccato</string>
+    <string name="ride_active_safe">Corsa attiva • Guida in sicurezza</string>
+    <string name="ride_passengers">PASSEGGERI</string>
+    <string name="ride_splitting_bill">DIVISIONE CONTO</string>
+    <string name="ride_current_cost">COSTO ATTUALE</string>
+    <string name="ride_end_rental">Termina noleggio</string>
+    <string name="ride_report_issue">Segnala problema</string>
+
+    <!-- Trip Summary -->
+    <string name="trip_view_breakdown">Vedi dettaglio</string>
+    <string name="trip_co2_saved">CO2 RISPARMIATA</string>
+    <string name="trip_paid">PAGATO</string>
+    <string name="trip_split_bill_subtitle">Dividi il conto con i passeggeri</string>
+    <string name="trip_rate">Valuta la tua esperienza</string>
+
+    <!-- Subscriptions -->
+    <string name="subscription_title">Abbonamenti</string>
+    <string name="subscription_plans">Piani Disponibili</string>
+    <string name="subscription_active">Abbonamento Attivo</string>
+    <string name="subscription_no_active">Nessun abbonamento attivo</string>
+    <string name="subscription_no_active_subtitle">Scegli un piano per risparmiare sulle corse</string>
+    <string name="subscription_subscribe">Abbonati</string>
+    <string name="subscription_cancel">Annulla Abbonamento</string>
+    <string name="subscription_cancel_confirm">Vuoi annullare il tuo abbonamento? Resterà attivo fino alla fine del periodo di fatturazione corrente.</string>
+    <string name="subscription_auto_renew">Rinnovo automatico</string>
+    <string name="subscription_per_month">/mese</string>
+    <string name="subscription_per_year">/anno</string>
+    <string name="subscription_included_minutes">minuti inclusi</string>
+    <string name="subscription_discount">sconto</string>
+    <string name="subscription_minutes_used">Minuti utilizzati</string>
+    <string name="subscription_minutes_remaining">Minuti rimanenti</string>
+    <string name="subscription_current_period">Periodo corrente</string>
+    <string name="subscription_status_active">Attivo</string>
+    <string name="subscription_status_cancelled">Annullato</string>
+    <string name="subscription_billing_period">Periodo di fatturazione</string>
+    <string name="subscription_features">Funzionalità</string>
+    <string name="subscription_price_per_month">Prezzo al mese</string>
+
+    <!-- Promotions -->
+    <string name="promotion_title">Promozioni</string>
+    <string name="promotion_enter_code">Inserisci codice promozionale</string>
+    <string name="promotion_apply">Applica</string>
+    <string name="promotion_applied">Promozione applicata con successo!</string>
+    <string name="promotion_available">Promozioni Disponibili</string>
+    <string name="promotion_no_available">Nessuna promozione disponibile</string>
+    <string name="promotion_no_available_subtitle">Controlla più tardi per nuove offerte</string>
+    <string name="promotion_valid_until">Valida fino al</string>
+    <string name="promotion_type_percentage">Sconto percentuale</string>
+    <string name="promotion_type_fixed">Sconto fisso</string>
+    <string name="promotion_type_free_minutes">Minuti gratuiti</string>
+    <string name="promotion_off">DI SCONTO</string>
+    <string name="promotion_code_applied">Codice promozionale applicato!</string>
+    <string name="promotion_discount">Sconto</string>
+    <string name="promotion_no_promotions">Nessuna promozione disponibile</string>
+    <string name="promotion_type">Tipo</string>
+
+    <!-- Penalties -->
+    <string name="penalty_title">Sanzioni</string>
+    <string name="penalty_contest">Contesta</string>
+    <string name="penalty_contest_title">Contesta Sanzione</string>
+    <string name="penalty_contest_hint">Spiega perché vuoi contestare questa sanzione (minimo 20 caratteri)</string>
+    <string name="penalty_contest_submit">Invia Contestazione</string>
+    <string name="penalty_contest_success">Contestazione inviata con successo</string>
+    <string name="penalty_no_penalties">Nessuna sanzione</string>
+    <string name="penalty_no_penalties_subtitle">Non hai sanzioni. Ottimo lavoro!</string>
+    <string name="penalty_status_pending">In attesa</string>
+    <string name="penalty_status_paid">Pagata</string>
+    <string name="penalty_status_contested">Contestata</string>
+    <string name="penalty_status_cancelled">Annullata</string>
+    <string name="penalty_type_parking">Violazione sosta</string>
+    <string name="penalty_type_damage">Danno</string>
+    <string name="penalty_type_traffic">Multa stradale</string>
+    <string name="penalty_type_late_return">Restituzione tardiva</string>
+    <string name="penalty_type_other">Altro</string>
+    <string name="penalty_due_date">Scadenza</string>
+    <string name="penalty_amount">Importo</string>
+    <string name="penalty_type">Tipo</string>
+    <string name="penalty_retry">Riprova</string>
+    <string name="penalty_cancel">Annulla</string>
+    <string name="penalty_success">Successo</string>
+
+    <!-- Profile Navigation -->
+    <string name="profile_subscriptions">Abbonamenti</string>
+    <string name="profile_promotions">Promozioni</string>
+    <string name="profile_penalties">Sanzioni</string>
+    <string name="profile_movo_points">MovoPoints</string>
+    <string name="penalty_type_geofence_exit">Uscita area autorizzata</string>
+    
+    <!-- Filtri -->
+    <string name="filter_title">Filtri</string>
+    <string name="filter_min_battery">Batteria minima: %d%%</string>
+    <string name="filter_max_price">Prezzo massimo: €%.2f/min</string>
+    <string name="filter_max_distance">Distanza massima: %.1f km</string>
+    <string name="filter_apply">Applica filtri</string>
+    <string name="filter_reset">Reset</string>
+    
+    <!-- Registrazione -->
+    <string name="register_skip_license">Salta per ora</string>
+</resources>
