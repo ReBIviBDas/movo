@@ -12,8 +12,8 @@ router.use(tokenChecker);
 // BOOKING ENDPOINTS
 // ============================================================================
 
-// GET /api/v1/bookings/active - Get user's active booking
-router.get('/active', async (req, res) => {
+// GET /api/v1/bookings - Get user's active booking
+router.get('/', async (req, res) => {
     try {
         const booking = await Booking.findOne({ 
             user_id: req.loggedUser.id, 

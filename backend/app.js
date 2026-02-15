@@ -12,7 +12,9 @@ const fleetRoutes = require('./routes/fleet');
 const paymentMethodsRoutes = require('./routes/payment-methods');
 const bookingsRoutes = require('./routes/bookings');
 const rentalsRoutes = require('./routes/rentals');
-const reportsRoutes = require('./routes/reports');
+const issuesRoutes = require('./routes/issues');
+const operatorIssuesRoutes = require('./routes/operator-issues');
+const operatorUsersRoutes = require('./routes/operator-users');
 const tokenChecker = require('./middlewares/tokenChecker');
 require('dotenv').config();
 
@@ -43,11 +45,13 @@ try {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/vehicles', vehiclesRoutes);
-app.use('/api/v1/fleet', fleetRoutes);
-app.use('/api/v1/payment-methods', paymentMethodsRoutes);
+app.use('/api/v1/operator/vehicles', fleetRoutes);
+app.use('/api/v1/payments/methods', paymentMethodsRoutes);
 app.use('/api/v1/bookings', bookingsRoutes);
 app.use('/api/v1/rentals', rentalsRoutes);
-app.use('/api/v1/reports', reportsRoutes);
+app.use('/api/v1/issues', issuesRoutes);
+app.use('/api/v1/operator/issues', operatorIssuesRoutes);
+app.use('/api/v1/operator/users', operatorUsersRoutes);
 
 // PROTECTED ROUTE EXAMPLE (deprecated - use /users/me instead)
 app.get('/api/v1/profile', tokenChecker, (req, res) => {

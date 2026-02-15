@@ -312,7 +312,7 @@ async function submitReport() {
       formData.append('photos', photo)
     })
     
-    const response = await fetch(`${API_BASE_URL}/reports`, {
+    const response = await fetch(`${API_BASE_URL}/issues`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authState.token}`

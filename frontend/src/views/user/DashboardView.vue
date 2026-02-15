@@ -24,7 +24,7 @@ onMounted(async () => {
     }
 
     // Check for active booking
-    const bookingRes = await fetch(`${API_BASE_URL}/bookings/active`, {
+    const bookingRes = await fetch(`${API_BASE_URL}/bookings`, {
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     if (bookingRes.ok) {

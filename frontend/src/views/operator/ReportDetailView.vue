@@ -242,7 +242,7 @@ onMounted(() => {
 async function fetchReport() {
   loading.value = true
   try {
-    const response = await fetch(`${API_BASE_URL}/reports/${route.params.id}`, {
+    const response = await fetch(`${API_BASE_URL}/operator/issues/${route.params.id}`, {
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     
@@ -265,7 +265,7 @@ async function fetchReport() {
 async function saveNotes() {
   saving.value = true
   try {
-    await fetch(`${API_BASE_URL}/reports/${route.params.id}`, {
+    await fetch(`${API_BASE_URL}/operator/issues/${route.params.id}`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${authState.token}`,
@@ -283,7 +283,7 @@ async function saveNotes() {
 async function updateStatus() {
   updating.value = true
   try {
-    await fetch(`${API_BASE_URL}/reports/${route.params.id}`, {
+    await fetch(`${API_BASE_URL}/operator/issues/${route.params.id}`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${authState.token}`,
@@ -302,7 +302,7 @@ async function updateStatus() {
 async function updatePriority() {
   updating.value = true
   try {
-    await fetch(`${API_BASE_URL}/reports/${route.params.id}`, {
+    await fetch(`${API_BASE_URL}/operator/issues/${route.params.id}`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${authState.token}`,
@@ -323,7 +323,7 @@ async function resolveReport() {
   
   resolving.value = true
   try {
-    const response = await fetch(`${API_BASE_URL}/reports/${route.params.id}/resolve`, {
+    const response = await fetch(`${API_BASE_URL}/operator/issues/${route.params.id}/resolve`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${authState.token}`,

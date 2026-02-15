@@ -10,7 +10,7 @@ const isLoading = ref(true)
 // Fetch pending users count on mount
 onMounted(async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/pending`, {
+    const response = await fetch(`${API_BASE_URL}/operator/users/pending`, {
       headers: {
         'Authorization': `Bearer ${authState.token}`
       }

@@ -19,7 +19,7 @@ async function fetchBooking() {
   error.value = ''
   
   try {
-    const response = await fetch(`${API_BASE_URL}/bookings/active`, {
+    const response = await fetch(`${API_BASE_URL}/bookings`, {
       headers: { 'Authorization': `Bearer ${authState.token}` }
     })
     
@@ -85,7 +85,7 @@ async function unlockVehicle() {
       lng: booking.value.vehicle.location.lng
     }
     
-    const response = await fetch(`${API_BASE_URL}/rentals/start`, {
+    const response = await fetch(`${API_BASE_URL}/rentals/unlock`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authState.token}`,

@@ -98,7 +98,7 @@ router.post('/', async (req, res) => {
 });
 
 // PATCH /api/v1/payment-methods/:id/default - Set as default
-router.patch('/:id/default', async (req, res) => {
+router.put('/:id/default', async (req, res) => {
     try {
         const method = await PaymentMethod.findOne({ 
             _id: req.params.id, 

@@ -4,16 +4,17 @@ const Report = require('../models/Report');
 const Vehicle = require('../models/Vehicle');
 const Rental = require('../models/Rental');
 const tokenChecker = require('../middlewares/tokenChecker');
-const roleChecker = require('../middlewares/roleChecker');
 const upload = require('../middlewares/upload');
 
+// All routes require authentication
+router.use(tokenChecker);
+
 // ============================================================================
-// USER ROUTES (Report Problems)
+// USER ISSUE ROUTES
 // ============================================================================
 
-// POST /api/v1/reports - Create a new report
+// POST /api/v1/issues - Create a new issue report
 router.post('/',
-    tokenChecker,
     (req, res, next) => {
         // Custom upload handler that doesn't fail if no files
         upload.array('photos', 5)(req, res, (err) => {
@@ -112,9 +113,8 @@ router.post('/',
     }
 );
 
-// GET /api/v1/reports/mine - Get user's own reports
-router.get('/mine',
-    tokenChecker,
+// GET /api/v1/issues - Get user's own issues
+router.get('/',
     async (req, res) => {
         try {
             const { status, page = 1, limit = 10 } = req.query;
@@ -161,9 +161,8 @@ router.get('/mine',
     }
 );
 
-// GET /api/v1/reports/:id - Get single report details
+// GET /api/v1/issues/:id - Get single issue details
 router.get('/:id',
-    tokenChecker,
     async (req, res) => {
         try {
             const report = await Report.findById(req.params.id)
@@ -180,11 +179,10 @@ router.get('/:id',
                 });
             }
             
-            // Check access: user can only see own reports, operators can see all
-            const isOperator = ['operator', 'admin'].includes(req.loggedUser.role);
+            // Check access: user can only see own reports
             const isOwner = report.user_id._id.toString() === req.loggedUser.id;
             
-            if (!isOperator && !isOwner) {
+            if (!isOwner) {
                 return res.status(403).json({
                     type: 'forbidden',
                     title: 'Forbidden',
@@ -226,7 +224,6 @@ router.get('/:id',
                         id: report.assigned_to._id,
                         name: `${report.assigned_to.first_name} ${report.assigned_to.last_name}`
                     } : null,
-                    operator_notes: isOperator ? report.operator_notes : undefined,
                     resolution: report.resolution,
                     created_at: report.created_at,
                     updated_at: report.updated_at,
@@ -239,208 +236,6 @@ router.get('/:id',
                 type: 'server_error',
                 title: 'Internal Server Error',
                 detail: 'Error fetching report'
-            });
-        }
-    }
-);
-
-// ============================================================================
-// OPERATOR ROUTES
-// ============================================================================
-
-// GET /api/v1/reports - List all reports (operators only)
-router.get('/',
-    tokenChecker,
-    roleChecker('operator', 'admin'),
-    async (req, res) => {
-        try {
-            const { status, category, priority, page = 1, limit = 20 } = req.query;
-            
-            const query = {};
-            if (status) query.status = status;
-            if (category) query.category = category;
-            if (priority) query.priority = priority;
-            
-            const reports = await Report.find(query)
-                .sort({ priority: -1, created_at: -1 })
-                .skip((page - 1) * limit)
-                .limit(parseInt(limit))
-                .populate('user_id', 'first_name last_name email')
-                .populate('vehicle_id', 'plate model');
-            
-            const total = await Report.countDocuments(query);
-            
-            // Get counts by status
-            const statusCounts = await Report.aggregate([
-                { $group: { _id: '$status', count: { $sum: 1 } } }
-            ]);
-            
-            res.json({
-                reports: reports.map(r => ({
-                    id: r._id,
-                    reference_id: r.reference_id,
-                    user: `${r.user_id.first_name} ${r.user_id.last_name}`,
-                    user_email: r.user_id.email,
-                    vehicle: r.vehicle_id ? r.vehicle_id.plate : null,
-                    category: r.category,
-                    category_label: Report.getCategoryLabel(r.category),
-                    status: r.status,
-                    priority: r.priority,
-                    created_at: r.created_at
-                })),
-                counts: {
-                    open: statusCounts.find(s => s._id === 'open')?.count || 0,
-                    in_progress: statusCounts.find(s => s._id === 'in_progress')?.count || 0,
-                    resolved: statusCounts.find(s => s._id === 'resolved')?.count || 0,
-                    closed: statusCounts.find(s => s._id === 'closed')?.count || 0
-                },
-                pagination: {
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    total,
-                    pages: Math.ceil(total / limit)
-                }
-            });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                type: 'server_error',
-                title: 'Internal Server Error',
-                detail: 'Error fetching reports'
-            });
-        }
-    }
-);
-
-// PATCH /api/v1/reports/:id - Update report (operators only)
-router.patch('/:id',
-    tokenChecker,
-    roleChecker('operator', 'admin'),
-    async (req, res) => {
-        try {
-            const report = await Report.findById(req.params.id);
-            
-            if (!report) {
-                return res.status(404).json({
-                    type: 'not_found',
-                    title: 'Not Found',
-                    detail: 'Report not found'
-                });
-            }
-            
-            const { status, priority, operator_notes, assigned_to } = req.body;
-            
-            if (status) {
-                const validStatuses = ['open', 'in_progress', 'resolved', 'closed'];
-                if (!validStatuses.includes(status)) {
-                    return res.status(400).json({
-                        type: 'validation_error',
-                        title: 'Bad Request',
-                        detail: 'Invalid status'
-                    });
-                }
-                report.status = status;
-                
-                // Auto-assign if taking in progress
-                if (status === 'in_progress' && !report.assigned_to) {
-                    report.assigned_to = req.loggedUser.id;
-                }
-            }
-            
-            if (priority) {
-                const validPriorities = ['low', 'medium', 'high', 'urgent'];
-                if (!validPriorities.includes(priority)) {
-                    return res.status(400).json({
-                        type: 'validation_error',
-                        title: 'Bad Request',
-                        detail: 'Invalid priority'
-                    });
-                }
-                report.priority = priority;
-            }
-            
-            if (operator_notes !== undefined) {
-                report.operator_notes = operator_notes;
-            }
-            
-            if (assigned_to !== undefined) {
-                report.assigned_to = assigned_to || null;
-            }
-            
-            await report.save();
-            
-            res.json({
-                message: 'Report updated',
-                report: {
-                    id: report._id,
-                    reference_id: report.reference_id,
-                    status: report.status,
-                    priority: report.priority
-                }
-            });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                type: 'server_error',
-                title: 'Internal Server Error',
-                detail: 'Error updating report'
-            });
-        }
-    }
-);
-
-// PATCH /api/v1/reports/:id/resolve - Resolve report (operators only)
-router.patch('/:id/resolve',
-    tokenChecker,
-    roleChecker('operator', 'admin'),
-    async (req, res) => {
-        try {
-            const report = await Report.findById(req.params.id);
-            
-            if (!report) {
-                return res.status(404).json({
-                    type: 'not_found',
-                    title: 'Not Found',
-                    detail: 'Report not found'
-                });
-            }
-            
-            const { resolution } = req.body;
-            
-            if (!resolution) {
-                return res.status(400).json({
-                    type: 'validation_error',
-                    title: 'Bad Request',
-                    detail: 'Resolution description is required'
-                });
-            }
-            
-            report.status = 'resolved';
-            report.resolution = resolution;
-            report.resolved_at = new Date();
-            
-            if (!report.assigned_to) {
-                report.assigned_to = req.loggedUser.id;
-            }
-            
-            await report.save();
-            
-            res.json({
-                message: 'Report resolved',
-                report: {
-                    id: report._id,
-                    reference_id: report.reference_id,
-                    status: report.status,
-                    resolution: report.resolution,
-                    resolved_at: report.resolved_at
-                }
-            });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                type: 'server_error',
-                title: 'Internal Server Error',
-                detail: 'Error resolving report'
             });
         }
     }
