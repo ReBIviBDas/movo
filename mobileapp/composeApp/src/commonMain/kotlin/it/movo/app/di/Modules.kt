@@ -92,7 +92,7 @@ val appModule = module {
     single { PenaltyRepository(get()) }
 
     viewModel { LoginViewModel(get()) }
-    viewModel { RegisterViewModel(get()) }
+    viewModel { RegisterViewModel(get(), get()) }
     viewModel { ForgotPasswordViewModel(get()) }
     viewModel { MapViewModel(get(), get()) }
     viewModel { BookingViewModel(get(), get(), get()) }

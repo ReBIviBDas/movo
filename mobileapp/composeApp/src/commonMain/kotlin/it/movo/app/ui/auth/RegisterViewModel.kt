@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import it.movo.app.data.model.RegisterRequest
 import it.movo.app.data.repository.AuthRepository
 import it.movo.app.data.remote.parseErrorMessage
-import kotlinx.coroutines.delay
+import it.movo.app.platform.ImagePicker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -85,7 +85,10 @@ data class RegisterUiState(
     }
 }
 
-class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel() {
+class RegisterViewModel(
+    private val authRepository: AuthRepository,
+    private val imagePicker: ImagePicker
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
@@ -99,24 +102,20 @@ class RegisterViewModel(private val authRepository: AuthRepository) : ViewModel(
     fun onFiscalCodeChange(value: String) { _uiState.update { it.copy(fiscalCode = value) } }
     fun onPhoneChange(value: String) { _uiState.update { it.copy(phone = value) } }
     fun onAddressChange(value: String) { _uiState.update { it.copy(address = value) } }
-    // TODO: Replace mock upload with real file picker (e.g. calf-file-picker or platform-specific implementation)
     fun onDriverLicenseSelected() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            delay(1000)
-            val mockData = ByteArray(128) { it.toByte() }
-            _uiState.update { it.copy(isLoading = false, hasDriverLicense = true, drivingLicense = mockData) }
+            val data = imagePicker.pickImage()
+            _uiState.update { it.copy(isLoading = false, hasDriverLicense = data != null, drivingLicense = data) }
         }
     }
     fun onDriverLicenseData(data: ByteArray?) { _uiState.update { it.copy(hasDriverLicense = data != null, drivingLicense = data) } }
     fun onIdentityDocumentSelected(data: ByteArray?) { _uiState.update { it.copy(identityDocument = data) } }
-    // TODO: Replace mock upload with real file picker
     fun onIdentityDocumentClick() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            delay(1000)
-            val mockData = ByteArray(128) { it.toByte() }
-            _uiState.update { it.copy(isLoading = false, identityDocument = mockData) }
+            val data = imagePicker.pickImage()
+            _uiState.update { it.copy(isLoading = false, identityDocument = data) }
         }
     }
     fun onAcceptTermsChange(value: Boolean) { _uiState.update { it.copy(acceptTerms = value) } }
