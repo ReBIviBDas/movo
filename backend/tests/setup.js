@@ -77,6 +77,8 @@ async function createTestUser(overrides = {}) {
         accept_privacy: true,
         status: 'active',
         role: 'user',
+        driving_enabled: true,
+        driving_license_verified: true,
         ...overrides
     };
 
