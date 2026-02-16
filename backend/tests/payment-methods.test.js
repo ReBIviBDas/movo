@@ -17,7 +17,7 @@ afterEach(async () => {
 });
 
 // ============================================================================
-// Test 12: Aggiunta metodo di pagamento
+// Test 10: Aggiunta metodo di pagamento
 // ============================================================================
 describe('POST /api/v1/payments/methods', () => {
     it('Test 12 - should add a payment method (first card becomes default)', async () => {

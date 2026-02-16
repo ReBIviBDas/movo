@@ -18,7 +18,7 @@ afterEach(async () => {
 });
 
 // ============================================================================
-// Test 10: Sblocco veicolo (inizio noleggio)
+// Test 9: Sblocco veicolo (inizio noleggio)
 // ============================================================================
 describe('POST /api/v1/rentals/unlock', () => {
     it('Test 10 - should unlock vehicle and start rental from valid booking', async () => {
