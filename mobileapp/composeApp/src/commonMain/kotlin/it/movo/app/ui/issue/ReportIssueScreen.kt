@@ -1,7 +1,6 @@
 package it.movo.app.ui.issue
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -48,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.movo.app.data.model.IssueCategory
 import it.movo.app.ui.theme.MovoOnSurface
@@ -58,24 +57,24 @@ import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoTheme
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.common_done
-import movo.composeapp.generated.resources.report_add_photo
-import movo.composeapp.generated.resources.report_category
-import movo.composeapp.generated.resources.report_category_battery
-import movo.composeapp.generated.resources.report_category_cleanliness
-import movo.composeapp.generated.resources.report_category_damage
-import movo.composeapp.generated.resources.report_category_other
-import movo.composeapp.generated.resources.report_category_technical
-import movo.composeapp.generated.resources.report_description
-import movo.composeapp.generated.resources.report_description_hint
-import movo.composeapp.generated.resources.report_max_photos
-import movo.composeapp.generated.resources.report_photos
-import movo.composeapp.generated.resources.report_submit
-import movo.composeapp.generated.resources.report_success
-import movo.composeapp.generated.resources.report_title
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.common_done
+import it.movo.app.composeapp.generated.resources.report_add_photo
+import it.movo.app.composeapp.generated.resources.report_category
+import it.movo.app.composeapp.generated.resources.report_category_battery
+import it.movo.app.composeapp.generated.resources.report_category_cleanliness
+import it.movo.app.composeapp.generated.resources.report_category_damage
+import it.movo.app.composeapp.generated.resources.report_category_other
+import it.movo.app.composeapp.generated.resources.report_category_technical
+import it.movo.app.composeapp.generated.resources.report_description
+import it.movo.app.composeapp.generated.resources.report_description_hint
+import it.movo.app.composeapp.generated.resources.report_max_photos
+import it.movo.app.composeapp.generated.resources.report_photos
+import it.movo.app.composeapp.generated.resources.report_submit
+import it.movo.app.composeapp.generated.resources.report_success
+import it.movo.app.composeapp.generated.resources.report_title
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,7 +98,7 @@ fun ReportIssueScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },
@@ -418,7 +417,7 @@ private fun ReportIssueScreenPreview() {
                         IconButton(onClick = {}) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                                contentDescription = stringResource(Res.string.back)
                             )
                         }
                     },

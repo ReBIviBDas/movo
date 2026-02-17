@@ -1,13 +1,12 @@
 package it.movo.app.ui.wallet
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -55,38 +54,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import it.movo.app.data.model.PaymentMethod
 import it.movo.app.data.model.PaymentMethodType
 import it.movo.app.ui.theme.MovoOnSurface
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
 import it.movo.app.ui.theme.MovoOutline
-import it.movo.app.ui.theme.MovoOutlineVariant
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
-import it.movo.app.ui.theme.MovoWhite
 import it.movo.app.ui.theme.MovoTheme
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.wallet_add_new_card
-import movo.composeapp.generated.resources.wallet_default
-import movo.composeapp.generated.resources.wallet_empty
-import movo.composeapp.generated.resources.wallet_empty_subtitle
-import movo.composeapp.generated.resources.wallet_expires
-import movo.composeapp.generated.resources.wallet_payments_secured
-import movo.composeapp.generated.resources.wallet_remove
-import movo.composeapp.generated.resources.wallet_set_default
-import movo.composeapp.generated.resources.wallet_subtitle
-import movo.composeapp.generated.resources.wallet_title
-import movo.composeapp.generated.resources.wallet_cancel
-import movo.composeapp.generated.resources.wallet_card_number
-import movo.composeapp.generated.resources.wallet_cvv
-import movo.composeapp.generated.resources.wallet_expiry_date
-import movo.composeapp.generated.resources.wallet_save
-import movo.composeapp.generated.resources.wallet_view_transactions
+import it.movo.app.ui.theme.MovoWhite
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.nav_wallet
+import it.movo.app.composeapp.generated.resources.wallet_add_new_card
+import it.movo.app.composeapp.generated.resources.wallet_cancel
+import it.movo.app.composeapp.generated.resources.wallet_card_number
+import it.movo.app.composeapp.generated.resources.wallet_cvv
+import it.movo.app.composeapp.generated.resources.wallet_default
+import it.movo.app.composeapp.generated.resources.wallet_empty
+import it.movo.app.composeapp.generated.resources.wallet_empty_subtitle
+import it.movo.app.composeapp.generated.resources.wallet_expires
+import it.movo.app.composeapp.generated.resources.wallet_expiry_date
+import it.movo.app.composeapp.generated.resources.wallet_payments_secured
+import it.movo.app.composeapp.generated.resources.wallet_save
+import it.movo.app.composeapp.generated.resources.wallet_set_default
+import it.movo.app.composeapp.generated.resources.wallet_subtitle
+import it.movo.app.composeapp.generated.resources.wallet_title
+import it.movo.app.composeapp.generated.resources.wallet_view_transactions
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,7 +158,7 @@ fun WalletScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Wallet",
+                        text = stringResource(Res.string.nav_wallet),
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -166,14 +166,15 @@ fun WalletScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.back),
                             tint = MovoOnSurface
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MovoSurface
-                )
+                ),
+                windowInsets = WindowInsets(0.dp)
             )
         }
     ) { paddingValues ->
@@ -211,6 +212,7 @@ private fun WalletContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(top = 24.dp)
                 .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -389,7 +391,11 @@ private fun PaymentMethodCard(
                 }
                 if (method.expiryMonth != null && method.expiryYear != null) {
                     Text(
-                        text = stringResource(Res.string.wallet_expires, method.expiryMonth.toString().padStart(2, '0'), method.expiryYear.toString().takeLast(2)),
+                        text = stringResource(
+                            Res.string.wallet_expires,
+                            method.expiryMonth.toString().padStart(2, '0'),
+                            method.expiryYear.toString().takeLast(2)
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MovoOnSurfaceVariant
                     )
@@ -422,7 +428,12 @@ private fun CardBrandIcon(brand: String?, type: PaymentMethodType) {
     val (backgroundColor, iconColor) = when {
         brand?.lowercase() == "visa" -> Pair(Color(0xFF1A1F71), Color.White)
         brand?.lowercase() == "mastercard" -> Pair(Color(0xFFEB001B), Color.White)
-        brand?.lowercase() == "amex" || brand?.lowercase() == "american express" -> Pair(Color(0xFF2E77BC), Color.White)
+        brand?.lowercase() == "amex" || brand?.lowercase() == "american express" -> Pair(
+            Color(
+                0xFF2E77BC
+            ), Color.White
+        )
+
         type == PaymentMethodType.PAYPAL -> Pair(Color(0xFF003087), Color.White)
         type == PaymentMethodType.APPLE_PAY -> Pair(Color(0xFF000000), Color.White)
         type == PaymentMethodType.GOOGLE_PAY -> Pair(Color(0xFF4285F4), Color.White)

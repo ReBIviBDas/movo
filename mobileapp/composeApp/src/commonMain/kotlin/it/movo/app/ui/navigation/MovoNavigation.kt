@@ -19,8 +19,6 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 import it.movo.app.ui.auth.ForgotPasswordScreen
 import it.movo.app.ui.auth.ForgotPasswordViewModel
 import it.movo.app.ui.auth.LoginScreen
@@ -37,24 +35,26 @@ import it.movo.app.ui.map.MapScreen
 import it.movo.app.ui.map.MapViewModel
 import it.movo.app.ui.payment.SplitPaymentScreen
 import it.movo.app.ui.payment.SplitPaymentViewModel
+import it.movo.app.ui.penalty.PenaltyScreen
+import it.movo.app.ui.penalty.PenaltyViewModel
 import it.movo.app.ui.profile.ProfileScreen
 import it.movo.app.ui.profile.ProfileViewModel
+import it.movo.app.ui.promotion.PromotionScreen
+import it.movo.app.ui.promotion.PromotionViewModel
 import it.movo.app.ui.ride.ActiveRideScreen
 import it.movo.app.ui.ride.ActiveRideViewModel
 import it.movo.app.ui.ride.TripSummaryScreen
 import it.movo.app.ui.ride.TripSummaryViewModel
 import it.movo.app.ui.settings.NotificationSettingsScreen
 import it.movo.app.ui.settings.NotificationSettingsViewModel
+import it.movo.app.ui.subscription.SubscriptionScreen
+import it.movo.app.ui.subscription.SubscriptionViewModel
 import it.movo.app.ui.vehicle.VehicleDetailScreen
 import it.movo.app.ui.vehicle.VehicleDetailViewModel
 import it.movo.app.ui.wallet.WalletScreen
 import it.movo.app.ui.wallet.WalletViewModel
-import it.movo.app.ui.subscription.SubscriptionScreen
-import it.movo.app.ui.subscription.SubscriptionViewModel
-import it.movo.app.ui.promotion.PromotionScreen
-import it.movo.app.ui.promotion.PromotionViewModel
-import it.movo.app.ui.penalty.PenaltyScreen
-import it.movo.app.ui.penalty.PenaltyViewModel
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.viewmodel.koinViewModel
 
 enum class BottomNavTab(val label: String) {
@@ -94,11 +94,11 @@ fun MovoNavigation(isLoggedIn: Boolean) {
 
     val currentRoute = backStack.lastOrNull()
     val showBottomBar = currentRoute != null &&
-        currentRoute !is LoginRoute &&
-        currentRoute !is RegisterRoute &&
-        currentRoute !is ForgotPasswordRoute &&
-        currentRoute !is ActiveRideRoute &&
-        currentRoute !is TripSummaryRoute
+            currentRoute !is LoginRoute &&
+            currentRoute !is RegisterRoute &&
+            currentRoute !is ForgotPasswordRoute &&
+            currentRoute !is ActiveRideRoute &&
+            currentRoute !is TripSummaryRoute
 
     Scaffold(
         bottomBar = {
@@ -340,10 +340,10 @@ private fun MovoBottomBar(
 ) {
     NavigationBar {
         NavigationBarItem(
-            icon = { 
+            icon = {
                 val isSelected = currentRoute is MapRoute
                 Icon(
-                    imageVector = Icons.Default.Map, 
+                    imageVector = Icons.Default.Map,
                     contentDescription = "Explore"
                 )
             },

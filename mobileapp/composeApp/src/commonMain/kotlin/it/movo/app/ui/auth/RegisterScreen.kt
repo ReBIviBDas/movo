@@ -7,7 +7,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,7 +24,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Check
@@ -37,11 +35,8 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,53 +69,52 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoTealContainer
-import it.movo.app.ui.theme.MovoTealLight
-import it.movo.app.ui.theme.OnMovoTealContainer
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.register_accept_cookies
-import movo.composeapp.generated.resources.register_accept_privacy
-import movo.composeapp.generated.resources.register_accept_terms
-import movo.composeapp.generated.resources.register_completed
-import movo.composeapp.generated.resources.register_confirm_password
-import movo.composeapp.generated.resources.register_continue
-import movo.composeapp.generated.resources.register_create_account
-import movo.composeapp.generated.resources.register_date_format
-import movo.composeapp.generated.resources.register_date_of_birth
-import movo.composeapp.generated.resources.register_drivers_license
-import movo.composeapp.generated.resources.register_address
-import movo.composeapp.generated.resources.register_email
-import movo.composeapp.generated.resources.register_first_name
-import movo.composeapp.generated.resources.register_identity_document
-import movo.composeapp.generated.resources.register_identity_front
-import movo.composeapp.generated.resources.register_identity_tap
-import movo.composeapp.generated.resources.register_identity_hint
-import movo.composeapp.generated.resources.register_age_error
-import movo.composeapp.generated.resources.register_fiscal_code
-import movo.composeapp.generated.resources.register_get_started
-import movo.composeapp.generated.resources.register_license_front
-import movo.composeapp.generated.resources.register_license_hint
-import movo.composeapp.generated.resources.register_license_tap
-import movo.composeapp.generated.resources.register_password
-import movo.composeapp.generated.resources.register_step1_subtitle
-import movo.composeapp.generated.resources.register_step1_title
-import movo.composeapp.generated.resources.register_step2_subtitle
-import movo.composeapp.generated.resources.register_step2_title
-import movo.composeapp.generated.resources.register_step3_subtitle
-import movo.composeapp.generated.resources.register_step3_title
-import movo.composeapp.generated.resources.register_step4_subtitle
-import movo.composeapp.generated.resources.register_step4_title
-import movo.composeapp.generated.resources.register_phone
-import movo.composeapp.generated.resources.register_skip_license
-import movo.composeapp.generated.resources.register_step_of
-import movo.composeapp.generated.resources.register_surname
-import movo.composeapp.generated.resources.register_title
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import it.movo.app.ui.theme.MovoTheme
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.register_accept_cookies
+import it.movo.app.composeapp.generated.resources.register_accept_privacy
+import it.movo.app.composeapp.generated.resources.register_accept_terms
+import it.movo.app.composeapp.generated.resources.register_address
+import it.movo.app.composeapp.generated.resources.register_age_error
+import it.movo.app.composeapp.generated.resources.register_completed
+import it.movo.app.composeapp.generated.resources.register_confirm_password
+import it.movo.app.composeapp.generated.resources.register_continue
+import it.movo.app.composeapp.generated.resources.register_create_account
+import it.movo.app.composeapp.generated.resources.register_date_format
+import it.movo.app.composeapp.generated.resources.register_date_of_birth
+import it.movo.app.composeapp.generated.resources.register_drivers_license
+import it.movo.app.composeapp.generated.resources.register_email
+import it.movo.app.composeapp.generated.resources.register_first_name
+import it.movo.app.composeapp.generated.resources.register_fiscal_code
+import it.movo.app.composeapp.generated.resources.register_get_started
+import it.movo.app.composeapp.generated.resources.register_identity_document
+import it.movo.app.composeapp.generated.resources.register_identity_front
+import it.movo.app.composeapp.generated.resources.register_identity_hint
+import it.movo.app.composeapp.generated.resources.register_identity_tap
+import it.movo.app.composeapp.generated.resources.register_license_front
+import it.movo.app.composeapp.generated.resources.register_license_hint
+import it.movo.app.composeapp.generated.resources.register_license_tap
+import it.movo.app.composeapp.generated.resources.register_password
+import it.movo.app.composeapp.generated.resources.register_phone
+import it.movo.app.composeapp.generated.resources.register_skip_license
+import it.movo.app.composeapp.generated.resources.register_step1_subtitle
+import it.movo.app.composeapp.generated.resources.register_step1_title
+import it.movo.app.composeapp.generated.resources.register_step2_subtitle
+import it.movo.app.composeapp.generated.resources.register_step2_title
+import it.movo.app.composeapp.generated.resources.register_step3_subtitle
+import it.movo.app.composeapp.generated.resources.register_step3_title
+import it.movo.app.composeapp.generated.resources.register_step4_subtitle
+import it.movo.app.composeapp.generated.resources.register_step4_title
+import it.movo.app.composeapp.generated.resources.register_step_of
+import it.movo.app.composeapp.generated.resources.register_surname
+import it.movo.app.composeapp.generated.resources.register_title
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -279,7 +273,7 @@ private fun RegisterContent(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },
@@ -303,13 +297,20 @@ private fun RegisterContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(Res.string.register_step_of, uiState.currentStep, uiState.totalSteps),
+                    text = stringResource(
+                        Res.string.register_step_of,
+                        uiState.currentStep,
+                        uiState.totalSteps
+                    ),
                     color = MovoTeal,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = stringResource(Res.string.register_completed, (uiState.progress * 100).toInt()),
+                    text = stringResource(
+                        Res.string.register_completed,
+                        (uiState.progress * 100).toInt()
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium
                 )
@@ -334,10 +335,10 @@ private fun RegisterContent(
                 transitionSpec = {
                     if (targetState > initialState) {
                         (slideInHorizontally { width -> width } + fadeIn()) togetherWith
-                        (slideOutHorizontally { width -> -width } + fadeOut())
+                                (slideOutHorizontally { width -> -width } + fadeOut())
                     } else {
                         (slideInHorizontally { width -> -width } + fadeIn()) togetherWith
-                        (slideOutHorizontally { width -> width } + fadeOut())
+                                (slideOutHorizontally { width -> width } + fadeOut())
                     }
                 },
                 label = "StepContent"
@@ -353,6 +354,7 @@ private fun RegisterContent(
                         onConfirmPasswordChange = onConfirmPasswordChange,
                         onTogglePasswordVisibility = onTogglePasswordVisibility
                     )
+
                     2 -> Step2PersonalDetails(
                         firstName = uiState.firstName,
                         lastName = uiState.lastName,
@@ -372,6 +374,7 @@ private fun RegisterContent(
                         onLicenseClick = onLicenseClick,
                         onSkipLicense = onSkipLicense
                     )
+
                     3 -> Step3TermsAndPrivacy(
                         acceptTerms = uiState.acceptTerms,
                         acceptPrivacy = uiState.acceptPrivacy,
@@ -380,6 +383,7 @@ private fun RegisterContent(
                         onAcceptPrivacyChange = onAcceptPrivacyChange,
                         onAcceptCookiesChange = onAcceptCookiesChange
                     )
+
                     4 -> Step4Success()
                     else -> {}
                 }
@@ -911,7 +915,9 @@ private fun Step2PersonalDetails(
                     )
                 }
                 .background(
-                    color = if (hasIdentityDocument) MovoTealContainer.copy(alpha = 0.5f) else MovoTealContainer.copy(alpha = 0.3f),
+                    color = if (hasIdentityDocument) MovoTealContainer.copy(alpha = 0.5f) else MovoTealContainer.copy(
+                        alpha = 0.3f
+                    ),
                     shape = RoundedCornerShape(16.dp)
                 )
                 .clickable { onIdentityDocumentClick() },

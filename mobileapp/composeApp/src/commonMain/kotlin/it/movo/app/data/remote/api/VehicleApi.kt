@@ -13,13 +13,13 @@ class VehicleApi(private val client: HttpClient) {
         bounds: String? = null,
         minBattery: Int? = null
     ): VehiclesResponse =
-        client.get("/vehicles") {
+        client.get("vehicles") {
             bounds?.let { parameter("bounds", it) }
             minBattery?.let { parameter("min_battery", it) }
         }.body()
 
     suspend fun getVehicle(id: String): Vehicle =
-        client.get("/vehicles/$id").body()
+        client.get("vehicles/$id").body()
 
     suspend fun searchVehicles(
         location: String? = null,
@@ -30,7 +30,7 @@ class VehicleApi(private val client: HttpClient) {
         cursor: String? = null,
         limit: Int? = null
     ): VehicleSearchResponse =
-        client.get("/vehicles/search") {
+        client.get("vehicles/search") {
             location?.let { parameter("location", it) }
             maxDistance?.let { parameter("max_distance", it) }
             minBattery?.let { parameter("min_battery", it) }

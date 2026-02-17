@@ -2,8 +2,8 @@ package it.movo.app.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.movo.app.data.repository.AuthRepository
 import it.movo.app.data.remote.parseErrorMessage
+import it.movo.app.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,7 +46,14 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             authRepository.login(state.email, state.password)
                 .onSuccess { _uiState.update { it.copy(isLoading = false, loginSuccess = true) } }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, errorMessage = parseErrorMessage(e as Exception)) } }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = parseErrorMessage(e as Exception)
+                        )
+                    }
+                }
         }
     }
 

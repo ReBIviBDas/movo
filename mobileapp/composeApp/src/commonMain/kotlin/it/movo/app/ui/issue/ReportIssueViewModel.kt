@@ -73,14 +73,24 @@ class ReportIssueViewModel(
                         _uiState.update { it.copy(vehicleId = rental.vehicleId) }
                     }
                     .onFailure { e ->
-                        _uiState.update { it.copy(errorMessage = e.message ?: "Failed to load rental details") }
+                        _uiState.update {
+                            it.copy(
+                                errorMessage = e.message ?: "Failed to load rental details"
+                            )
+                        }
                     }
             }
         }
     }
 
     fun onCategorySelected(category: IssueCategory) {
-        _uiState.update { it.copy(selectedCategory = category, isCategoryMenuExpanded = false, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                selectedCategory = category,
+                isCategoryMenuExpanded = false,
+                errorMessage = null
+            )
+        }
     }
 
     fun toggleCategoryMenu() {

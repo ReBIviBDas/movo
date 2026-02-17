@@ -58,15 +58,13 @@ import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoWarning
-import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.vehicle_available
-import movo.composeapp.generated.resources.vehicle_book_now
-import movo.composeapp.generated.resources.vehicle_details
-import movo.composeapp.generated.resources.vehicle_features
-import movo.composeapp.generated.resources.vehicle_license_plate
-import movo.composeapp.generated.resources.vehicle_price
-import movo.composeapp.generated.resources.vehicle_range_label
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.vehicle_available
+import it.movo.app.composeapp.generated.resources.vehicle_book_now
+import it.movo.app.composeapp.generated.resources.vehicle_details
+import it.movo.app.composeapp.generated.resources.vehicle_features
+import it.movo.app.composeapp.generated.resources.vehicle_license_plate
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -97,7 +95,7 @@ fun VehicleDetailScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },
@@ -116,6 +114,7 @@ fun VehicleDetailScreen(
                     CircularProgressIndicator(color = MovoTeal)
                 }
             }
+
             uiState.errorMessage != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(paddingValues),
@@ -127,6 +126,7 @@ fun VehicleDetailScreen(
                     )
                 }
             }
+
             uiState.vehicle != null -> {
                 val vehicle = uiState.vehicle!!
                 Column(

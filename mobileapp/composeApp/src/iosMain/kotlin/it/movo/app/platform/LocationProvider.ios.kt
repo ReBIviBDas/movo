@@ -12,7 +12,7 @@ class IosLocationProvider : LocationProvider {
     override suspend fun getCurrentLocation(): GeoPoint? {
         val status = CLLocationManager.authorizationStatus()
         val authorized = status == kCLAuthorizationStatusAuthorizedWhenInUse ||
-            status == kCLAuthorizationStatusAuthorizedAlways
+                status == kCLAuthorizationStatusAuthorizedAlways
 
         if (!authorized) {
             locationManager.requestWhenInUseAuthorization()

@@ -48,11 +48,13 @@ class ForgotPasswordViewModel(private val authRepository: AuthRepository) : View
             authRepository.requestPasswordReset(email)
                 .onSuccess { _uiState.update { it.copy(isLoading = false, emailSent = true) } }
                 .onFailure { e ->
-                    _uiState.update { it.copy(
-                        isLoading = false,
-                        emailSent = false,
-                        errorMessage = e.message ?: "An error occurred"
-                    ) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            emailSent = false,
+                            errorMessage = e.message ?: "An error occurred"
+                        )
+                    }
                 }
         }
     }

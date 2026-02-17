@@ -1,7 +1,6 @@
 package it.movo.app.ui.booking
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,9 +16,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.BatteryFull
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
@@ -48,13 +47,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
-import it.movo.app.ui.theme.MovoTheme
 import it.movo.app.data.model.VehicleMapItem
 import it.movo.app.ui.theme.MovoOnSurface
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
@@ -62,18 +58,20 @@ import it.movo.app.ui.theme.MovoOutline
 import it.movo.app.ui.theme.MovoOutlineVariant
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
+import it.movo.app.ui.theme.MovoTheme
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.booking_cancel
-import movo.composeapp.generated.resources.booking_check_damages
-import movo.composeapp.generated.resources.booking_plate
-import movo.composeapp.generated.resources.booking_reservation_active
-import movo.composeapp.generated.resources.booking_time_to_reach
-import movo.composeapp.generated.resources.booking_unlock_app
-import movo.composeapp.generated.resources.booking_unlock_vehicle
-import movo.composeapp.generated.resources.booking_walk_time
-import movo.composeapp.generated.resources.booking_walk_to
-import movo.composeapp.generated.resources.vehicle_battery
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.booking_cancel
+import it.movo.app.composeapp.generated.resources.booking_check_damages
+import it.movo.app.composeapp.generated.resources.booking_plate
+import it.movo.app.composeapp.generated.resources.booking_reservation_active
+import it.movo.app.composeapp.generated.resources.booking_time_to_reach
+import it.movo.app.composeapp.generated.resources.booking_unlock_app
+import it.movo.app.composeapp.generated.resources.booking_unlock_vehicle
+import it.movo.app.composeapp.generated.resources.booking_walk_time
+import it.movo.app.composeapp.generated.resources.booking_walk_to
+import it.movo.app.composeapp.generated.resources.vehicle_battery
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -154,7 +152,7 @@ private fun BookingContent(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.back),
                             tint = MovoOnSurface
                         )
                     }
@@ -359,7 +357,10 @@ private fun VehicleInfoCard(
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Text(
-                            text = stringResource(Res.string.vehicle_battery, vehicle?.batteryLevel ?: 0),
+                            text = stringResource(
+                                Res.string.vehicle_battery,
+                                vehicle?.batteryLevel ?: 0
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = MovoTeal
                         )
@@ -382,7 +383,11 @@ private fun ChecklistSection(
             isCompleted = true,
             isFirst = true,
             title = stringResource(Res.string.booking_walk_to, address),
-            subtitle = if (walkMinutes > 0 || walkMeters > 0) stringResource(Res.string.booking_walk_time, walkMinutes, walkMeters) else null,
+            subtitle = if (walkMinutes > 0 || walkMeters > 0) stringResource(
+                Res.string.booking_walk_time,
+                walkMinutes,
+                walkMeters
+            ) else null,
             showNavigateIcon = true
         )
 

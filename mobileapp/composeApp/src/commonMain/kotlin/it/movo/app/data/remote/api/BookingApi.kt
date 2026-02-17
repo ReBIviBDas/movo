@@ -11,11 +11,11 @@ import it.movo.app.data.model.CreateBookingRequest
 
 class BookingApi(private val client: HttpClient) {
     suspend fun createBooking(request: CreateBookingRequest): Booking =
-        client.post("/bookings") { setBody(request) }.body()
+        client.post("bookings") { setBody(request) }.body()
 
     suspend fun getActiveBooking(): Booking =
-        client.get("/bookings").body()
+        client.get("bookings").body()
 
     suspend fun cancelBooking(id: String): Unit =
-        client.delete("/bookings/$id").body()
+        client.delete("bookings/$id").body()
 }

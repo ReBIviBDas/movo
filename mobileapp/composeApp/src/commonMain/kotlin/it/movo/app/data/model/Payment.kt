@@ -17,10 +17,14 @@ data class PaymentMethod(
 
 @Serializable
 enum class PaymentMethodType {
-    @SerialName("card") CARD,
-    @SerialName("paypal") PAYPAL,
-    @SerialName("apple_pay") APPLE_PAY,
-    @SerialName("google_pay") GOOGLE_PAY
+    @SerialName("card")
+    CARD,
+    @SerialName("paypal")
+    PAYPAL,
+    @SerialName("apple_pay")
+    APPLE_PAY,
+    @SerialName("google_pay")
+    GOOGLE_PAY
 }
 
 @Serializable
@@ -48,18 +52,26 @@ data class Payment(
 
 @Serializable
 enum class PaymentType {
-    @SerialName("rental") RENTAL,
-    @SerialName("subscription") SUBSCRIPTION,
-    @SerialName("penalty") PENALTY,
-    @SerialName("refund") REFUND
+    @SerialName("rental")
+    RENTAL,
+    @SerialName("subscription")
+    SUBSCRIPTION,
+    @SerialName("penalty")
+    PENALTY,
+    @SerialName("refund")
+    REFUND
 }
 
 @Serializable
 enum class PaymentStatus {
-    @SerialName("pending") PENDING,
-    @SerialName("completed") COMPLETED,
-    @SerialName("failed") FAILED,
-    @SerialName("refunded") REFUNDED
+    @SerialName("pending")
+    PENDING,
+    @SerialName("completed")
+    COMPLETED,
+    @SerialName("failed")
+    FAILED,
+    @SerialName("refunded")
+    REFUNDED
 }
 
 @Serializable
@@ -74,17 +86,24 @@ data class SplitRequest(
 
 @Serializable
 enum class SplitRequestStatus {
-    @SerialName("pending") PENDING,
-    @SerialName("accepted") ACCEPTED,
-    @SerialName("rejected") REJECTED,
-    @SerialName("expired") EXPIRED
+    @SerialName("pending")
+    PENDING,
+    @SerialName("accepted")
+    ACCEPTED,
+    @SerialName("rejected")
+    REJECTED,
+    @SerialName("expired")
+    EXPIRED
 }
 
 @Serializable
 enum class SplitParticipantStatus {
-    @SerialName("pending") PENDING,
-    @SerialName("accepted") ACCEPTED,
-    @SerialName("rejected") REJECTED
+    @SerialName("pending")
+    PENDING,
+    @SerialName("accepted")
+    ACCEPTED,
+    @SerialName("rejected")
+    REJECTED
 }
 
 @Serializable

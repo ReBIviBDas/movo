@@ -42,11 +42,8 @@ import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoTealContainer
 import it.movo.app.ui.theme.MovoWarning
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.close
-import movo.composeapp.generated.resources.vehicle_battery
-import movo.composeapp.generated.resources.vehicle_range
-import movo.composeapp.generated.resources.vehicle_reserve_free
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.vehicle_reserve_free
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -68,7 +65,12 @@ fun VehiclePreviewSheet(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable(onClick = onExpandClick),
-        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 20.dp),
+        shape = RoundedCornerShape(
+            topStart = 20.dp,
+            topEnd = 20.dp,
+            bottomStart = 20.dp,
+            bottomEnd = 20.dp
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MovoSurface)
     ) {

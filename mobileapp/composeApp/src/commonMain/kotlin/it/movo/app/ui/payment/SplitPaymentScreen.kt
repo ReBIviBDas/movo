@@ -44,13 +44,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.movo.app.ui.theme.MovoOnSurface
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
@@ -59,19 +59,19 @@ import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoTheme
-import movo.composeapp.generated.resources.Res
-import androidx.compose.ui.tooling.preview.Preview
-import movo.composeapp.generated.resources.common_done
-import movo.composeapp.generated.resources.split_add_participant
-import movo.composeapp.generated.resources.split_cost_with_passengers
-import movo.composeapp.generated.resources.split_equal
-import movo.composeapp.generated.resources.split_participant
-import movo.composeapp.generated.resources.split_percentage
-import movo.composeapp.generated.resources.split_remove
-import movo.composeapp.generated.resources.split_request_sent
-import movo.composeapp.generated.resources.split_send_request
-import movo.composeapp.generated.resources.split_title
-import movo.composeapp.generated.resources.split_user_id_email
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.common_done
+import it.movo.app.composeapp.generated.resources.split_add_participant
+import it.movo.app.composeapp.generated.resources.split_cost_with_passengers
+import it.movo.app.composeapp.generated.resources.split_equal
+import it.movo.app.composeapp.generated.resources.split_participant
+import it.movo.app.composeapp.generated.resources.split_percentage
+import it.movo.app.composeapp.generated.resources.split_remove
+import it.movo.app.composeapp.generated.resources.split_request_sent
+import it.movo.app.composeapp.generated.resources.split_send_request
+import it.movo.app.composeapp.generated.resources.split_title
+import it.movo.app.composeapp.generated.resources.split_user_id_email
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,8 +92,18 @@ fun SplitPaymentScreen(
         onNavigateBack = onNavigateBack,
         onAddParticipant = { viewModel.addParticipant() },
         onRemoveParticipant = { viewModel.removeParticipant(it) },
-        onUpdateParticipantUserId = { index, userId -> viewModel.updateParticipantUserId(index, userId) },
-        onUpdateParticipantPercentage = { index, percentage -> viewModel.updateParticipantPercentage(index, percentage) },
+        onUpdateParticipantUserId = { index, userId ->
+            viewModel.updateParticipantUserId(
+                index,
+                userId
+            )
+        },
+        onUpdateParticipantPercentage = { index, percentage ->
+            viewModel.updateParticipantPercentage(
+                index,
+                percentage
+            )
+        },
         onSplitEqually = { viewModel.splitEqually() },
         onSendSplitRequest = { viewModel.sendSplitRequest() }
     )
@@ -125,7 +135,7 @@ private fun SplitPaymentContent(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },

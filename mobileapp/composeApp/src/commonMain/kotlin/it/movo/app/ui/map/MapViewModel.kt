@@ -64,8 +64,22 @@ class MapViewModel(
             vehicleRepository.getVehiclesOnMap(
                 minBattery = if (state.minBattery > 0) state.minBattery else null
             )
-                .onSuccess { vehicles -> _uiState.update { it.copy(vehicles = vehicles, isLoading = false) } }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
+                .onSuccess { vehicles ->
+                    _uiState.update {
+                        it.copy(
+                            vehicles = vehicles,
+                            isLoading = false
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = e.message
+                        )
+                    }
+                }
         }
     }
 
@@ -144,12 +158,14 @@ class MapViewModel(
     }
 
     fun resetFilters() {
-        _uiState.update { it.copy(
-            minBattery = 0,
-            maxPrice = Double.MAX_VALUE,
-            maxDistance = Double.MAX_VALUE,
-            showFilterSheet = false
-        ) }
+        _uiState.update {
+            it.copy(
+                minBattery = 0,
+                maxPrice = Double.MAX_VALUE,
+                maxDistance = Double.MAX_VALUE,
+                showFilterSheet = false
+            )
+        }
         if (_uiState.value.searchQuery.isNotBlank()) {
             performSearch(_uiState.value.searchQuery)
         } else {
@@ -169,8 +185,23 @@ class MapViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             vehicleRepository.getVehicle(vehicleId)
-                .onSuccess { vehicle -> _uiState.update { it.copy(selectedVehicle = vehicle, showVehicleDetails = true, isLoading = false) } }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
+                .onSuccess { vehicle ->
+                    _uiState.update {
+                        it.copy(
+                            selectedVehicle = vehicle,
+                            showVehicleDetails = true,
+                            isLoading = false
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = e.message
+                        )
+                    }
+                }
         }
     }
 

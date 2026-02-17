@@ -20,29 +20,29 @@ import it.movo.app.data.model.RegisterResponse
 
 class AuthApi(private val client: HttpClient) {
     suspend fun login(request: LoginRequest): AuthResponse =
-        client.post("/auth/login") { setBody(request) }.body()
+        client.post("auth/login") { setBody(request) }.body()
 
     suspend fun loginWithGoogle(request: GoogleLoginRequest): AuthResponse =
-        client.post("/auth/login/google") { setBody(request) }.body()
+        client.post("auth/login/google") { setBody(request) }.body()
 
     suspend fun logout(): Unit =
-        client.post("/auth/logout").body()
+        client.post("auth/logout").body()
 
     suspend fun logoutAll(): Unit =
-        client.post("/auth/logout-all").body()
+        client.post("auth/logout-all").body()
 
     suspend fun refreshToken(request: RefreshTokenRequest): AuthResponse =
-        client.post("/auth/refresh") { setBody(request) }.body()
+        client.post("auth/refresh") { setBody(request) }.body()
 
     suspend fun requestPasswordReset(request: PasswordResetRequest): MessageResponse =
-        client.post("/auth/password-reset/request") { setBody(request) }.body()
+        client.post("auth/password-reset/request") { setBody(request) }.body()
 
     suspend fun confirmPasswordReset(request: PasswordResetConfirm): MessageResponse =
-        client.post("/auth/password-reset/confirm") { setBody(request) }.body()
+        client.post("auth/password-reset/confirm") { setBody(request) }.body()
 
     suspend fun register(request: RegisterRequest): RegisterResponse =
         client.submitFormWithBinaryData(
-            url = "/auth/register",
+            url = "auth/register",
             formData = formData {
                 append("email", request.email)
                 append("password", request.password)

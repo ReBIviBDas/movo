@@ -11,17 +11,19 @@ class SubscriptionRepository(private val subscriptionApi: SubscriptionApi) {
         subscriptionApi.getPlans().plans
     }
 
-    suspend fun subscribe(planId: String, autoRenew: Boolean = true): Result<UserSubscription> = runCatching {
-        subscriptionApi.subscribe(SubscribeRequest(planId, autoRenew))
-    }
+    suspend fun subscribe(planId: String, autoRenew: Boolean = true): Result<UserSubscription> =
+        runCatching {
+            subscriptionApi.subscribe(SubscribeRequest(planId, autoRenew))
+        }
 
     suspend fun getActiveSubscription(): Result<UserSubscription> = runCatching {
         subscriptionApi.getActiveSubscription()
     }
 
-    suspend fun toggleAutoRenew(id: String, autoRenew: Boolean): Result<UserSubscription> = runCatching {
-        subscriptionApi.toggleAutoRenew(id, autoRenew)
-    }
+    suspend fun toggleAutoRenew(id: String, autoRenew: Boolean): Result<UserSubscription> =
+        runCatching {
+            subscriptionApi.toggleAutoRenew(id, autoRenew)
+        }
 
     suspend fun cancelSubscription(id: String): Result<CancelSubscriptionResponse> = runCatching {
         subscriptionApi.cancelSubscription(id)

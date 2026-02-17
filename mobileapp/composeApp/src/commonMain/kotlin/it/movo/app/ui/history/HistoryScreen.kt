@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,7 +18,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -34,24 +33,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.movo.app.data.model.GeoPoint
 import it.movo.app.data.model.RentalSummary
 import it.movo.app.data.model.VehicleMapItem
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoTheme
-import movo.composeapp.generated.resources.Res
-import androidx.compose.ui.tooling.preview.Preview
-import movo.composeapp.generated.resources.history_cost
-import movo.composeapp.generated.resources.history_date
-import movo.composeapp.generated.resources.history_duration
-import movo.composeapp.generated.resources.history_empty
-import movo.composeapp.generated.resources.history_empty_subtitle
-import movo.composeapp.generated.resources.history_title
-import movo.composeapp.generated.resources.retry
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.history_duration
+import it.movo.app.composeapp.generated.resources.history_empty
+import it.movo.app.composeapp.generated.resources.history_empty_subtitle
+import it.movo.app.composeapp.generated.resources.history_title
+import it.movo.app.composeapp.generated.resources.retry
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +93,8 @@ private fun HistoryContent(
                 title = { Text(stringResource(Res.string.history_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MovoSurface
-                )
+                ),
+                windowInsets = WindowInsets(0.dp)
             )
         }
     ) { padding ->
@@ -111,6 +109,7 @@ private fun HistoryContent(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
                 uiState.errorMessage != null -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
@@ -128,6 +127,7 @@ private fun HistoryContent(
                         }
                     }
                 }
+
                 uiState.rentals.isEmpty() -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
@@ -146,6 +146,7 @@ private fun HistoryContent(
                         )
                     }
                 }
+
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),

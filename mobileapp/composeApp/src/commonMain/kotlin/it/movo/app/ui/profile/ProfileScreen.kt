@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,18 +21,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -45,12 +47,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -64,11 +65,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import it.movo.app.ui.theme.MovoError
 import it.movo.app.ui.theme.MovoOnSurface
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
@@ -77,47 +77,47 @@ import it.movo.app.ui.theme.MovoOutlineVariant
 import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
-import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.cancel
-import movo.composeapp.generated.resources.common_email
-import movo.composeapp.generated.resources.common_loading
-import movo.composeapp.generated.resources.delete
-import movo.composeapp.generated.resources.profile_change_password
-import movo.composeapp.generated.resources.profile_current_password
-import movo.composeapp.generated.resources.profile_enter_password
-import movo.composeapp.generated.resources.profile_new_password
-import movo.composeapp.generated.resources.profile_notification_settings
-import movo.composeapp.generated.resources.profile_delete_account
-import movo.composeapp.generated.resources.profile_delete_confirm
-import movo.composeapp.generated.resources.profile_drivers_license
-import movo.composeapp.generated.resources.profile_email_subtitle
-import movo.composeapp.generated.resources.profile_email_updates
-import movo.composeapp.generated.resources.profile_full_name
-import movo.composeapp.generated.resources.profile_license_valid_until
-import movo.composeapp.generated.resources.profile_license_verified
-import movo.composeapp.generated.resources.profile_logout
-import movo.composeapp.generated.resources.profile_member_since
-import movo.composeapp.generated.resources.profile_notifications
-import movo.composeapp.generated.resources.profile_personal_details
-import movo.composeapp.generated.resources.profile_phone_number
-import movo.composeapp.generated.resources.profile_push_notifications
-import movo.composeapp.generated.resources.profile_push_subtitle
-import movo.composeapp.generated.resources.profile_save_changes
-import movo.composeapp.generated.resources.profile_title
-import movo.composeapp.generated.resources.profile_subscriptions
-import movo.composeapp.generated.resources.profile_promotions
-import movo.composeapp.generated.resources.profile_penalties
-import movo.composeapp.generated.resources.profile_movo_points
-import movo.composeapp.generated.resources.profile_address
-import movo.composeapp.generated.resources.profile_date_of_birth
-import movo.composeapp.generated.resources.profile_fiscal_code
-import movo.composeapp.generated.resources.profile_logout_all
-import movo.composeapp.generated.resources.profile_export_data
-import movo.composeapp.generated.resources.save
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import it.movo.app.ui.theme.MovoTheme
+import it.movo.app.ui.theme.MovoWhite
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.cancel
+import it.movo.app.composeapp.generated.resources.common_email
+import it.movo.app.composeapp.generated.resources.common_loading
+import it.movo.app.composeapp.generated.resources.delete
+import it.movo.app.composeapp.generated.resources.profile_address
+import it.movo.app.composeapp.generated.resources.profile_change_password
+import it.movo.app.composeapp.generated.resources.profile_current_password
+import it.movo.app.composeapp.generated.resources.profile_date_of_birth
+import it.movo.app.composeapp.generated.resources.profile_delete_account
+import it.movo.app.composeapp.generated.resources.profile_delete_confirm
+import it.movo.app.composeapp.generated.resources.profile_drivers_license
+import it.movo.app.composeapp.generated.resources.profile_email_subtitle
+import it.movo.app.composeapp.generated.resources.profile_email_updates
+import it.movo.app.composeapp.generated.resources.profile_enter_password
+import it.movo.app.composeapp.generated.resources.profile_export_data
+import it.movo.app.composeapp.generated.resources.profile_fiscal_code
+import it.movo.app.composeapp.generated.resources.profile_full_name
+import it.movo.app.composeapp.generated.resources.profile_license_valid_until
+import it.movo.app.composeapp.generated.resources.profile_license_verified
+import it.movo.app.composeapp.generated.resources.profile_logout
+import it.movo.app.composeapp.generated.resources.profile_logout_all
+import it.movo.app.composeapp.generated.resources.profile_member_since
+import it.movo.app.composeapp.generated.resources.profile_movo_points
+import it.movo.app.composeapp.generated.resources.profile_new_password
+import it.movo.app.composeapp.generated.resources.profile_notification_settings
+import it.movo.app.composeapp.generated.resources.profile_notifications
+import it.movo.app.composeapp.generated.resources.profile_penalties
+import it.movo.app.composeapp.generated.resources.profile_personal_details
+import it.movo.app.composeapp.generated.resources.profile_phone_number
+import it.movo.app.composeapp.generated.resources.profile_promotions
+import it.movo.app.composeapp.generated.resources.profile_push_notifications
+import it.movo.app.composeapp.generated.resources.profile_push_subtitle
+import it.movo.app.composeapp.generated.resources.profile_save_changes
+import it.movo.app.composeapp.generated.resources.profile_subscriptions
+import it.movo.app.composeapp.generated.resources.profile_title
+import it.movo.app.composeapp.generated.resources.save
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -202,13 +202,14 @@ private fun ProfileContent(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MovoSurface
-                )
+                ),
+                windowInsets = WindowInsets(0.dp)
             )
         }
     ) { paddingValues ->

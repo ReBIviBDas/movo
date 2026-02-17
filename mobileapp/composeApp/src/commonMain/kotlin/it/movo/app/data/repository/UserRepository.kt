@@ -19,9 +19,10 @@ class UserRepository(private val userApi: UserApi) {
         userApi.updateProfile(update)
     }
 
-    suspend fun updatePassword(currentPassword: String, newPassword: String): Result<Unit> = runCatching {
-        userApi.updatePassword(PasswordUpdate(currentPassword, newPassword))
-    }
+    suspend fun updatePassword(currentPassword: String, newPassword: String): Result<Unit> =
+        runCatching {
+            userApi.updatePassword(PasswordUpdate(currentPassword, newPassword))
+        }
 
     suspend fun deleteAccount(password: String): Result<DeleteAccountResponse> = runCatching {
         userApi.deleteAccount(DeleteAccountRequest(password))
@@ -31,9 +32,10 @@ class UserRepository(private val userApi: UserApi) {
         userApi.getNotificationPreferences()
     }
 
-    suspend fun updateNotificationPreferences(prefs: NotificationPreferences): Result<NotificationPreferences> = runCatching {
-        userApi.updateNotificationPreferences(prefs)
-    }
+    suspend fun updateNotificationPreferences(prefs: NotificationPreferences): Result<NotificationPreferences> =
+        runCatching {
+            userApi.updateNotificationPreferences(prefs)
+        }
 
     suspend fun exportData(): Result<DataExportResponse> = runCatching {
         userApi.exportData()

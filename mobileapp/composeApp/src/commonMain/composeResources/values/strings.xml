@@ -42,7 +42,7 @@
     <string name="login_error_email_required">Email is required</string>
     <string name="login_error_password_required">Password is required</string>
     <string name="login_or_divider">or</string>
-    
+
     <!-- New Login Screen Strings -->
     <string name="login_welcome_title">Welcome to Movo</string>
     <string name="login_subtitle_new">Drive Green in Trento</string>
@@ -214,7 +214,7 @@
     <string name="profile_personal_details">Personal Details</string>
     <string name="profile_full_name">Full Name</string>
     <string name="profile_phone_number">Phone Number</string>
-    <string name="profile_drivers_license">Driver\'s License</string>
+    <string name="profile_drivers_license">Driver's License</string>
     <string name="profile_license_verified">VERIFIED</string>
     <string name="profile_license_valid_until">Valid until %s</string>
     <string name="profile_member_since">Member since %s</string>
@@ -360,6 +360,8 @@
     <string name="penalty_contest_reason">Explain why you are contesting this penalty (minimum 20 characters)</string>
     <string name="penalty_contest_submit">Submit Contest</string>
     <string name="penalty_contest_success">Contest submitted successfully</string>
+    <string name="penalty_no_penalties">No penalties</string>
+    <string name="penalty_no_penalties_subtitle">You have no penalties. Great job!</string>
     <string name="penalty_status_pending">Pending</string>
     <string name="penalty_status_paid">Paid</string>
     <string name="penalty_status_contested">Contested</string>
@@ -383,7 +385,7 @@
     <string name="profile_penalties">Penalties</string>
     <string name="profile_movo_points">MovoPoints</string>
     <string name="penalty_type_geofence_exit">Geofence Exit</string>
-    
+
     <!-- Filters -->
     <string name="filter_title">Filters</string>
     <string name="filter_min_battery">Min Battery: %d%%</string>
@@ -391,7 +393,7 @@
     <string name="filter_max_distance">Max Distance: %.1f km</string>
     <string name="filter_apply">Apply Filters</string>
     <string name="filter_reset">Reset</string>
-    
+
     <!-- Register -->
     <string name="register_skip_license">Skip for now</string>
     <string name="register_identity_document">Identity Document</string>

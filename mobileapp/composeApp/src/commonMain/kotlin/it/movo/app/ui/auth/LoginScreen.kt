@@ -47,25 +47,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.login_button
-import movo.composeapp.generated.resources.login_email_label
-import movo.composeapp.generated.resources.login_email_placeholder
-import movo.composeapp.generated.resources.login_forgot_password
-import movo.composeapp.generated.resources.login_google
-import movo.composeapp.generated.resources.login_no_account
-import movo.composeapp.generated.resources.login_or_continue
-import movo.composeapp.generated.resources.login_password_label
-import movo.composeapp.generated.resources.login_password_placeholder
-import movo.composeapp.generated.resources.login_sign_up
-import movo.composeapp.generated.resources.login_subtitle
-import movo.composeapp.generated.resources.login_welcome_title
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import it.movo.app.ui.theme.MovoTheme
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.login_button
+import it.movo.app.composeapp.generated.resources.login_email_label
+import it.movo.app.composeapp.generated.resources.login_email_placeholder
+import it.movo.app.composeapp.generated.resources.login_forgot_password
+import it.movo.app.composeapp.generated.resources.login_google
+import it.movo.app.composeapp.generated.resources.login_no_account
+import it.movo.app.composeapp.generated.resources.login_or_continue
+import it.movo.app.composeapp.generated.resources.login_password_label
+import it.movo.app.composeapp.generated.resources.login_password_placeholder
+import it.movo.app.composeapp.generated.resources.login_sign_up
+import it.movo.app.composeapp.generated.resources.login_subtitle
+import it.movo.app.composeapp.generated.resources.login_welcome_title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoginScreen(
@@ -124,7 +125,7 @@ private fun LoginContent(
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(Res.string.back)
                 )
             }
         }

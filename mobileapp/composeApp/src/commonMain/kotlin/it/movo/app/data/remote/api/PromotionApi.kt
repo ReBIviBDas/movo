@@ -11,8 +11,8 @@ import it.movo.app.data.model.PromotionsResponse
 
 class PromotionApi(private val client: HttpClient) {
     suspend fun getPromotions(): PromotionsResponse =
-        client.get("/promotions").body()
+        client.get("promotions").body()
 
     suspend fun applyPromoCode(request: ApplyPromoRequest): Promotion =
-        client.post("/promotions/apply") { setBody(request) }.body()
+        client.post("promotions/apply") { setBody(request) }.body()
 }

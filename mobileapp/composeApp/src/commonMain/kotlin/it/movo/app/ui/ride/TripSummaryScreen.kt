@@ -19,8 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.LocationOn
@@ -28,11 +28,11 @@ import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
@@ -60,21 +61,20 @@ import it.movo.app.ui.theme.MovoOutline
 import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
-import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.trip_co2_saved
-import movo.composeapp.generated.resources.trip_distance
-import movo.composeapp.generated.resources.trip_done
-import movo.composeapp.generated.resources.trip_duration
-import movo.composeapp.generated.resources.trip_paid
-import movo.composeapp.generated.resources.trip_rate
-import movo.composeapp.generated.resources.trip_split_bill
-import movo.composeapp.generated.resources.trip_summary_title
-import movo.composeapp.generated.resources.retry
-import movo.composeapp.generated.resources.trip_view_breakdown
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import it.movo.app.ui.theme.MovoTheme
+import it.movo.app.ui.theme.MovoWhite
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.retry
+import it.movo.app.composeapp.generated.resources.trip_co2_saved
+import it.movo.app.composeapp.generated.resources.trip_distance
+import it.movo.app.composeapp.generated.resources.trip_done
+import it.movo.app.composeapp.generated.resources.trip_duration
+import it.movo.app.composeapp.generated.resources.trip_paid
+import it.movo.app.composeapp.generated.resources.trip_rate
+import it.movo.app.composeapp.generated.resources.trip_split_bill
+import it.movo.app.composeapp.generated.resources.trip_summary_title
+import it.movo.app.composeapp.generated.resources.trip_view_breakdown
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TripSummaryScreen(
@@ -224,12 +224,16 @@ private fun TripSummaryContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Subtotale: €${totalEuros}.${totalCents.toString().padStart(2, '0')}",
+                        text = "Subtotale: €${totalEuros}.${
+                            totalCents.toString().padStart(2, '0')
+                        }",
                         fontSize = 14.sp,
                         color = MovoOnSurfaceVariant
                     )
                     Text(
-                        text = "Sconto: -€${discountEuros}.${discountCents.toString().padStart(2, '0')}",
+                        text = "Sconto: -€${discountEuros}.${
+                            discountCents.toString().padStart(2, '0')
+                        }",
                         fontSize = 14.sp,
                         color = MovoSuccess
                     )

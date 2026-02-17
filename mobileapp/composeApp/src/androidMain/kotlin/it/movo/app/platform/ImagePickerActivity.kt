@@ -1,7 +1,5 @@
-package it.movo.app
+package it.movo.app.platform
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts

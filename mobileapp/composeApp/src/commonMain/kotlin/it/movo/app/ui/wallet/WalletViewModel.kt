@@ -30,7 +30,13 @@ class WalletViewModel(private val paymentRepository: PaymentRepository) : ViewMo
             _uiState.update { it.copy(isLoading = true) }
             paymentRepository.getPaymentMethods()
                 .onSuccess { methods ->
-                    _uiState.update { it.copy(paymentMethods = methods, isLoading = false, errorMessage = null) }
+                    _uiState.update {
+                        it.copy(
+                            paymentMethods = methods,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -89,7 +95,12 @@ class WalletViewModel(private val paymentRepository: PaymentRepository) : ViewMo
                     dismissAddCardDialog()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Failed to add card") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = e.message ?: "Failed to add card"
+                        )
+                    }
                 }
         }
     }

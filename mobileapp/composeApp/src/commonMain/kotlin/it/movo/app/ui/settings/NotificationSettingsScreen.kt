@@ -1,7 +1,6 @@
 package it.movo.app.ui.settings
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,18 +51,19 @@ import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.notification_alerts
-import movo.composeapp.generated.resources.notifications_booking_reminders
-import movo.composeapp.generated.resources.notifications_email
-import movo.composeapp.generated.resources.notifications_promotional
-import movo.composeapp.generated.resources.notifications_push
-import movo.composeapp.generated.resources.notifications_rental_alerts
-import movo.composeapp.generated.resources.notifications_saved
-import movo.composeapp.generated.resources.notifications_sms
-import movo.composeapp.generated.resources.notifications_title
-import movo.composeapp.generated.resources.notifications_transactional
-import movo.composeapp.generated.resources.profile_save_changes
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.notification_alerts
+import it.movo.app.composeapp.generated.resources.notifications_booking_reminders
+import it.movo.app.composeapp.generated.resources.notifications_email
+import it.movo.app.composeapp.generated.resources.notifications_promotional
+import it.movo.app.composeapp.generated.resources.notifications_push
+import it.movo.app.composeapp.generated.resources.notifications_rental_alerts
+import it.movo.app.composeapp.generated.resources.notifications_saved
+import it.movo.app.composeapp.generated.resources.notifications_sms
+import it.movo.app.composeapp.generated.resources.notifications_title
+import it.movo.app.composeapp.generated.resources.notifications_transactional
+import it.movo.app.composeapp.generated.resources.profile_save_changes
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,7 +88,7 @@ fun NotificationSettingsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },

@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 data class BookingUiState(
@@ -31,7 +30,10 @@ data class BookingUiState(
 ) {
     val timerMinutes: Int get() = remainingSeconds / 60
     val timerSeconds: Int get() = remainingSeconds % 60
-    val timerText: String get() = "${timerMinutes.toString().padStart(2, '0')}:${timerSeconds.toString().padStart(2, '0')}"
+    val timerText: String
+        get() = "${
+            timerMinutes.toString().padStart(2, '0')
+        }:${timerSeconds.toString().padStart(2, '0')}"
     val isExpired: Boolean get() = remainingSeconds <= 0
 }
 
@@ -54,7 +56,13 @@ class BookingViewModel(
             bookingRepository.getActiveBooking()
                 .onSuccess { booking ->
                     val remainingSeconds = calculateRemainingSeconds(booking.expiresAt)
-                    _uiState.update { it.copy(booking = booking, remainingSeconds = remainingSeconds, isLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            booking = booking,
+                            remainingSeconds = remainingSeconds,
+                            isLoading = false
+                        )
+                    }
                     if (remainingSeconds > 0) {
                         startTimer()
                     }
@@ -83,10 +91,23 @@ class BookingViewModel(
                 bookingRepository.createBooking(vehicleId)
                     .onSuccess { booking ->
                         val remainingSeconds = calculateRemainingSeconds(booking.expiresAt)
-                        _uiState.update { it.copy(booking = booking, remainingSeconds = remainingSeconds, isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                booking = booking,
+                                remainingSeconds = remainingSeconds,
+                                isLoading = false
+                            )
+                        }
                         startTimer()
                     }
-                    .onFailure { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
+                    .onFailure { e ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = e.message
+                            )
+                        }
+                    }
             } finally {
                 _uiState.update { it.copy(isProcessing = false) }
             }
@@ -111,8 +132,22 @@ class BookingViewModel(
             _uiState.update { it.copy(isCancelling = true, isProcessing = true) }
             try {
                 bookingRepository.cancelBooking(bookingId)
-                    .onSuccess { _uiState.update { it.copy(isCancelling = false, bookingCancelled = true) } }
-                    .onFailure { e -> _uiState.update { it.copy(isCancelling = false, errorMessage = e.message) } }
+                    .onSuccess {
+                        _uiState.update {
+                            it.copy(
+                                isCancelling = false,
+                                bookingCancelled = true
+                            )
+                        }
+                    }
+                    .onFailure { e ->
+                        _uiState.update {
+                            it.copy(
+                                isCancelling = false,
+                                errorMessage = e.message
+                            )
+                        }
+                    }
             } finally {
                 _uiState.update { it.copy(isProcessing = false) }
             }
@@ -124,12 +159,21 @@ class BookingViewModel(
         val bookingId = booking.id
         if (_uiState.value.isProcessing) return
         viewModelScope.launch {
-            _uiState.update { it.copy(isUnlocking = true, isProcessing = true, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    isUnlocking = true,
+                    isProcessing = true,
+                    errorMessage = null
+                )
+            }
             try {
                 val userLocation = locationProvider.getCurrentLocation()
                 if (userLocation == null) {
                     _uiState.update {
-                        it.copy(isUnlocking = false, errorMessage = "Unable to get your location. Please enable GPS.")
+                        it.copy(
+                            isUnlocking = false,
+                            errorMessage = "Unable to get your location. Please enable GPS."
+                        )
                     }
                     return@launch
                 }
@@ -149,8 +193,22 @@ class BookingViewModel(
                 }
 
                 rentalRepository.unlockVehicle(bookingId, userLocation)
-                    .onSuccess { rental -> _uiState.update { it.copy(isUnlocking = false, rentalStarted = true) } }
-                    .onFailure { e -> _uiState.update { it.copy(isUnlocking = false, errorMessage = e.message) } }
+                    .onSuccess { rental ->
+                        _uiState.update {
+                            it.copy(
+                                isUnlocking = false,
+                                rentalStarted = true
+                            )
+                        }
+                    }
+                    .onFailure { e ->
+                        _uiState.update {
+                            it.copy(
+                                isUnlocking = false,
+                                errorMessage = e.message
+                            )
+                        }
+                    }
             } finally {
                 _uiState.update { it.copy(isProcessing = false) }
             }

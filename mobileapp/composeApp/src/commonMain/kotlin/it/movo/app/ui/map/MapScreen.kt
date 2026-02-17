@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -50,33 +49,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import it.movo.app.data.model.Vehicle
 import it.movo.app.data.model.VehicleMapItem
 import it.movo.app.data.model.VehicleStatus
-import it.movo.app.ui.theme.MovoOnSurface
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
 import it.movo.app.ui.theme.MovoOutline
 import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
-import it.movo.app.ui.theme.MovoTealContainer
+import it.movo.app.ui.theme.MovoTheme
 import it.movo.app.ui.theme.MovoWarning
 import it.movo.app.ui.theme.MovoWhite
-import it.movo.app.ui.theme.MovoTheme
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.filter_apply
-import movo.composeapp.generated.resources.filter_max_distance
-import movo.composeapp.generated.resources.filter_max_price
-import movo.composeapp.generated.resources.filter_min_battery
-import movo.composeapp.generated.resources.filter_reset
-import movo.composeapp.generated.resources.filter_title
-import movo.composeapp.generated.resources.map_search_placeholder
-import movo.composeapp.generated.resources.vehicle_battery
-import movo.composeapp.generated.resources.vehicle_range
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.filter_apply
+import it.movo.app.composeapp.generated.resources.filter_max_distance
+import it.movo.app.composeapp.generated.resources.filter_max_price
+import it.movo.app.composeapp.generated.resources.filter_min_battery
+import it.movo.app.composeapp.generated.resources.filter_reset
+import it.movo.app.composeapp.generated.resources.filter_title
+import it.movo.app.composeapp.generated.resources.map_search_placeholder
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -284,7 +278,10 @@ private fun FilterSheetContent(
         // Price Filter
         val displayPrice = if (maxPrice == Double.MAX_VALUE) 1.0 else maxPrice
         Text(
-            text = if (maxPrice == Double.MAX_VALUE) "No price limit" else stringResource(Res.string.filter_max_price, maxPrice),
+            text = if (maxPrice == Double.MAX_VALUE) "No price limit" else stringResource(
+                Res.string.filter_max_price,
+                maxPrice
+            ),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium
         )
@@ -304,7 +301,10 @@ private fun FilterSheetContent(
         // Distance Filter
         val displayDistance = if (maxDistance == Double.MAX_VALUE) 10.0 else maxDistance
         Text(
-            text = if (maxDistance == Double.MAX_VALUE) "No distance limit" else stringResource(Res.string.filter_max_distance, maxDistance),
+            text = if (maxDistance == Double.MAX_VALUE) "No distance limit" else stringResource(
+                Res.string.filter_max_distance,
+                maxDistance
+            ),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium
         )
