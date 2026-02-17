@@ -6,10 +6,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GeoPoint(
     val type: String = "Point",
-    val coordinates: List<Double> = emptyList()
+    val coordinates: List<Double> = emptyList(),
+    val lat: Double? = null,
+    val lng: Double? = null
 ) {
-    val longitude: Double get() = coordinates.getOrElse(0) { 0.0 }
-    val latitude: Double get() = coordinates.getOrElse(1) { 0.0 }
+    val longitude: Double get() = lng ?: coordinates.getOrElse(0) { 0.0 }
+    val latitude: Double get() = lat ?: coordinates.getOrElse(1) { 0.0 }
 }
 
 @Serializable

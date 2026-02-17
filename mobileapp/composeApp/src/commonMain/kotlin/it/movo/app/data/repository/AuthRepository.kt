@@ -20,14 +20,14 @@ class AuthRepository(
 
     suspend fun login(email: String, password: String): Result<AuthResponse> = runCatching {
         val response = authApi.login(LoginRequest(email, password))
-        response.refreshToken?.let { tokenManager.saveTokens(response.accessToken, it) }
+        tokenManager.saveTokens(response.accessToken, response.refreshToken)
         response
     }
 
     suspend fun loginWithGoogle(code: String, redirectUri: String): Result<AuthResponse> =
         runCatching {
             val response = authApi.loginWithGoogle(GoogleLoginRequest(code, redirectUri))
-            response.refreshToken?.let { tokenManager.saveTokens(response.accessToken, it) }
+            tokenManager.saveTokens(response.accessToken, response.refreshToken)
             response
         }
 
@@ -45,7 +45,7 @@ class AuthRepository(
         val token =
             tokenManager.refreshToken ?: throw IllegalStateException("No refresh token available")
         val response = authApi.refreshToken(RefreshTokenRequest(token))
-        response.refreshToken?.let { tokenManager.saveTokens(response.accessToken, it) }
+        tokenManager.saveTokens(response.accessToken, response.refreshToken)
         response
     }
 

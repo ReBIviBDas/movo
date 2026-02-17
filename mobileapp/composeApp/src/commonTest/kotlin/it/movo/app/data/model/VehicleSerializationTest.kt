@@ -171,6 +171,37 @@ class VehicleSerializationTest {
     }
 
     @Test
+    fun geoPointDeserializesFromLatLngFormat() {
+        val raw = """{ "lat": 46.0678, "lng": 11.1234 }"""
+
+        val point = json.decodeFromString<GeoPoint>(raw)
+
+        assertEquals(11.1234, point.longitude, 0.0001)
+        assertEquals(46.0678, point.latitude, 0.0001)
+    }
+
+    @Test
+    fun vehicleMapItemDeserializesFromBackendFormat() {
+        val raw = """
+        {
+            "id": "v1",
+            "model": "Fiat 500e",
+            "plate": "AB123CD",
+            "location": { "lat": 46.07, "lng": 11.12 },
+            "battery_level": 85,
+            "status": "available",
+            "price_per_minute": 0.25
+        }
+        """.trimIndent()
+
+        val item = json.decodeFromString<VehicleMapItem>(raw)
+
+        assertEquals("v1", item.id)
+        assertEquals(11.12, item.location.longitude, 0.001)
+        assertEquals(46.07, item.location.latitude, 0.001)
+    }
+
+    @Test
     fun vehiclesResponseDeserializes() {
         val raw = """
         {
