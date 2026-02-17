@@ -1,0 +1,28 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: sws2apps/render-deployment@v2.0.0
+        with:
+          serviceId: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
+
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: sws2apps/render-deployment@v2.0.0
+        with:
+          serviceId: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
