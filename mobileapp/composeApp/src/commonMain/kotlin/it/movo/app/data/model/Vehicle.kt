@@ -74,6 +74,15 @@ enum class VehicleStatus {
 }
 
 @Serializable
+data class VehicleSummary(
+    val id: String? = null,
+    val plate: String? = null,
+    val model: String? = null,
+    val type: String? = null,
+    @SerialName("battery_level") val batteryLevel: Int? = null
+)
+
+@Serializable
 data class VehiclesResponse(
     val vehicles: List<VehicleMapItem>,
     @SerialName("updated_at") val updatedAt: String? = null

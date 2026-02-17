@@ -10,7 +10,6 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import it.movo.app.data.model.AddPaymentMethodRequest
 import it.movo.app.data.model.CreateSplitRequest
-import it.movo.app.data.model.PaymentMethod
 import it.movo.app.data.model.PaymentMethodsResponse
 import it.movo.app.data.model.SplitRequest
 import it.movo.app.data.model.TransactionsResponse
@@ -19,14 +18,16 @@ class PaymentApi(private val client: HttpClient) {
     suspend fun getPaymentMethods(): PaymentMethodsResponse =
         client.get("payments/methods").body()
 
-    suspend fun addPaymentMethod(request: AddPaymentMethodRequest): PaymentMethod =
-        client.post("payments/methods") { setBody(request) }.body()
+    suspend fun addPaymentMethod(request: AddPaymentMethodRequest) {
+        client.post("payments/methods") { setBody(request) }
+    }
 
     suspend fun deletePaymentMethod(id: String): Unit =
         client.delete("payments/methods/$id").body()
 
-    suspend fun setDefaultPaymentMethod(id: String): PaymentMethod =
-        client.put("payments/methods/$id/default").body()
+    suspend fun setDefaultPaymentMethod(id: String) {
+        client.put("payments/methods/$id/default")
+    }
 
     suspend fun createSplitRequest(request: CreateSplitRequest): SplitRequest =
         client.post("payments/split-request") { setBody(request) }.body()

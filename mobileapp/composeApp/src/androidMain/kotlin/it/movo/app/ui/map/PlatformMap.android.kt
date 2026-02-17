@@ -1,5 +1,9 @@
 package it.movo.app.ui.map
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -48,12 +54,18 @@ actual fun PlatformMap(
     ) {
         vehicles.forEach { vehicle ->
             val position = LatLng(vehicle.location.latitude, vehicle.location.longitude)
-            val markerHue = batteryToHue(vehicle.batteryLevel)
+            val markerIcon = remember(vehicle.id, vehicle.batteryLevel) {
+                createVehicleBitmapDescriptor(vehicle.batteryLevel)
+            }
 
             MarkerInfoWindowContent(
                 state = rememberMarkerState(key = vehicle.id, position = position),
                 title = vehicle.model,
-                icon = BitmapDescriptorFactory.defaultMarker(markerHue),
+                icon = markerIcon,
+                onClick = {
+                    onVehicleClick(vehicle)
+                    false
+                },
                 onInfoWindowClick = { onVehicleClick(vehicle) }
             ) {
                 VehicleInfoWindow(vehicle)
@@ -62,10 +74,39 @@ actual fun PlatformMap(
     }
 }
 
-private fun batteryToHue(batteryLevel: Int): Float = when {
-    batteryLevel >= 60 -> BitmapDescriptorFactory.HUE_GREEN
-    batteryLevel >= 30 -> BitmapDescriptorFactory.HUE_YELLOW
-    else -> BitmapDescriptorFactory.HUE_RED
+private fun createVehicleBitmapDescriptor(batteryLevel: Int): BitmapDescriptor {
+    val size = 96
+    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+
+    val batteryColor = when {
+        batteryLevel >= 60 -> android.graphics.Color.rgb(76, 175, 80)
+        batteryLevel >= 30 -> android.graphics.Color.rgb(255, 193, 7)
+        else -> android.graphics.Color.rgb(244, 67, 54)
+    }
+
+    val outerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = batteryColor
+        style = Paint.Style.FILL
+    }
+    val cx = size / 2f
+    val cy = size / 2f
+    canvas.drawCircle(cx, cy, size / 2f, outerPaint)
+
+    val innerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.WHITE
+        style = Paint.Style.FILL
+    }
+    canvas.drawCircle(cx, cy, size / 2f - 6f, innerPaint)
+
+    val emojiPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textSize = 40f
+        textAlign = Paint.Align.CENTER
+        typeface = Typeface.DEFAULT
+    }
+    canvas.drawText("\uD83D\uDE97", cx, cy + 14f, emojiPaint)
+
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
 @Composable

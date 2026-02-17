@@ -14,7 +14,7 @@ data class Rental(
     val id: String,
     @SerialName("user_id") val userId: String,
     @SerialName("vehicle_id") val vehicleId: String,
-    val vehicle: VehicleMapItem? = null,
+    val vehicle: VehicleSummary? = null,
     val status: RentalStatus = RentalStatus.ACTIVE,
     @SerialName("started_at") val startedAt: String,
     @SerialName("start_location") val startLocation: GeoPoint? = null,
@@ -25,16 +25,17 @@ data class Rental(
 @Serializable
 data class RentalSummary(
     val id: String,
-    @SerialName("user_id") val userId: String,
-    @SerialName("vehicle_id") val vehicleId: String,
-    val vehicle: VehicleMapItem? = null,
+    @SerialName("user_id") val userId: String? = null,
+    @SerialName("vehicle_id") val vehicleId: String? = null,
+    val vehicle: VehicleSummary? = null,
     val status: RentalStatus = RentalStatus.COMPLETED,
-    @SerialName("started_at") val startedAt: String,
+    @SerialName("started_at") val startedAt: String = "",
     @SerialName("start_location") val startLocation: GeoPoint? = null,
     @SerialName("ended_at") val endedAt: String? = null,
     @SerialName("end_location") val endLocation: GeoPoint? = null,
     @SerialName("duration_minutes") val durationMinutes: Int? = null,
     @SerialName("distance_km") val distanceKm: Double? = null,
+    @SerialName("total_cost") val totalCost: Double? = null,
     @SerialName("total_cost_cents") val totalCostCents: Int = 0,
     @SerialName("discount_applied_cents") val discountAppliedCents: Int = 0,
     @SerialName("final_cost_cents") val finalCostCents: Int = 0
@@ -58,6 +59,14 @@ data class EndRentalRequest(
 
 @Serializable
 data class RentalHistoryResponse(
-    val data: List<RentalSummary>,
-    val pagination: CursorPagination? = null
+    val rentals: List<RentalSummary>,
+    val pagination: PagePagination? = null
+)
+
+@Serializable
+data class PagePagination(
+    val page: Int = 1,
+    val limit: Int = 10,
+    val total: Int = 0,
+    val pages: Int = 0
 )

@@ -70,7 +70,7 @@ class ReportIssueViewModel(
             viewModelScope.launch {
                 rentalRepository.getRental(rentalId)
                     .onSuccess { rental ->
-                        _uiState.update { it.copy(vehicleId = rental.vehicleId) }
+                        _uiState.update { it.copy(vehicleId = rental.vehicleId.orEmpty()) }
                     }
                     .onFailure { e ->
                         _uiState.update {
