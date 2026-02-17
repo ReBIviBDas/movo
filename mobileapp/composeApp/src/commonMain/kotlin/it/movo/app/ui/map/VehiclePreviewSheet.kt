@@ -143,7 +143,7 @@ fun VehiclePreviewSheet(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "${vehicle.licensePlate} • 4 seats",
+                        text = "${vehicle.licensePlate ?: "XXXXXX"} • 4 seats",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MovoOnSurfaceVariant
                     )

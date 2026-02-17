@@ -22,22 +22,22 @@ data class GeoPolygon(
 data class VehicleMapItem(
     val id: String,
     val model: String,
-    @SerialName("license_plate") val licensePlate: String,
+    @SerialName("plate") val licensePlate: String? = null,
     val location: GeoPoint,
     @SerialName("battery_level") val batteryLevel: Int,
     val status: VehicleStatus = VehicleStatus.AVAILABLE,
-    @SerialName("base_price_per_minute") val basePricePerMinute: Int = 0
+    @SerialName("price_per_minute") val basePricePerMinute: Int = 0
 )
 
 @Serializable
 data class Vehicle(
     val id: String,
     val model: String,
-    @SerialName("license_plate") val licensePlate: String,
+    @SerialName("plate") val licensePlate: String? = null,
     val location: GeoPoint,
     @SerialName("battery_level") val batteryLevel: Int,
     val status: VehicleStatus = VehicleStatus.AVAILABLE,
-    @SerialName("base_price_per_minute") val basePricePerMinute: Int = 0,
+    @SerialName("price_per_minute") val basePricePerMinute: Int = 0,
     val year: Int? = null,
     val color: String? = null,
     val features: List<String> = emptyList(),
@@ -49,11 +49,11 @@ data class Vehicle(
 data class VehicleSearchResult(
     val id: String,
     val model: String,
-    @SerialName("license_plate") val licensePlate: String,
+    @SerialName("plate") val licensePlate: String? = null,
     val location: GeoPoint,
     @SerialName("battery_level") val batteryLevel: Int,
     val status: VehicleStatus = VehicleStatus.AVAILABLE,
-    @SerialName("base_price_per_minute") val basePricePerMinute: Int = 0,
+    @SerialName("price_per_minute") val basePricePerMinute: Int = 0,
     val year: Int? = null,
     val color: String? = null,
     val features: List<String> = emptyList(),

@@ -290,7 +290,7 @@ private fun VehicleInfoCard(vehicle: Vehicle) {
             InfoRow(
                 icon = Icons.Default.DirectionsCar,
                 label = stringResource(Res.string.vehicle_license_plate),
-                value = vehicle.licensePlate
+                value = vehicle.licensePlate ?: "XXXXXX"
             )
 
             vehicle.year?.let { year ->

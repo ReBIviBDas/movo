@@ -189,7 +189,7 @@ fun VehicleDetailsSheet(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = vehicle.licensePlate,
+                        text = vehicle.licensePlate ?: "XXXXXX",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = MovoOnSurface
