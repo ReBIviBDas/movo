@@ -237,8 +237,9 @@ private fun VehicleStatsRow(vehicle: Vehicle) {
         StatItem(
             icon = Icons.Default.Speed,
             value = run {
-                val cents = vehicle.basePricePerMinute.toLong()
-                "€${cents / 100}.${(cents % 100).toString().padStart(2, '0')}/min"
+                val euros = vehicle.basePricePerMinute.toInt()
+                val cents = ((vehicle.basePricePerMinute - euros) * 100).toInt()
+                "€${euros}.${cents.toString().padStart(2, '0')}/min"
             },
             color = MovoOnSurface
         )

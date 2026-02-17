@@ -133,11 +133,11 @@ private fun MapContent(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Map placeholder
-        MapPlaceholder(
+        PlatformMap(
             vehicles = uiState.vehicles,
             parkingAreas = uiState.parkingAreas,
-            onVehicleClick = onVehicleMarkerClick
+            onVehicleClick = onVehicleMarkerClick,
+            modifier = Modifier.fillMaxSize()
         )
 
         // Search bar
@@ -528,7 +528,7 @@ private fun MapScreenPreview() {
                         ),
                         batteryLevel = 85,
                         status = VehicleStatus.AVAILABLE,
-                        basePricePerMinute = 25
+                        basePricePerMinute = 0.25
                     ),
                     VehicleMapItem(
                         id = "2",
@@ -540,7 +540,7 @@ private fun MapScreenPreview() {
                         ),
                         batteryLevel = 42,
                         status = VehicleStatus.AVAILABLE,
-                        basePricePerMinute = 20
+                        basePricePerMinute = 0.20
                     ),
                     VehicleMapItem(
                         id = "3",
@@ -552,7 +552,7 @@ private fun MapScreenPreview() {
                         ),
                         batteryLevel = 28,
                         status = VehicleStatus.AVAILABLE,
-                        basePricePerMinute = 18
+                        basePricePerMinute = 0.18
                     )
                 ),
                 parkingAreas = emptyList(),

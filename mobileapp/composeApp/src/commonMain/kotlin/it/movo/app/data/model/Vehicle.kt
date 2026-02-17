@@ -26,7 +26,7 @@ data class VehicleMapItem(
     val location: GeoPoint,
     @SerialName("battery_level") val batteryLevel: Int,
     val status: VehicleStatus = VehicleStatus.AVAILABLE,
-    @SerialName("price_per_minute") val basePricePerMinute: Int = 0
+    @SerialName("price_per_minute") val basePricePerMinute: Double = 0.0
 )
 
 @Serializable
@@ -37,7 +37,7 @@ data class Vehicle(
     val location: GeoPoint,
     @SerialName("battery_level") val batteryLevel: Int,
     val status: VehicleStatus = VehicleStatus.AVAILABLE,
-    @SerialName("price_per_minute") val basePricePerMinute: Int = 0,
+    @SerialName("price_per_minute") val basePricePerMinute: Double = 0.0,
     val year: Int? = null,
     val color: String? = null,
     val features: List<String> = emptyList(),
@@ -53,7 +53,7 @@ data class VehicleSearchResult(
     val location: GeoPoint,
     @SerialName("battery_level") val batteryLevel: Int,
     val status: VehicleStatus = VehicleStatus.AVAILABLE,
-    @SerialName("price_per_minute") val basePricePerMinute: Int = 0,
+    @SerialName("price_per_minute") val basePricePerMinute: Double = 0.0,
     val year: Int? = null,
     val color: String? = null,
     val features: List<String> = emptyList(),

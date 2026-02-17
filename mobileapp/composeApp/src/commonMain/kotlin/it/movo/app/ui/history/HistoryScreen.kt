@@ -266,7 +266,7 @@ private fun HistoryScreenPreview() {
                 licensePlate = "AB123CD",
                 location = GeoPoint(coordinates = listOf(12.5, 41.9)),
                 batteryLevel = 85,
-                basePricePerMinute = 25
+                basePricePerMinute = 0.25
             ),
             startedAt = "2026-02-10T14:30:00Z",
             durationMinutes = 45,
@@ -282,7 +282,7 @@ private fun HistoryScreenPreview() {
                 licensePlate = "EF456GH",
                 location = GeoPoint(coordinates = listOf(12.6, 41.8)),
                 batteryLevel = 72,
-                basePricePerMinute = 20
+                basePricePerMinute = 0.20
             ),
             startedAt = "2026-02-08T09:15:00Z",
             durationMinutes = 120,
@@ -298,7 +298,7 @@ private fun HistoryScreenPreview() {
                 licensePlate = "IJ789KL",
                 location = GeoPoint(coordinates = listOf(12.4, 42.0)),
                 batteryLevel = 90,
-                basePricePerMinute = 28
+                basePricePerMinute = 0.28
             ),
             startedAt = "2026-02-05T16:45:00Z",
             durationMinutes = 30,

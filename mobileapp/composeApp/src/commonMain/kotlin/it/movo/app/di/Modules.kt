@@ -1,7 +1,6 @@
 package it.movo.app.di
 
 import com.russhwolf.settings.Settings
-import io.ktor.client.plugins.auth.providers.BearerTokens
 import it.movo.app.data.auth.TokenManager
 import it.movo.app.data.remote.api.AuthApi
 import it.movo.app.data.remote.api.BookingApi
@@ -53,17 +52,7 @@ val appModule = module {
     single {
         val tokenManager: TokenManager = get()
         createHttpClient(
-            tokenProvider = {
-                tokenManager.accessToken?.let {
-                    BearerTokens(it, tokenManager.refreshToken ?: "")
-                }
-            },
-            tokenRefresher = {
-                val authRepo: AuthRepository = get()
-                authRepo.refreshTokens().getOrNull()?.let {
-                    BearerTokens(it.accessToken, it.refreshToken ?: "")
-                }
-            }
+            tokenProvider = { tokenManager.accessToken }
         )
     }
 

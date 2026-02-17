@@ -213,7 +213,7 @@ class MapViewModel(
         viewModelScope.launch {
             parkingAreaRepository.getParkingAreas(bounds)
                 .onSuccess { areas -> _uiState.update { it.copy(parkingAreas = areas) } }
-                .onFailure { e -> _uiState.update { it.copy(errorMessage = e.message) } }
+                .onFailure { _uiState.update { it.copy(parkingAreas = emptyList()) } }
         }
     }
 
