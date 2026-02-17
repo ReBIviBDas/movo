@@ -10,6 +10,8 @@ plugins {
 }
 
 kotlin {
+    jvm()
+
     androidLibrary {
         namespace = "${project.group}.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()

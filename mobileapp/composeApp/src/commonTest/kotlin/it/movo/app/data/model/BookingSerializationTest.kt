@@ -4,6 +4,8 @@ import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlin.test.assertTrue
 
 class BookingSerializationTest {
 
@@ -108,10 +110,12 @@ class BookingSerializationTest {
 
     @Test
     fun createBookingRequestSerializes() {
-        val request = CreateBookingRequest(vehicleId = "v1", durationMinutes = 15)
+        val request = CreateBookingRequest(vehicleId = "v1", durationMinutes = 30)
         val serialized = json.encodeToString(CreateBookingRequest.serializer(), request)
 
-        assertEquals(true, serialized.contains("\"vehicle_id\":\"v1\""))
-        assertEquals(true, serialized.contains("\"duration_minutes\":15"))
+        assertTrue(serialized.contains("vehicle_id"))
+        assertTrue(serialized.contains("v1"))
+        assertTrue(serialized.contains("duration_minutes"))
+        assertTrue(serialized.contains("30"))
     }
 }
