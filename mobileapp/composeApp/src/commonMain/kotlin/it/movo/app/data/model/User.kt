@@ -5,16 +5,22 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Language {
-    @SerialName("it") IT,
-    @SerialName("en") EN,
-    @SerialName("de") DE
+    @SerialName("it")
+    IT,
+    @SerialName("en")
+    EN,
+    @SerialName("de")
+    DE
 }
 
 @Serializable
 enum class NotificationChannelType {
-    @SerialName("push") PUSH,
-    @SerialName("email") EMAIL,
-    @SerialName("sms") SMS
+    @SerialName("push")
+    PUSH,
+    @SerialName("email")
+    EMAIL,
+    @SerialName("sms")
+    SMS
 }
 
 @Serializable

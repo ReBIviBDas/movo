@@ -16,15 +16,15 @@ class PenaltyApi(private val client: HttpClient) {
         cursor: String? = null,
         limit: Int? = null
     ): PenaltiesResponse =
-        client.get("/penalties") {
+        client.get("penalties") {
             status?.let { parameter("status", it) }
             cursor?.let { parameter("cursor", it) }
             limit?.let { parameter("limit", it) }
         }.body()
 
     suspend fun getPenalty(id: String): Penalty =
-        client.get("/penalties/$id").body()
+        client.get("penalties/$id").body()
 
     suspend fun contestPenalty(id: String, request: ContestPenaltyRequest): Penalty =
-        client.post("/penalties/$id/contest") { setBody(request) }.body()
+        client.post("penalties/$id/contest") { setBody(request) }.body()
 }

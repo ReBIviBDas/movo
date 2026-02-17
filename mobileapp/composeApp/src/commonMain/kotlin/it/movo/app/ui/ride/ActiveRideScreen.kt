@@ -34,7 +34,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,9 +49,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.movo.app.ui.theme.MovoError
@@ -61,23 +60,25 @@ import it.movo.app.ui.theme.MovoOutline
 import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
+import it.movo.app.ui.theme.MovoTheme
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.ride_active_safe
-import movo.composeapp.generated.resources.ride_connected
-import movo.composeapp.generated.resources.ride_current_cost
-import movo.composeapp.generated.resources.ride_distance
-import movo.composeapp.generated.resources.ride_duration
-import movo.composeapp.generated.resources.ride_end_rental
-import movo.composeapp.generated.resources.ride_lock_car
-import movo.composeapp.generated.resources.ride_near_vehicle
-import movo.composeapp.generated.resources.ride_passengers
-import movo.composeapp.generated.resources.ride_report_issue
-import movo.composeapp.generated.resources.ride_splitting_bill
-import movo.composeapp.generated.resources.ride_swipe_unlock
-import movo.composeapp.generated.resources.ride_total_cost
-import movo.composeapp.generated.resources.ride_vehicle_locked
-import movo.composeapp.generated.resources.ride_vehicle_unlocked
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.ride_active_safe
+import it.movo.app.composeapp.generated.resources.ride_connected
+import it.movo.app.composeapp.generated.resources.ride_current_cost
+import it.movo.app.composeapp.generated.resources.ride_distance
+import it.movo.app.composeapp.generated.resources.ride_duration
+import it.movo.app.composeapp.generated.resources.ride_end_rental
+import it.movo.app.composeapp.generated.resources.ride_lock_car
+import it.movo.app.composeapp.generated.resources.ride_near_vehicle
+import it.movo.app.composeapp.generated.resources.ride_passengers
+import it.movo.app.composeapp.generated.resources.ride_report_issue
+import it.movo.app.composeapp.generated.resources.ride_splitting_bill
+import it.movo.app.composeapp.generated.resources.ride_swipe_unlock
+import it.movo.app.composeapp.generated.resources.ride_total_cost
+import it.movo.app.composeapp.generated.resources.ride_vehicle_locked
+import it.movo.app.composeapp.generated.resources.ride_vehicle_unlocked
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -103,6 +104,25 @@ fun ActiveRideScreen(
         return
     }
 
+    ActiveRideContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onToggleLock = viewModel::toggleLock,
+        onEndRental = viewModel::endRental,
+        onReportIssue = onReportIssue,
+        snackbarHostState = snackbarHostState
+    )
+}
+
+@Composable
+private fun ActiveRideContent(
+    uiState: ActiveRideUiState,
+    onNavigateBack: () -> Unit,
+    onToggleLock: () -> Unit,
+    onEndRental: () -> Unit,
+    onReportIssue: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
@@ -135,15 +155,15 @@ fun ActiveRideScreen(
                     if (uiState.isVehicleLocked) {
                         LockedStateContent(
                             uiState = uiState,
-                            onUnlockClick = viewModel::toggleLock,
-                            onEndRentalClick = viewModel::endRental,
+                            onUnlockClick = onToggleLock,
+                            onEndRentalClick = onEndRental,
                             onReportIssueClick = onReportIssue
                         )
                     } else {
                         UnlockedStateContent(
                             uiState = uiState,
-                            onLockClick = viewModel::toggleLock,
-                            onEndRentalClick = viewModel::endRental,
+                            onLockClick = onToggleLock,
+                            onEndRentalClick = onEndRental,
                             onReportIssueClick = onReportIssue
                         )
                     }
@@ -199,7 +219,7 @@ private fun TopBarOverlay(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(Res.string.back),
                     tint = Color.Black
                 )
             }
@@ -732,5 +752,28 @@ private fun MetricCard(
                 color = textColor
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ActiveRideScreenPreview() {
+    MovoTheme {
+        ActiveRideContent(
+            uiState = ActiveRideUiState(
+                isVehicleLocked = false,
+                vehicleName = "Fiat 500e",
+                vehicleId = "MV-1234",
+                batteryLevel = 72,
+                durationSeconds = 1834,
+                currentCostCents = 1250,
+                distanceKm = 5.3,
+                passengers = listOf("Mario", "Luigi")
+            ),
+            onNavigateBack = {},
+            onToggleLock = {},
+            onEndRental = {},
+            onReportIssue = {}
+        )
     }
 }

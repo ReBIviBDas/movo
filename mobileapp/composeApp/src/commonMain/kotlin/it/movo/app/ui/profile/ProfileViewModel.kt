@@ -2,10 +2,9 @@ package it.movo.app.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.movo.app.data.model.NotificationPreferences
 import it.movo.app.data.model.NotificationChannel
 import it.movo.app.data.model.NotificationChannelType
-import it.movo.app.data.model.UserProfile
+import it.movo.app.data.model.NotificationPreferences
 import it.movo.app.data.model.UserProfileUpdate
 import it.movo.app.data.repository.AuthRepository
 import it.movo.app.data.repository.UserRepository
@@ -49,10 +48,10 @@ class ProfileViewModel(
     fun loadProfile() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            
+
             val profileResult = userRepository.getProfile()
             val prefsResult = userRepository.getNotificationPreferences()
-            
+
             profileResult
                 .onSuccess { profile ->
                     val fullName = "${profile.firstName} ${profile.lastName}"
@@ -75,13 +74,17 @@ class ProfileViewModel(
                 .onFailure { e ->
                     _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
                 }
-            
+
             prefsResult
                 .onSuccess { prefs ->
                     _uiState.update { state ->
                         state.copy(
-                            pushNotificationsEnabled = prefs.transactional.channels.contains(NotificationChannelType.PUSH),
-                            emailUpdatesEnabled = prefs.promotional.channels.contains(NotificationChannelType.EMAIL)
+                            pushNotificationsEnabled = prefs.transactional.channels.contains(
+                                NotificationChannelType.PUSH
+                            ),
+                            emailUpdatesEnabled = prefs.promotional.channels.contains(
+                                NotificationChannelType.EMAIL
+                            )
                         )
                     }
                 }
@@ -111,37 +114,41 @@ class ProfileViewModel(
     fun saveChanges() {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
-            
+
             val nameParts = _uiState.value.fullName.split(" ", limit = 2)
             val firstName = nameParts.getOrNull(0) ?: ""
             val lastName = nameParts.getOrNull(1) ?: ""
-            
+
             val profileUpdate = UserProfileUpdate(
                 firstName = firstName,
                 lastName = lastName,
                 phone = _uiState.value.phone,
                 address = _uiState.value.address.ifBlank { null }
             )
-            
+
             val profileResult = userRepository.updateProfile(profileUpdate)
-            
+
             val notificationPrefs = NotificationPreferences(
                 transactional = NotificationChannel(
                     enabled = _uiState.value.pushNotificationsEnabled,
-                    channels = if (_uiState.value.pushNotificationsEnabled) listOf(NotificationChannelType.PUSH) else emptyList()
+                    channels = if (_uiState.value.pushNotificationsEnabled) listOf(
+                        NotificationChannelType.PUSH
+                    ) else emptyList()
                 ),
                 promotional = NotificationChannel(
                     enabled = _uiState.value.emailUpdatesEnabled,
-                    channels = if (_uiState.value.emailUpdatesEnabled) listOf(NotificationChannelType.EMAIL) else emptyList()
+                    channels = if (_uiState.value.emailUpdatesEnabled) listOf(
+                        NotificationChannelType.EMAIL
+                    ) else emptyList()
                 )
             )
-            
+
             val prefsResult = userRepository.updateNotificationPreferences(notificationPrefs)
-            
+
             if (profileResult.isSuccess && prefsResult.isSuccess) {
                 _uiState.update { it.copy(isSaving = false, profileSaved = true) }
             } else {
-                val error = profileResult.exceptionOrNull()?.message 
+                val error = profileResult.exceptionOrNull()?.message
                     ?: prefsResult.exceptionOrNull()?.message
                 _uiState.update { it.copy(isSaving = false, errorMessage = error) }
             }
@@ -161,7 +168,14 @@ class ProfileViewModel(
             _uiState.update { it.copy(isLoading = true) }
             authRepository.logoutAll()
                 .onSuccess { _uiState.update { it.copy(isLoading = false, logoutSuccess = true) } }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = e.message
+                        )
+                    }
+                }
         }
     }
 
@@ -170,7 +184,14 @@ class ProfileViewModel(
             _uiState.update { it.copy(isExporting = true, errorMessage = null) }
             userRepository.exportData()
                 .onSuccess { _uiState.update { it.copy(isExporting = false, profileSaved = true) } }
-                .onFailure { e -> _uiState.update { it.copy(isExporting = false, errorMessage = e.message) } }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isExporting = false,
+                            errorMessage = e.message
+                        )
+                    }
+                }
         }
     }
 
@@ -179,7 +200,14 @@ class ProfileViewModel(
             _uiState.update { it.copy(isSaving = true) }
             userRepository.updatePassword(currentPassword, newPassword)
                 .onSuccess { _uiState.update { it.copy(isSaving = false, profileSaved = true) } }
-                .onFailure { e -> _uiState.update { it.copy(isSaving = false, errorMessage = e.message) } }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            errorMessage = e.message
+                        )
+                    }
+                }
         }
     }
 
@@ -188,7 +216,14 @@ class ProfileViewModel(
             _uiState.update { it.copy(isLoading = true) }
             userRepository.deleteAccount(password)
                 .onSuccess { _uiState.update { it.copy(isLoading = false, logoutSuccess = true) } }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = e.message
+                        )
+                    }
+                }
         }
     }
 

@@ -6,7 +6,11 @@ import it.movo.app.data.model.IssueCategory
 import it.movo.app.data.remote.api.IssueApi
 
 class IssueRepository(private val issueApi: IssueApi) {
-    suspend fun getIssues(status: String? = null, cursor: String? = null, limit: Int? = null): Result<List<Issue>> = runCatching {
+    suspend fun getIssues(
+        status: String? = null,
+        cursor: String? = null,
+        limit: Int? = null
+    ): Result<List<Issue>> = runCatching {
         issueApi.getIssues(status, cursor, limit).data
     }
 

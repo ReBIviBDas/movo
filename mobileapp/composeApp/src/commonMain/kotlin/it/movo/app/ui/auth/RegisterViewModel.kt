@@ -3,18 +3,18 @@ package it.movo.app.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.movo.app.data.model.RegisterRequest
-import it.movo.app.data.repository.AuthRepository
 import it.movo.app.data.remote.parseErrorMessage
+import it.movo.app.data.repository.AuthRepository
 import it.movo.app.platform.ImagePicker
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 data class RegisterUiState(
     val currentStep: Int = 1,
@@ -47,13 +47,17 @@ data class RegisterUiState(
     val progress: Float get() = currentStep.toFloat() / totalSteps.toFloat()
     val isUnder18: Boolean get() = dateOfBirth.isNotBlank() && !isAtLeast18(dateOfBirth)
     val hasIdentityDocument: Boolean get() = identityDocument != null
-    val canProceed: Boolean get() = when (currentStep) {
-        1 -> email.isNotBlank() && isValidEmail(email) && password.length >= 8 && password == confirmPassword
-        2 -> firstName.isNotBlank() && lastName.isNotBlank() && dateOfBirth.isNotBlank() && !isUnder18 && fiscalCode.isNotBlank() && phone.isNotBlank() && isValidPhone(phone)
-        3 -> true
-        4 -> acceptTerms && acceptPrivacy
-        else -> false
-    }
+    val canProceed: Boolean
+        get() = when (currentStep) {
+            1 -> email.isNotBlank() && isValidEmail(email) && password.length >= 8 && password == confirmPassword
+            2 -> firstName.isNotBlank() && lastName.isNotBlank() && dateOfBirth.isNotBlank() && !isUnder18 && fiscalCode.isNotBlank() && phone.isNotBlank() && isValidPhone(
+                phone
+            )
+
+            3 -> true
+            4 -> acceptTerms && acceptPrivacy
+            else -> false
+        }
 
     companion object {
         private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
@@ -75,8 +79,9 @@ data class RegisterUiState(
                 val now = Clock.System.now()
                 val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
                 val age = today.year - dob.year -
-                    if (today.month < dob.month ||
-                        (today.month == dob.month && today.day < dob.day)) 1 else 0
+                        if (today.month < dob.month ||
+                            (today.month == dob.month && today.day < dob.day)
+                        ) 1 else 0
                 age >= 18
             } catch (_: Exception) {
                 false
@@ -92,25 +97,68 @@ class RegisterViewModel(
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
-    fun onEmailChange(value: String) { _uiState.update { it.copy(email = value, errorMessage = null) } }
-    fun onPasswordChange(value: String) { _uiState.update { it.copy(password = value, errorMessage = null) } }
-    fun onConfirmPasswordChange(value: String) { _uiState.update { it.copy(confirmPassword = value, errorMessage = null) } }
-    fun togglePasswordVisibility() { _uiState.update { it.copy(passwordVisible = !it.passwordVisible) } }
-    fun onFirstNameChange(value: String) { _uiState.update { it.copy(firstName = value) } }
-    fun onLastNameChange(value: String) { _uiState.update { it.copy(lastName = value) } }
-    fun onDateOfBirthChange(value: String) { _uiState.update { it.copy(dateOfBirth = value) } }
-    fun onFiscalCodeChange(value: String) { _uiState.update { it.copy(fiscalCode = value) } }
-    fun onPhoneChange(value: String) { _uiState.update { it.copy(phone = value) } }
-    fun onAddressChange(value: String) { _uiState.update { it.copy(address = value) } }
+    fun onEmailChange(value: String) {
+        _uiState.update { it.copy(email = value, errorMessage = null) }
+    }
+
+    fun onPasswordChange(value: String) {
+        _uiState.update { it.copy(password = value, errorMessage = null) }
+    }
+
+    fun onConfirmPasswordChange(value: String) {
+        _uiState.update { it.copy(confirmPassword = value, errorMessage = null) }
+    }
+
+    fun togglePasswordVisibility() {
+        _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
+    }
+
+    fun onFirstNameChange(value: String) {
+        _uiState.update { it.copy(firstName = value) }
+    }
+
+    fun onLastNameChange(value: String) {
+        _uiState.update { it.copy(lastName = value) }
+    }
+
+    fun onDateOfBirthChange(value: String) {
+        _uiState.update { it.copy(dateOfBirth = value) }
+    }
+
+    fun onFiscalCodeChange(value: String) {
+        _uiState.update { it.copy(fiscalCode = value) }
+    }
+
+    fun onPhoneChange(value: String) {
+        _uiState.update { it.copy(phone = value) }
+    }
+
+    fun onAddressChange(value: String) {
+        _uiState.update { it.copy(address = value) }
+    }
+
     fun onDriverLicenseSelected() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val data = imagePicker.pickImage()
-            _uiState.update { it.copy(isLoading = false, hasDriverLicense = data != null, drivingLicense = data) }
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    hasDriverLicense = data != null,
+                    drivingLicense = data
+                )
+            }
         }
     }
-    fun onDriverLicenseData(data: ByteArray?) { _uiState.update { it.copy(hasDriverLicense = data != null, drivingLicense = data) } }
-    fun onIdentityDocumentSelected(data: ByteArray?) { _uiState.update { it.copy(identityDocument = data) } }
+
+    fun onDriverLicenseData(data: ByteArray?) {
+        _uiState.update { it.copy(hasDriverLicense = data != null, drivingLicense = data) }
+    }
+
+    fun onIdentityDocumentSelected(data: ByteArray?) {
+        _uiState.update { it.copy(identityDocument = data) }
+    }
+
     fun onIdentityDocumentClick() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -118,9 +166,18 @@ class RegisterViewModel(
             _uiState.update { it.copy(isLoading = false, identityDocument = data) }
         }
     }
-    fun onAcceptTermsChange(value: Boolean) { _uiState.update { it.copy(acceptTerms = value) } }
-    fun onAcceptPrivacyChange(value: Boolean) { _uiState.update { it.copy(acceptPrivacy = value) } }
-    fun onAcceptCookiesChange(value: Boolean) { _uiState.update { it.copy(acceptCookies = value) } }
+
+    fun onAcceptTermsChange(value: Boolean) {
+        _uiState.update { it.copy(acceptTerms = value) }
+    }
+
+    fun onAcceptPrivacyChange(value: Boolean) {
+        _uiState.update { it.copy(acceptPrivacy = value) }
+    }
+
+    fun onAcceptCookiesChange(value: Boolean) {
+        _uiState.update { it.copy(acceptCookies = value) }
+    }
 
     fun nextStep() {
         val state = _uiState.value
@@ -158,10 +215,26 @@ class RegisterViewModel(
                 identityDocument = state.identityDocument
             )
             authRepository.register(request)
-                .onSuccess { _uiState.update { it.copy(isLoading = false, registrationSuccess = true) } }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, errorMessage = parseErrorMessage(e as Exception)) } }
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            registrationSuccess = true
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = parseErrorMessage(e as Exception)
+                        )
+                    }
+                }
         }
     }
 
-    fun clearError() { _uiState.update { it.copy(errorMessage = null) } }
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
 }

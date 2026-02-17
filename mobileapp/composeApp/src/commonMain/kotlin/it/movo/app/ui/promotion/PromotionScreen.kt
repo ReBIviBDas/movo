@@ -35,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,19 +52,19 @@ import it.movo.app.ui.theme.MovoOnSurfaceVariant
 import it.movo.app.ui.theme.MovoOutline
 import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
-import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.promotion_apply
-import movo.composeapp.generated.resources.promotion_available
-import movo.composeapp.generated.resources.promotion_code_applied
-import movo.composeapp.generated.resources.promotion_discount
-import movo.composeapp.generated.resources.promotion_enter_code
-import movo.composeapp.generated.resources.promotion_no_promotions
-import movo.composeapp.generated.resources.promotion_title
-import movo.composeapp.generated.resources.promotion_type
-import movo.composeapp.generated.resources.promotion_valid_until
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.promotion_apply
+import it.movo.app.composeapp.generated.resources.promotion_available
+import it.movo.app.composeapp.generated.resources.promotion_code_applied
+import it.movo.app.composeapp.generated.resources.promotion_discount
+import it.movo.app.composeapp.generated.resources.promotion_enter_code
+import it.movo.app.composeapp.generated.resources.promotion_no_promotions
+import it.movo.app.composeapp.generated.resources.promotion_title
+import it.movo.app.composeapp.generated.resources.promotion_type
+import it.movo.app.composeapp.generated.resources.promotion_valid_until
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,7 +107,7 @@ fun PromotionScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.back),
                             tint = MovoOnSurface
                         )
                     }

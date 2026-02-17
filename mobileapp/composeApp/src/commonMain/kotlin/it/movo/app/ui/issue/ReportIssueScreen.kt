@@ -1,7 +1,6 @@
 package it.movo.app.ui.issue
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -48,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.movo.app.data.model.IssueCategory
 import it.movo.app.ui.theme.MovoOnSurface
@@ -57,21 +56,24 @@ import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.common_done
-import movo.composeapp.generated.resources.report_add_photo
-import movo.composeapp.generated.resources.report_category
-import movo.composeapp.generated.resources.report_category_cleanliness
-import movo.composeapp.generated.resources.report_category_damage
-import movo.composeapp.generated.resources.report_category_other
-import movo.composeapp.generated.resources.report_category_technical
-import movo.composeapp.generated.resources.report_description
-import movo.composeapp.generated.resources.report_description_hint
-import movo.composeapp.generated.resources.report_max_photos
-import movo.composeapp.generated.resources.report_photos
-import movo.composeapp.generated.resources.report_submit
-import movo.composeapp.generated.resources.report_success
-import movo.composeapp.generated.resources.report_title
+import it.movo.app.ui.theme.MovoTheme
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.common_done
+import it.movo.app.composeapp.generated.resources.report_add_photo
+import it.movo.app.composeapp.generated.resources.report_category
+import it.movo.app.composeapp.generated.resources.report_category_battery
+import it.movo.app.composeapp.generated.resources.report_category_cleanliness
+import it.movo.app.composeapp.generated.resources.report_category_damage
+import it.movo.app.composeapp.generated.resources.report_category_other
+import it.movo.app.composeapp.generated.resources.report_category_technical
+import it.movo.app.composeapp.generated.resources.report_description
+import it.movo.app.composeapp.generated.resources.report_description_hint
+import it.movo.app.composeapp.generated.resources.report_max_photos
+import it.movo.app.composeapp.generated.resources.report_photos
+import it.movo.app.composeapp.generated.resources.report_submit
+import it.movo.app.composeapp.generated.resources.report_success
+import it.movo.app.composeapp.generated.resources.report_title
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +98,7 @@ fun ReportIssueScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },
@@ -106,152 +108,177 @@ fun ReportIssueScreen(
             )
         }
     ) { paddingValues ->
-        if (uiState.isSubmitted) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = MovoSuccess,
-                        modifier = Modifier.size(64.dp)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(Res.string.report_success),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    TextButton(onClick = onNavigateBack) {
-                        Text(
-                            text = stringResource(Res.string.common_done),
-                            color = MovoTeal,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-            }
-        } else {
+        ReportIssueContent(
+            uiState = uiState,
+            paddingValues = paddingValues,
+            onNavigateBack = onNavigateBack,
+            onToggleCategoryMenu = { viewModel.toggleCategoryMenu() },
+            onDismissCategoryMenu = { viewModel.dismissCategoryMenu() },
+            onCategorySelected = { viewModel.onCategorySelected(it) },
+            onDescriptionChange = { viewModel.onDescriptionChange(it) },
+            onAddPhoto = { viewModel.pickAndAddPhoto() },
+            onSubmitReport = { viewModel.submitReport() }
+        )
+    }
+}
+
+@Composable
+private fun ReportIssueContent(
+    uiState: ReportIssueUiState,
+    paddingValues: androidx.compose.foundation.layout.PaddingValues,
+    onNavigateBack: () -> Unit,
+    onToggleCategoryMenu: () -> Unit,
+    onDismissCategoryMenu: () -> Unit,
+    onCategorySelected: (IssueCategory) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onAddPhoto: () -> Unit,
+    onSubmitReport: () -> Unit
+) {
+    if (uiState.isSubmitted) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(Res.string.report_category),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MovoOnSurfaceVariant
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MovoSuccess,
+                    modifier = Modifier.size(64.dp)
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                CategoryDropdown(
-                    selectedCategory = uiState.selectedCategory,
-                    expanded = uiState.isCategoryMenuExpanded,
-                    onToggle = { viewModel.toggleCategoryMenu() },
-                    onDismiss = { viewModel.dismissCategoryMenu() },
-                    onSelect = { viewModel.onCategorySelected(it) }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = stringResource(Res.string.report_description),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MovoOnSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = uiState.description,
-                    onValueChange = { viewModel.onDescriptionChange(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp),
-                    placeholder = { Text(stringResource(Res.string.report_description_hint)) },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MovoTeal,
-                        focusedLabelColor = MovoTeal
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = stringResource(Res.string.report_photos),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MovoOnSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                PhotoPlaceholders(
-                    photoCount = uiState.photos.size,
-                    onAddPhoto = { viewModel.pickAndAddPhoto() }
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = stringResource(Res.string.report_max_photos),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MovoOnSurfaceVariant
-                )
-
-                if (uiState.errorMessage != null) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = uiState.errorMessage!!,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = { viewModel.submitReport() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = !uiState.isLoading
-                ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(Res.string.report_submit),
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-
                 Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(Res.string.report_success),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                TextButton(onClick = onNavigateBack) {
+                    Text(
+                        text = stringResource(Res.string.common_done),
+                        color = MovoTeal,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.report_category),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MovoOnSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            CategoryDropdown(
+                selectedCategory = uiState.selectedCategory,
+                expanded = uiState.isCategoryMenuExpanded,
+                onToggle = onToggleCategoryMenu,
+                onDismiss = onDismissCategoryMenu,
+                onSelect = onCategorySelected
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(Res.string.report_description),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MovoOnSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = uiState.description,
+                onValueChange = onDescriptionChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp),
+                placeholder = { Text(stringResource(Res.string.report_description_hint)) },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MovoTeal,
+                    focusedLabelColor = MovoTeal
+                )
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(Res.string.report_photos),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MovoOnSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            PhotoPlaceholders(
+                photoCount = uiState.photos.size,
+                onAddPhoto = onAddPhoto
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = stringResource(Res.string.report_max_photos),
+                style = MaterialTheme.typography.bodySmall,
+                color = MovoOnSurfaceVariant
+            )
+
+            if (uiState.errorMessage != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = uiState.errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = onSubmitReport,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MovoTeal),
+                shape = RoundedCornerShape(12.dp),
+                enabled = !uiState.isLoading
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = stringResource(Res.string.report_submit),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -356,6 +383,61 @@ private fun PhotoPlaceholders(
                     )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+private fun ReportIssueScreenPreview() {
+    val mockUiState = ReportIssueUiState(
+        vehicleId = "VEH123",
+        selectedCategory = IssueCategory.TECHNICAL,
+        description = "The scooter's brake seems to be not working properly. It makes a squeaking sound when applied.",
+        photos = emptyList(),
+        isCategoryMenuExpanded = false,
+        isLoading = false,
+        isSubmitted = false,
+        errorMessage = null
+    )
+
+    MovoTheme {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Report Issue",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(Res.string.back)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MovoSurface
+                    )
+                )
+            }
+        ) { paddingValues ->
+            ReportIssueContent(
+                uiState = mockUiState,
+                paddingValues = paddingValues,
+                onNavigateBack = {},
+                onToggleCategoryMenu = {},
+                onDismissCategoryMenu = {},
+                onCategorySelected = {},
+                onDescriptionChange = {},
+                onAddPhoto = {},
+                onSubmitReport = {}
+            )
         }
     }
 }

@@ -16,11 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,16 +48,16 @@ import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoTealContainer
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.vehicle_available
-import movo.composeapp.generated.resources.vehicle_book_now
-import movo.composeapp.generated.resources.vehicle_distance_label
-import movo.composeapp.generated.resources.vehicle_range_label
-import movo.composeapp.generated.resources.vehicle_reserve_later
-import movo.composeapp.generated.resources.vehicle_seats_label
-import movo.composeapp.generated.resources.vehicle_split_add
-import movo.composeapp.generated.resources.vehicle_split_friends
-import movo.composeapp.generated.resources.vehicle_split_you
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.vehicle_available
+import it.movo.app.composeapp.generated.resources.vehicle_book_now
+import it.movo.app.composeapp.generated.resources.vehicle_distance_label
+import it.movo.app.composeapp.generated.resources.vehicle_range_label
+import it.movo.app.composeapp.generated.resources.vehicle_reserve_later
+import it.movo.app.composeapp.generated.resources.vehicle_seats_label
+import it.movo.app.composeapp.generated.resources.vehicle_split_add
+import it.movo.app.composeapp.generated.resources.vehicle_split_friends
+import it.movo.app.composeapp.generated.resources.vehicle_split_you
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

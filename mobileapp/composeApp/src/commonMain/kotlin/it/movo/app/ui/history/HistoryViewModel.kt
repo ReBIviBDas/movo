@@ -27,17 +27,17 @@ class HistoryViewModel(private val rentalRepository: RentalRepository) : ViewMod
     fun loadHistory() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            
+
             val result = rentalRepository.getRentalHistory(
                 from = null,
                 to = null,
                 cursor = null,
                 limit = 50
             )
-            
+
             result.fold(
                 onSuccess = { rentals ->
-                    _uiState.update { 
+                    _uiState.update {
                         it.copy(
                             rentals = rentals,
                             isLoading = false,
@@ -46,7 +46,7 @@ class HistoryViewModel(private val rentalRepository: RentalRepository) : ViewMod
                     }
                 },
                 onFailure = { error ->
-                    _uiState.update { 
+                    _uiState.update {
                         it.copy(
                             isLoading = false,
                             errorMessage = error.message ?: "Failed to load history"

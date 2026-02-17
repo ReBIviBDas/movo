@@ -18,18 +18,18 @@ class IssueApi(private val client: HttpClient) {
         cursor: String? = null,
         limit: Int? = null
     ): IssuesResponse =
-        client.get("/issues") {
+        client.get("issues") {
             status?.let { parameter("status", it) }
             cursor?.let { parameter("cursor", it) }
             limit?.let { parameter("limit", it) }
         }.body()
 
     suspend fun getIssue(id: String): Issue =
-        client.get("/issues/$id").body()
+        client.get("issues/$id").body()
 
     suspend fun createIssue(request: CreateIssueRequest): Issue =
         client.submitFormWithBinaryData(
-            url = "/issues",
+            url = "issues",
             formData = formData {
                 append("vehicle_id", request.vehicleId)
                 request.rentalId?.let { append("rental_id", it) }
