@@ -10,6 +10,8 @@ plugins {
 }
 
 kotlin {
+    jvm()
+
     androidLibrary {
         namespace = "${project.group}.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -81,6 +83,8 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }
