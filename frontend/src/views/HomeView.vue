@@ -16,7 +16,7 @@ import VehicleMap from '@/components/VehicleMap.vue'
         </p>
         <div class="flex gap-4 justify-center mb-6">
           <RouterLink to="/register" class="btn btn-primary">
-            Inizia Ora
+            Registrati
           </RouterLink>
           <RouterLink to="/login" class="btn btn-outline">
             Accedi

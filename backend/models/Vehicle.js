@@ -59,7 +59,7 @@ const vehicleSchema = new Schema({
         default: null
     }
 }, {
-    timestamps: { createdAt: 'created_at', updatedAt: 'last_updated' }
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
 // Create 2dsphere index for geospatial queries

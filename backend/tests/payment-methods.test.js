@@ -20,7 +20,7 @@ afterEach(async () => {
 // Test 10: Aggiunta metodo di pagamento
 // ============================================================================
 describe('POST /api/v1/payments/methods', () => {
-    it('Test 12 - should add a payment method (first card becomes default)', async () => {
+    it('Test 10 - should add a payment method (first card becomes default)', async () => {
         const { token } = await createTestUser();
 
         const res = await request(app)
