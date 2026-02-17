@@ -13,7 +13,14 @@ export default {
     daisyui,
   ],
   daisyui: {
-    themes: ["light", "dark", "corporate"],
+    themes: [
+      {
+        corporate: {
+          ...require("daisyui/src/theming/themes")["corporate"],
+          primary: "#86c4bd",
+        },
+      },
+    ],
     darkTheme: "dark",
   },
 }

@@ -18,10 +18,10 @@ afterEach(async () => {
 });
 
 // ============================================================================
-// Test 10: Sblocco veicolo (inizio noleggio)
+// Test 9: Sblocco veicolo (inizio noleggio)
 // ============================================================================
 describe('POST /api/v1/rentals/unlock', () => {
-    it('Test 10 - should unlock vehicle and start rental from valid booking', async () => {
+    it('Test 9 - should unlock vehicle and start rental from valid booking', async () => {
         // Setup: user, vehicle, payment method, and booking
         const { user, token } = await createTestUser();
         const vehicle = await createTestVehicle({ status: 'available' });
