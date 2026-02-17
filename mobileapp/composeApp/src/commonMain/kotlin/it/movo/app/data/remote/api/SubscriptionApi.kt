@@ -14,19 +14,19 @@ import it.movo.app.data.model.UserSubscription
 
 class SubscriptionApi(private val client: HttpClient) {
     suspend fun getPlans(): SubscriptionPlansResponse =
-        client.get("/subscriptions").body()
+        client.get("subscriptions").body()
 
     suspend fun subscribe(request: SubscribeRequest): UserSubscription =
-        client.post("/subscriptions") { setBody(request) }.body()
+        client.post("subscriptions") { setBody(request) }.body()
 
     suspend fun getActiveSubscription(): UserSubscription =
-        client.get("/subscriptions/active").body()
+        client.get("subscriptions/active").body()
 
     suspend fun toggleAutoRenew(id: String, autoRenew: Boolean): UserSubscription =
-        client.patch("/subscriptions/$id/auto-renew") {
+        client.patch("subscriptions/$id/auto-renew") {
             setBody(AutoRenewRequest(autoRenew))
         }.body()
 
     suspend fun cancelSubscription(id: String): CancelSubscriptionResponse =
-        client.post("/subscriptions/$id/cancel").body()
+        client.post("subscriptions/$id/cancel").body()
 }

@@ -43,12 +43,24 @@ class NotificationSettingsViewModel(private val userRepository: UserRepository) 
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
-                            promotionalPush = prefs.promotional.channels.contains(NotificationChannelType.PUSH),
-                            promotionalEmail = prefs.promotional.channels.contains(NotificationChannelType.EMAIL),
-                            promotionalSms = prefs.promotional.channels.contains(NotificationChannelType.SMS),
-                            transactionalPush = prefs.transactional.channels.contains(NotificationChannelType.PUSH),
-                            transactionalEmail = prefs.transactional.channels.contains(NotificationChannelType.EMAIL),
-                            transactionalSms = prefs.transactional.channels.contains(NotificationChannelType.SMS),
+                            promotionalPush = prefs.promotional.channels.contains(
+                                NotificationChannelType.PUSH
+                            ),
+                            promotionalEmail = prefs.promotional.channels.contains(
+                                NotificationChannelType.EMAIL
+                            ),
+                            promotionalSms = prefs.promotional.channels.contains(
+                                NotificationChannelType.SMS
+                            ),
+                            transactionalPush = prefs.transactional.channels.contains(
+                                NotificationChannelType.PUSH
+                            ),
+                            transactionalEmail = prefs.transactional.channels.contains(
+                                NotificationChannelType.EMAIL
+                            ),
+                            transactionalSms = prefs.transactional.channels.contains(
+                                NotificationChannelType.SMS
+                            ),
                             bookingReminders = prefs.bookingReminders,
                             rentalAlerts = prefs.rentalAlerts
                         )

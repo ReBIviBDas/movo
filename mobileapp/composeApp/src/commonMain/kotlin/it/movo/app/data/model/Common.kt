@@ -5,8 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class BillingPeriod {
-    @SerialName("monthly") MONTHLY,
-    @SerialName("yearly") YEARLY
+    @SerialName("monthly")
+    MONTHLY,
+    @SerialName("yearly")
+    YEARLY
 }
 
 @Serializable
@@ -48,9 +50,12 @@ data class ParkingArea(
 
 @Serializable
 enum class ParkingAreaType {
-    @SerialName("standard") STANDARD,
-    @SerialName("bonus") BONUS,
-    @SerialName("restricted") RESTRICTED
+    @SerialName("standard")
+    STANDARD,
+    @SerialName("bonus")
+    BONUS,
+    @SerialName("restricted")
+    RESTRICTED
 }
 
 @Serializable
@@ -71,20 +76,30 @@ data class Penalty(
 
 @Serializable
 enum class PenaltyType {
-    @SerialName("parking_violation") PARKING_VIOLATION,
-    @SerialName("geofence_exit") GEOFENCE_EXIT,
-    @SerialName("damage") DAMAGE,
-    @SerialName("traffic_fine") TRAFFIC_FINE,
-    @SerialName("late_return") LATE_RETURN,
-    @SerialName("other") OTHER
+    @SerialName("parking_violation")
+    PARKING_VIOLATION,
+    @SerialName("geofence_exit")
+    GEOFENCE_EXIT,
+    @SerialName("damage")
+    DAMAGE,
+    @SerialName("traffic_fine")
+    TRAFFIC_FINE,
+    @SerialName("late_return")
+    LATE_RETURN,
+    @SerialName("other")
+    OTHER
 }
 
 @Serializable
 enum class PenaltyStatus {
-    @SerialName("pending") PENDING,
-    @SerialName("paid") PAID,
-    @SerialName("contested") CONTESTED,
-    @SerialName("cancelled") CANCELLED
+    @SerialName("pending")
+    PENDING,
+    @SerialName("paid")
+    PAID,
+    @SerialName("contested")
+    CONTESTED,
+    @SerialName("cancelled")
+    CANCELLED
 }
 
 @Serializable
@@ -115,17 +130,24 @@ data class UserSubscription(
 
 @Serializable
 enum class SubscriptionStatus {
-    @SerialName("active") ACTIVE,
-    @SerialName("cancelling") CANCELLING,
-    @SerialName("cancelled") CANCELLED,
-    @SerialName("expired") EXPIRED
+    @SerialName("active")
+    ACTIVE,
+    @SerialName("cancelling")
+    CANCELLING,
+    @SerialName("cancelled")
+    CANCELLED,
+    @SerialName("expired")
+    EXPIRED
 }
 
 @Serializable
 enum class PromotionType {
-    @SerialName("percentage") PERCENTAGE,
-    @SerialName("fixed_amount") FIXED_AMOUNT,
-    @SerialName("free_minutes") FREE_MINUTES
+    @SerialName("percentage")
+    PERCENTAGE,
+    @SerialName("fixed_amount")
+    FIXED_AMOUNT,
+    @SerialName("free_minutes")
+    FREE_MINUTES
 }
 
 @Serializable

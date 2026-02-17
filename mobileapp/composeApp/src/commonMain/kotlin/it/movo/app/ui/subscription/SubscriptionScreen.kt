@@ -49,21 +49,22 @@ import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.subscription_active
-import movo.composeapp.generated.resources.subscription_auto_renew
-import movo.composeapp.generated.resources.subscription_billing_period
-import movo.composeapp.generated.resources.subscription_cancel
-import movo.composeapp.generated.resources.subscription_discount
-import movo.composeapp.generated.resources.subscription_features
-import movo.composeapp.generated.resources.subscription_minutes_included
-import movo.composeapp.generated.resources.subscription_minutes_remaining
-import movo.composeapp.generated.resources.subscription_minutes_used
-import movo.composeapp.generated.resources.subscription_no_active
-import movo.composeapp.generated.resources.subscription_plans
-import movo.composeapp.generated.resources.subscription_price_per_month
-import movo.composeapp.generated.resources.subscription_subscribe
-import movo.composeapp.generated.resources.subscription_title
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.subscription_active
+import it.movo.app.composeapp.generated.resources.subscription_auto_renew
+import it.movo.app.composeapp.generated.resources.subscription_billing_period
+import it.movo.app.composeapp.generated.resources.subscription_cancel
+import it.movo.app.composeapp.generated.resources.subscription_discount
+import it.movo.app.composeapp.generated.resources.subscription_features
+import it.movo.app.composeapp.generated.resources.subscription_minutes_included
+import it.movo.app.composeapp.generated.resources.subscription_minutes_remaining
+import it.movo.app.composeapp.generated.resources.subscription_minutes_used
+import it.movo.app.composeapp.generated.resources.subscription_no_active
+import it.movo.app.composeapp.generated.resources.subscription_plans
+import it.movo.app.composeapp.generated.resources.subscription_price_per_month
+import it.movo.app.composeapp.generated.resources.subscription_subscribe
+import it.movo.app.composeapp.generated.resources.subscription_title
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,7 +100,7 @@ fun SubscriptionScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.back),
                             tint = MovoOnSurface
                         )
                     }
@@ -251,7 +252,10 @@ private fun ActiveSubscriptionCard(
 
             if (subscription.plan?.billingPeriod != null) {
                 Text(
-                    text = stringResource(Res.string.subscription_billing_period, subscription.plan.billingPeriod),
+                    text = stringResource(
+                        Res.string.subscription_billing_period,
+                        subscription.plan.billingPeriod
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MovoOnSurfaceVariant
                 )
@@ -285,13 +289,19 @@ private fun ActiveSubscriptionCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(Res.string.subscription_minutes_used, subscription.minutesUsed),
+                        text = stringResource(
+                            Res.string.subscription_minutes_used,
+                            subscription.minutesUsed
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MovoOnSurfaceVariant
                     )
                     subscription.minutesRemaining?.let { remaining ->
                         Text(
-                            text = stringResource(Res.string.subscription_minutes_remaining, remaining),
+                            text = stringResource(
+                                Res.string.subscription_minutes_remaining,
+                                remaining
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MovoTeal,
                             fontWeight = FontWeight.SemiBold
@@ -377,7 +387,10 @@ private fun SubscriptionPlanCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(Res.string.subscription_price_per_month, formatPrice(plan.priceCents)),
+                    text = stringResource(
+                        Res.string.subscription_price_per_month,
+                        formatPrice(plan.priceCents)
+                    ),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MovoTeal
@@ -385,7 +398,10 @@ private fun SubscriptionPlanCard(
 
                 if (plan.discountPercentage > 0) {
                     Text(
-                        text = stringResource(Res.string.subscription_discount, plan.discountPercentage),
+                        text = stringResource(
+                            Res.string.subscription_discount,
+                            plan.discountPercentage
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MovoTeal,
                         fontWeight = FontWeight.SemiBold
@@ -395,7 +411,10 @@ private fun SubscriptionPlanCard(
 
             if (plan.includedMinutes != null) {
                 Text(
-                    text = stringResource(Res.string.subscription_minutes_included, plan.includedMinutes),
+                    text = stringResource(
+                        Res.string.subscription_minutes_included,
+                        plan.includedMinutes
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MovoOnSurface
                 )

@@ -28,17 +28,24 @@ data class AuthUser(
 
 @Serializable
 enum class UserRole {
-    @SerialName("user") USER,
-    @SerialName("operator") OPERATOR,
-    @SerialName("admin") ADMIN
+    @SerialName("user")
+    USER,
+    @SerialName("operator")
+    OPERATOR,
+    @SerialName("admin")
+    ADMIN
 }
 
 @Serializable
 enum class UserStatus {
-    @SerialName("active") ACTIVE,
-    @SerialName("pending_approval") PENDING_APPROVAL,
-    @SerialName("suspended") SUSPENDED,
-    @SerialName("blocked") BLOCKED
+    @SerialName("active")
+    ACTIVE,
+    @SerialName("pending_approval")
+    PENDING_APPROVAL,
+    @SerialName("suspended")
+    SUSPENDED,
+    @SerialName("blocked")
+    BLOCKED
 }
 
 @Serializable
@@ -51,7 +58,10 @@ data class PasswordResetRequest(
 )
 
 @Serializable
-data class PasswordResetConfirm(val token: String, @SerialName("new_password") val newPassword: String)
+data class PasswordResetConfirm(
+    val token: String,
+    @SerialName("new_password") val newPassword: String
+)
 
 data class RegisterRequest(
     val email: String,
@@ -79,8 +89,10 @@ data class RegisterResponse(
 
 @Serializable
 enum class RegistrationStatus {
-    @SerialName("active") ACTIVE,
-    @SerialName("pending_approval") PENDING_APPROVAL
+    @SerialName("active")
+    ACTIVE,
+    @SerialName("pending_approval")
+    PENDING_APPROVAL
 }
 
 @Serializable

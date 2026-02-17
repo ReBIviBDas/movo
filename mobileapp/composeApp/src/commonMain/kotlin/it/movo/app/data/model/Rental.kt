@@ -42,9 +42,12 @@ data class RentalSummary(
 
 @Serializable
 enum class RentalStatus {
-    @SerialName("active") ACTIVE,
-    @SerialName("paused") PAUSED,
-    @SerialName("completed") COMPLETED
+    @SerialName("active")
+    ACTIVE,
+    @SerialName("paused")
+    PAUSED,
+    @SerialName("completed")
+    COMPLETED
 }
 
 @Serializable

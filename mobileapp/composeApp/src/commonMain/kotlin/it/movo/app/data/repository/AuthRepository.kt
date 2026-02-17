@@ -24,11 +24,12 @@ class AuthRepository(
         response
     }
 
-    suspend fun loginWithGoogle(code: String, redirectUri: String): Result<AuthResponse> = runCatching {
-        val response = authApi.loginWithGoogle(GoogleLoginRequest(code, redirectUri))
-        response.refreshToken?.let { tokenManager.saveTokens(response.accessToken, it) }
-        response
-    }
+    suspend fun loginWithGoogle(code: String, redirectUri: String): Result<AuthResponse> =
+        runCatching {
+            val response = authApi.loginWithGoogle(GoogleLoginRequest(code, redirectUri))
+            response.refreshToken?.let { tokenManager.saveTokens(response.accessToken, it) }
+            response
+        }
 
     suspend fun logout(): Result<Unit> = runCatching {
         authApi.logout()
@@ -41,7 +42,8 @@ class AuthRepository(
     }
 
     suspend fun refreshTokens(): Result<AuthResponse> = runCatching {
-        val token = tokenManager.refreshToken ?: throw IllegalStateException("No refresh token available")
+        val token =
+            tokenManager.refreshToken ?: throw IllegalStateException("No refresh token available")
         val response = authApi.refreshToken(RefreshTokenRequest(token))
         response.refreshToken?.let { tokenManager.saveTokens(response.accessToken, it) }
         response
@@ -51,9 +53,10 @@ class AuthRepository(
         authApi.requestPasswordReset(PasswordResetRequest(email))
     }
 
-    suspend fun confirmPasswordReset(token: String, newPassword: String): Result<Unit> = runCatching {
-        authApi.confirmPasswordReset(PasswordResetConfirm(token, newPassword))
-    }
+    suspend fun confirmPasswordReset(token: String, newPassword: String): Result<Unit> =
+        runCatching {
+            authApi.confirmPasswordReset(PasswordResetConfirm(token, newPassword))
+        }
 
     suspend fun register(request: RegisterRequest): Result<RegisterResponse> = runCatching {
         authApi.register(request)

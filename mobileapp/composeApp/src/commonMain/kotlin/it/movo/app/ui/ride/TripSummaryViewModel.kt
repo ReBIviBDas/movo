@@ -27,19 +27,22 @@ data class TripSummaryUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 ) {
-    val totalCostText: String get() {
-        val euros = finalCostCents / 100
-        val cents = finalCostCents % 100
-        return "€${euros}.${cents.toString().padStart(2, '0')}"
-    }
-    val durationText: String get() {
-        return "$durationMinutes min"
-    }
-    val distanceText: String get() {
-        val whole = distanceKm.toInt()
-        val decimal = ((distanceKm - whole) * 10).toInt()
-        return "${whole}.${decimal} km"
-    }
+    val totalCostText: String
+        get() {
+            val euros = finalCostCents / 100
+            val cents = finalCostCents % 100
+            return "€${euros}.${cents.toString().padStart(2, '0')}"
+        }
+    val durationText: String
+        get() {
+            return "$durationMinutes min"
+        }
+    val distanceText: String
+        get() {
+            val whole = distanceKm.toInt()
+            val decimal = ((distanceKm - whole) * 10).toInt()
+            return "${whole}.${decimal} km"
+        }
 }
 
 class TripSummaryViewModel(private val rentalRepository: RentalRepository) : ViewModel() {

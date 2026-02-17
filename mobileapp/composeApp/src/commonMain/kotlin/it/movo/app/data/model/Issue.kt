@@ -19,19 +19,28 @@ data class Issue(
 
 @Serializable
 enum class IssueCategory {
-    @SerialName("technical") TECHNICAL,
-    @SerialName("damage") DAMAGE,
-    @SerialName("battery") BATTERY,
-    @SerialName("cleanliness") CLEANLINESS,
-    @SerialName("other") OTHER
+    @SerialName("technical")
+    TECHNICAL,
+    @SerialName("damage")
+    DAMAGE,
+    @SerialName("battery")
+    BATTERY,
+    @SerialName("cleanliness")
+    CLEANLINESS,
+    @SerialName("other")
+    OTHER
 }
 
 @Serializable
 enum class IssueStatus {
-    @SerialName("open") OPEN,
-    @SerialName("in_progress") IN_PROGRESS,
-    @SerialName("resolved") RESOLVED,
-    @SerialName("closed") CLOSED
+    @SerialName("open")
+    OPEN,
+    @SerialName("in_progress")
+    IN_PROGRESS,
+    @SerialName("resolved")
+    RESOLVED,
+    @SerialName("closed")
+    CLOSED
 }
 
 @Serializable

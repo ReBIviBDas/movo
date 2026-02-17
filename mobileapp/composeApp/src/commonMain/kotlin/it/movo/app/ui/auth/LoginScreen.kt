@@ -47,22 +47,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.movo.app.ui.theme.MovoSurfaceVariant
 import it.movo.app.ui.theme.MovoTeal
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.login_button
-import movo.composeapp.generated.resources.login_email_label
-import movo.composeapp.generated.resources.login_email_placeholder
-import movo.composeapp.generated.resources.login_forgot_password
-import movo.composeapp.generated.resources.login_google
-import movo.composeapp.generated.resources.login_no_account
-import movo.composeapp.generated.resources.login_or_continue
-import movo.composeapp.generated.resources.login_password_label
-import movo.composeapp.generated.resources.login_password_placeholder
-import movo.composeapp.generated.resources.login_sign_up
-import movo.composeapp.generated.resources.login_subtitle
-import movo.composeapp.generated.resources.login_welcome_title
+import it.movo.app.ui.theme.MovoTheme
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.login_button
+import it.movo.app.composeapp.generated.resources.login_email_label
+import it.movo.app.composeapp.generated.resources.login_email_placeholder
+import it.movo.app.composeapp.generated.resources.login_forgot_password
+import it.movo.app.composeapp.generated.resources.login_google
+import it.movo.app.composeapp.generated.resources.login_no_account
+import it.movo.app.composeapp.generated.resources.login_or_continue
+import it.movo.app.composeapp.generated.resources.login_password_label
+import it.movo.app.composeapp.generated.resources.login_password_placeholder
+import it.movo.app.composeapp.generated.resources.login_sign_up
+import it.movo.app.composeapp.generated.resources.login_subtitle
+import it.movo.app.composeapp.generated.resources.login_welcome_title
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -81,6 +84,31 @@ fun LoginScreen(
         }
     }
 
+    LoginContent(
+        uiState = uiState,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+        onLogin = viewModel::login,
+        onLoginWithGoogle = viewModel::loginWithGoogle,
+        onNavigateToRegister = onNavigateToRegister,
+        onNavigateToForgotPassword = onNavigateToForgotPassword,
+        onNavigateBack = onNavigateBack
+    )
+}
+
+@Composable
+private fun LoginContent(
+    uiState: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onLogin: () -> Unit,
+    onLoginWithGoogle: () -> Unit,
+    onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
+    onNavigateBack: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -97,7 +125,7 @@ fun LoginScreen(
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(Res.string.back)
                 )
             }
         }
@@ -150,7 +178,7 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = uiState.email,
-            onValueChange = viewModel::onEmailChange,
+            onValueChange = onEmailChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(stringResource(Res.string.login_email_placeholder)) },
             singleLine = true,
@@ -183,7 +211,7 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = uiState.password,
-            onValueChange = viewModel::onPasswordChange,
+            onValueChange = onPasswordChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(stringResource(Res.string.login_password_placeholder)) },
             singleLine = true,
@@ -193,7 +221,7 @@ fun LoginScreen(
                 imeAction = ImeAction.Done
             ),
             trailingIcon = {
-                IconButton(onClick = viewModel::togglePasswordVisibility) {
+                IconButton(onClick = onTogglePasswordVisibility) {
                     Icon(
                         imageVector = if (uiState.passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                         contentDescription = if (uiState.passwordVisible) "Hide password" else "Show password"
@@ -237,7 +265,7 @@ fun LoginScreen(
 
         if (uiState.errorMessage != null) {
             Text(
-                text = uiState.errorMessage!!,
+                text = uiState.errorMessage,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.fillMaxWidth(),
@@ -247,7 +275,7 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = viewModel::login,
+            onClick = onLogin,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -300,7 +328,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedButton(
-            onClick = viewModel::loginWithGoogle,
+            onClick = onLoginWithGoogle,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -342,6 +370,27 @@ fun LoginScreen(
                 modifier = Modifier.clickable(onClick = onNavigateToRegister)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun LoginScreenPreview() {
+    MovoTheme {
+        LoginContent(
+            uiState = LoginUiState(
+                email = "mario.rossi@email.com",
+                password = "password123"
+            ),
+            onEmailChange = {},
+            onPasswordChange = {},
+            onTogglePasswordVisibility = {},
+            onLogin = {},
+            onLoginWithGoogle = {},
+            onNavigateToRegister = {},
+            onNavigateToForgotPassword = {},
+            onNavigateBack = {}
+        )
     }
 }
 

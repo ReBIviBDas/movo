@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,31 +55,31 @@ import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoWarning
 import it.movo.app.ui.theme.MovoWhite
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.ok
-import movo.composeapp.generated.resources.penalty_amount
-import movo.composeapp.generated.resources.penalty_cancel
-import movo.composeapp.generated.resources.penalty_contest
-import movo.composeapp.generated.resources.penalty_contest_hint
-import movo.composeapp.generated.resources.penalty_contest_reason
-import movo.composeapp.generated.resources.penalty_contest_submit
-import movo.composeapp.generated.resources.penalty_contest_success
-import movo.composeapp.generated.resources.penalty_due_date
-import movo.composeapp.generated.resources.penalty_no_penalties
-import movo.composeapp.generated.resources.penalty_retry
-import movo.composeapp.generated.resources.penalty_status_cancelled
-import movo.composeapp.generated.resources.penalty_status_contested
-import movo.composeapp.generated.resources.penalty_status_paid
-import movo.composeapp.generated.resources.penalty_status_pending
-import movo.composeapp.generated.resources.penalty_success
-import movo.composeapp.generated.resources.penalty_title
-import movo.composeapp.generated.resources.penalty_type
-import movo.composeapp.generated.resources.penalty_type_damage
-import movo.composeapp.generated.resources.penalty_type_geofence_exit
-import movo.composeapp.generated.resources.penalty_type_late
-import movo.composeapp.generated.resources.penalty_type_other
-import movo.composeapp.generated.resources.penalty_type_parking
-import movo.composeapp.generated.resources.penalty_type_traffic
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.ok
+import it.movo.app.composeapp.generated.resources.penalty_amount
+import it.movo.app.composeapp.generated.resources.penalty_cancel
+import it.movo.app.composeapp.generated.resources.penalty_contest
+import it.movo.app.composeapp.generated.resources.penalty_contest_hint
+import it.movo.app.composeapp.generated.resources.penalty_contest_reason
+import it.movo.app.composeapp.generated.resources.penalty_contest_submit
+import it.movo.app.composeapp.generated.resources.penalty_contest_success
+import it.movo.app.composeapp.generated.resources.penalty_due_date
+import it.movo.app.composeapp.generated.resources.penalty_no_penalties
+import it.movo.app.composeapp.generated.resources.penalty_retry
+import it.movo.app.composeapp.generated.resources.penalty_status_cancelled
+import it.movo.app.composeapp.generated.resources.penalty_status_contested
+import it.movo.app.composeapp.generated.resources.penalty_status_paid
+import it.movo.app.composeapp.generated.resources.penalty_status_pending
+import it.movo.app.composeapp.generated.resources.penalty_success
+import it.movo.app.composeapp.generated.resources.penalty_title
+import it.movo.app.composeapp.generated.resources.penalty_type_damage
+import it.movo.app.composeapp.generated.resources.penalty_type_geofence_exit
+import it.movo.app.composeapp.generated.resources.penalty_type_late
+import it.movo.app.composeapp.generated.resources.penalty_type_other
+import it.movo.app.composeapp.generated.resources.penalty_type_parking
+import it.movo.app.composeapp.generated.resources.penalty_type_traffic
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,7 +104,7 @@ fun PenaltyScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },
@@ -220,8 +219,10 @@ private fun PenaltyCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = stringResource(Res.string.penalty_amount,
-                    penalty.amountCents / 100),
+                text = stringResource(
+                    Res.string.penalty_amount,
+                    penalty.amountCents / 100
+                ),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MovoOnSurface

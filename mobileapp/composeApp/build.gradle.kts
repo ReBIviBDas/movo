@@ -18,6 +18,9 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
         }
+        androidResources {
+            enable = true
+        }
     }
 
     listOf(
@@ -36,7 +39,7 @@ kotlin {
             implementation(libs.jetbrains.compose.foundation)
             implementation(libs.jetbrains.material3)
             implementation(libs.jetbrains.material3.adaptiveNavigation3)
-            implementation(compose.materialIconsExtended)
+            implementation(libs.jetbrains.compose.material.icons)
             implementation(libs.jetbrains.compose.ui)
             implementation(libs.jetbrains.compose.components.resources)
             implementation(libs.jetbrains.compose.ui.tooling.preview)
@@ -85,7 +88,6 @@ kotlin {
 compose {
     resources {
         generateResClass = always
-        packageOfResClass = "movo.composeapp.generated.resources"
     }
 }
 
@@ -95,5 +97,5 @@ dependencies {
 
 buildConfig {
     buildConfigField("APP_VERSION", project.version.toString())
-    buildConfigField("API_BASE_URL", "https://api.movotn.it/v1")
+    buildConfigField("API_BASE_URL", "https://movo-backend-hvlw.onrender.com/api/v1/")
 }

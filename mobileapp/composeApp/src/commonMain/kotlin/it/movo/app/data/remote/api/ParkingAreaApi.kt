@@ -9,10 +9,10 @@ import it.movo.app.data.model.ParkingAreasResponse
 
 class ParkingAreaApi(private val client: HttpClient) {
     suspend fun getParkingAreas(bounds: String? = null): ParkingAreasResponse =
-        client.get("/parking-areas") {
+        client.get("parking-areas") {
             bounds?.let { parameter("bounds", it) }
         }.body()
 
     suspend fun getParkingArea(id: String): ParkingArea =
-        client.get("/parking-areas/$id").body()
+        client.get("parking-areas/$id").body()
 }

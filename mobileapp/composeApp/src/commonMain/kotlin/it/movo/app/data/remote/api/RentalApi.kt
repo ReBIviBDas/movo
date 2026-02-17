@@ -14,19 +14,19 @@ import it.movo.app.data.model.UnlockRequest
 
 class RentalApi(private val client: HttpClient) {
     suspend fun unlockVehicle(request: UnlockRequest): Rental =
-        client.post("/rentals/unlock") { setBody(request) }.body()
+        client.post("rentals/unlock") { setBody(request) }.body()
 
     suspend fun getActiveRental(): Rental =
-        client.get("/rentals/active").body()
+        client.get("rentals/active").body()
 
     suspend fun pauseRental(id: String): Rental =
-        client.post("/rentals/$id/pause").body()
+        client.post("rentals/$id/pause").body()
 
     suspend fun resumeRental(id: String): Rental =
-        client.post("/rentals/$id/resume").body()
+        client.post("rentals/$id/resume").body()
 
     suspend fun endRental(id: String, request: EndRentalRequest? = null): RentalSummary =
-        client.post("/rentals/$id/end") {
+        client.post("rentals/$id/end") {
             request?.let { setBody(it) }
         }.body()
 
@@ -36,7 +36,7 @@ class RentalApi(private val client: HttpClient) {
         cursor: String? = null,
         limit: Int? = null
     ): RentalHistoryResponse =
-        client.get("/rentals/history") {
+        client.get("rentals/history") {
             from?.let { parameter("from", it) }
             to?.let { parameter("to", it) }
             cursor?.let { parameter("cursor", it) }
@@ -44,5 +44,5 @@ class RentalApi(private val client: HttpClient) {
         }.body()
 
     suspend fun getRental(id: String): RentalSummary =
-        client.get("/rentals/$id").body()
+        client.get("rentals/$id").body()
 }

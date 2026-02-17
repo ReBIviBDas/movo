@@ -31,11 +31,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ImagePickerActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:exported="false" />
-
     </application>
 
 </manifest>

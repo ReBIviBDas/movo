@@ -13,7 +13,10 @@ class PaymentRepository(private val paymentApi: PaymentApi) {
         paymentApi.getPaymentMethods().methods
     }
 
-    suspend fun addPaymentMethod(stripeToken: String, setAsDefault: Boolean? = null): Result<PaymentMethod> = runCatching {
+    suspend fun addPaymentMethod(
+        stripeToken: String,
+        setAsDefault: Boolean? = null
+    ): Result<PaymentMethod> = runCatching {
         paymentApi.addPaymentMethod(AddPaymentMethodRequest(stripeToken, setAsDefault))
     }
 
@@ -25,13 +28,17 @@ class PaymentRepository(private val paymentApi: PaymentApi) {
         paymentApi.setDefaultPaymentMethod(id)
     }
 
-    suspend fun createSplitRequest(rentalId: String, participants: List<SplitParticipant>): Result<SplitRequest> = runCatching {
+    suspend fun createSplitRequest(
+        rentalId: String,
+        participants: List<SplitParticipant>
+    ): Result<SplitRequest> = runCatching {
         paymentApi.createSplitRequest(CreateSplitRequest(rentalId, participants))
     }
 
-    suspend fun respondToSplitRequest(id: String, accept: Boolean): Result<SplitRequest> = runCatching {
-        paymentApi.respondToSplitRequest(id, accept)
-    }
+    suspend fun respondToSplitRequest(id: String, accept: Boolean): Result<SplitRequest> =
+        runCatching {
+            paymentApi.respondToSplitRequest(id, accept)
+        }
 
     suspend fun getTransactions(
         from: String? = null,

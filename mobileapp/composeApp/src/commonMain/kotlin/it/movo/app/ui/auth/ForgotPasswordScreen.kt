@@ -39,18 +39,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
+import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoSurfaceVariant
-import it.movo.app.ui.theme.MovoSuccess
 import it.movo.app.ui.theme.MovoTeal
-import movo.composeapp.generated.resources.Res
-import movo.composeapp.generated.resources.email_placeholder
-import movo.composeapp.generated.resources.forgot_back_to_login
-import movo.composeapp.generated.resources.forgot_button
-import movo.composeapp.generated.resources.forgot_email
-import movo.composeapp.generated.resources.forgot_subtitle
-import movo.composeapp.generated.resources.forgot_success
-import movo.composeapp.generated.resources.forgot_title
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.back
+import it.movo.app.composeapp.generated.resources.email_placeholder
+import it.movo.app.composeapp.generated.resources.forgot_back_to_login
+import it.movo.app.composeapp.generated.resources.forgot_button
+import it.movo.app.composeapp.generated.resources.forgot_email
+import it.movo.app.composeapp.generated.resources.forgot_subtitle
+import it.movo.app.composeapp.generated.resources.forgot_success
+import it.movo.app.composeapp.generated.resources.forgot_title
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +70,7 @@ fun ForgotPasswordScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },

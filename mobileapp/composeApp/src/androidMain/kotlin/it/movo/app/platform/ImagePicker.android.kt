@@ -2,7 +2,6 @@ package it.movo.app.platform
 
 import android.content.Context
 import android.content.Intent
-import it.movo.app.ImagePickerActivity
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 

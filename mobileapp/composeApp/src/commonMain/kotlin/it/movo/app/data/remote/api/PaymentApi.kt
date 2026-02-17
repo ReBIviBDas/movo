@@ -17,22 +17,22 @@ import it.movo.app.data.model.TransactionsResponse
 
 class PaymentApi(private val client: HttpClient) {
     suspend fun getPaymentMethods(): PaymentMethodsResponse =
-        client.get("/payments/methods").body()
+        client.get("payments/methods").body()
 
     suspend fun addPaymentMethod(request: AddPaymentMethodRequest): PaymentMethod =
-        client.post("/payments/methods") { setBody(request) }.body()
+        client.post("payments/methods") { setBody(request) }.body()
 
     suspend fun deletePaymentMethod(id: String): Unit =
-        client.delete("/payments/methods/$id").body()
+        client.delete("payments/methods/$id").body()
 
     suspend fun setDefaultPaymentMethod(id: String): PaymentMethod =
-        client.put("/payments/methods/$id/default").body()
+        client.put("payments/methods/$id/default").body()
 
     suspend fun createSplitRequest(request: CreateSplitRequest): SplitRequest =
-        client.post("/payments/split-request") { setBody(request) }.body()
+        client.post("payments/split-request") { setBody(request) }.body()
 
     suspend fun respondToSplitRequest(id: String, accept: Boolean): SplitRequest =
-        client.post("/payments/split-request/$id/respond") {
+        client.post("payments/split-request/$id/respond") {
             setBody(mapOf("accept" to accept))
         }.body()
 
@@ -43,7 +43,7 @@ class PaymentApi(private val client: HttpClient) {
         cursor: String? = null,
         limit: Int? = null
     ): TransactionsResponse =
-        client.get("/payments/transactions") {
+        client.get("payments/transactions") {
             from?.let { parameter("from", it) }
             to?.let { parameter("to", it) }
             type?.let { parameter("type", it) }

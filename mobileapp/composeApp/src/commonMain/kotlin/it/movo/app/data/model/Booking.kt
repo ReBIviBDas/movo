@@ -23,7 +23,10 @@ data class Booking(
 
 @Serializable
 enum class BookingStatus {
-    @SerialName("active") ACTIVE,
-    @SerialName("expired") EXPIRED,
-    @SerialName("converted_to_rental") CONVERTED_TO_RENTAL
+    @SerialName("active")
+    ACTIVE,
+    @SerialName("expired")
+    EXPIRED,
+    @SerialName("converted_to_rental")
+    CONVERTED_TO_RENTAL
 }

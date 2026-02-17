@@ -6,7 +6,10 @@ import it.movo.app.data.model.VehicleSearchResult
 import it.movo.app.data.remote.api.VehicleApi
 
 class VehicleRepository(private val vehicleApi: VehicleApi) {
-    suspend fun getVehiclesOnMap(bounds: String? = null, minBattery: Int? = null): Result<List<VehicleMapItem>> = runCatching {
+    suspend fun getVehiclesOnMap(
+        bounds: String? = null,
+        minBattery: Int? = null
+    ): Result<List<VehicleMapItem>> = runCatching {
         vehicleApi.getVehiclesOnMap(bounds, minBattery).vehicles
     }
 
@@ -23,6 +26,14 @@ class VehicleRepository(private val vehicleApi: VehicleApi) {
         cursor: String? = null,
         limit: Int? = null
     ): Result<List<VehicleSearchResult>> = runCatching {
-        vehicleApi.searchVehicles(location, maxDistance, minBattery, model, maxPricePerMinute, cursor, limit).data
+        vehicleApi.searchVehicles(
+            location,
+            maxDistance,
+            minBattery,
+            model,
+            maxPricePerMinute,
+            cursor,
+            limit
+        ).data
     }
 }

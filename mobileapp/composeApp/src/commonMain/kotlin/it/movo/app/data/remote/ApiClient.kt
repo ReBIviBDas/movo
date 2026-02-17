@@ -2,7 +2,6 @@ package it.movo.app.data.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -16,12 +15,12 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import it.movo.app.composeApp.BuildConfig
 import it.movo.app.data.model.ProblemDetails
 import kotlinx.serialization.json.Json
 
-private const val BASE_URL = "https://api.movotn.it/v1"
-
-class ProblemDetailsException(val details: ProblemDetails) : Exception(details.detail ?: details.title)
+class ProblemDetailsException(val details: ProblemDetails) :
+    Exception(details.detail ?: details.title)
 
 fun parseErrorMessage(exception: Exception): String {
     return when (exception) {
@@ -30,7 +29,10 @@ fun parseErrorMessage(exception: Exception): String {
     }
 }
 
-fun createHttpClient(tokenProvider: suspend () -> BearerTokens?, tokenRefresher: suspend () -> BearerTokens?): HttpClient {
+fun createHttpClient(
+    tokenProvider: suspend () -> BearerTokens?,
+    tokenRefresher: suspend () -> BearerTokens?
+): HttpClient {
     val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
@@ -73,7 +75,7 @@ fun createHttpClient(tokenProvider: suspend () -> BearerTokens?, tokenRefresher:
         }
 
         defaultRequest {
-            url(BASE_URL)
+            url(BuildConfig.API_BASE_URL)
             contentType(ContentType.Application.Json)
         }
     }
