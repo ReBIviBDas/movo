@@ -133,7 +133,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                         viewModel = viewModel,
                         onNavigateToRegister = { backStack.add(RegisterRoute) },
                         onNavigateToForgotPassword = { backStack.add(ForgotPasswordRoute) },
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
                         onLoginSuccess = {
                             while (backStack.size > 1) backStack.removeLastOrNull()
                             backStack.removeLastOrNull()
@@ -145,7 +145,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     val viewModel = koinViewModel<RegisterViewModel>()
                     RegisterScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
                         onRegistrationSuccess = {
                             backStack.removeLastOrNull()
                             backStack.add(LoginRoute)
@@ -156,7 +156,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     val viewModel = koinViewModel<ForgotPasswordViewModel>()
                     ForgotPasswordScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                     )
                 }
                 entry<MapRoute> {
@@ -179,7 +179,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     VehicleDetailScreen(
                         viewModel = viewModel,
                         vehicleId = route.vehicleId,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
                         onBookVehicle = { vehicleId ->
                             backStack.add(BookingRoute(vehicleId))
                         }
@@ -192,7 +192,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     }
                     BookingScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
                         onRentalStarted = { rentalId ->
                             backStack.removeLastOrNull()
                             backStack.add(ActiveRideRoute(rentalId))
@@ -209,7 +209,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     }
                     ActiveRideScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
                         onRideEnded = { rentalId ->
                             backStack.removeLastOrNull()
                             backStack.add(TripSummaryRoute(rentalId))
@@ -242,7 +242,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     SplitPaymentScreen(
                         viewModel = viewModel,
                         rentalId = route.rentalId,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                     )
                 }
                 entry<HistoryRoute> {
@@ -261,7 +261,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     val viewModel = koinViewModel<ProfileViewModel>()
                     ProfileScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
                         onLogout = {
                             while (backStack.size > 1) backStack.removeLastOrNull()
                             backStack.removeLastOrNull()
@@ -285,7 +285,7 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     val viewModel = koinViewModel<WalletViewModel>()
                     WalletScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
                         onViewTransactions = { }
                     )
                 }
@@ -297,35 +297,35 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                     }
                     ReportIssueScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                     )
                 }
                 entry<NotificationSettingsRoute> {
                     val viewModel = koinViewModel<NotificationSettingsViewModel>()
                     NotificationSettingsScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                     )
                 }
                 entry<SubscriptionRoute> {
                     val viewModel = koinViewModel<SubscriptionViewModel>()
                     SubscriptionScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                     )
                 }
                 entry<PromotionRoute> {
                     val viewModel = koinViewModel<PromotionViewModel>()
                     PromotionScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                     )
                 }
                 entry<PenaltyRoute> {
                     val viewModel = koinViewModel<PenaltyViewModel>()
                     PenaltyScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
                     )
                 }
             }
