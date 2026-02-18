@@ -26,7 +26,7 @@ data class VehicleMapItem(
     val model: String,
     @SerialName("plate") val licensePlate: String? = null,
     val location: GeoPoint,
-    @SerialName("battery_level") val batteryLevel: Int,
+    @SerialName("battery_level") val batteryLevel: Int = 0,
     val status: VehicleStatus = VehicleStatus.AVAILABLE,
     @SerialName("price_per_minute") val basePricePerMinute: Double = 0.0
 )
