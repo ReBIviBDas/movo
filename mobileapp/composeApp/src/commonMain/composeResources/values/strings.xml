@@ -86,7 +86,7 @@
     <string name="register_continue">Continue</string>
     <string name="register_get_started">Get Started</string>
     <string name="register_step_of">Step %1$d of %2$d</string>
-    <string name="register_completed">%1$d%% Completed</string>
+    <string name="register_completed">%1$d% Completed</string>
     <string name="register_step1_title">Create your account.</string>
     <string name="register_step1_subtitle">Enter your email and create a secure password.</string>
     <string name="register_step2_title">Let's get you driving.</string>
@@ -263,10 +263,12 @@
     <!-- Report Issue -->
     <string name="report_title">Report an Issue</string>
     <string name="report_category">Category</string>
-    <string name="report_category_technical">Technical Issue</string>
-    <string name="report_category_damage">Damage</string>
-    <string name="report_category_cleanliness">Cleanliness</string>
-    <string name="report_category_battery">Dead Battery</string>
+    <string name="report_category_vehicle_damage">Vehicle Damage</string>
+    <string name="report_category_vehicle_malfunction">Vehicle Malfunction</string>
+    <string name="report_category_accident">Accident</string>
+    <string name="report_category_parking_issue">Parking Issue</string>
+    <string name="report_category_app_issue">App Issue</string>
+    <string name="report_category_payment_issue">Payment Issue</string>
     <string name="report_category_other">Other</string>
     <string name="report_description">Description</string>
     <string name="report_description_hint">Describe the issue...</string>

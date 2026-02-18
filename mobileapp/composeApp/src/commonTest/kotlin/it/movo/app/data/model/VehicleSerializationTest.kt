@@ -63,7 +63,7 @@ class VehicleSerializationTest {
             "plate": "EF456GH",
             "location": { "type": "Point", "coordinates": [11.12, 46.07] },
             "battery_level": 92,
-            "status": "in_use",
+            "status": "rented",
             "price_per_minute": 0.30,
             "year": 2023,
             "color": "white",
@@ -79,7 +79,7 @@ class VehicleSerializationTest {
         assertEquals("Tesla Model 3", vehicle.model)
         assertEquals("EF456GH", vehicle.licensePlate)
         assertEquals(92, vehicle.batteryLevel)
-        assertEquals(VehicleStatus.IN_USE, vehicle.status)
+        assertEquals(VehicleStatus.RENTED, vehicle.status)
         assertEquals(0.30, vehicle.basePricePerMinute)
         assertEquals(2023, vehicle.year)
         assertEquals("white", vehicle.color)
@@ -119,12 +119,12 @@ class VehicleSerializationTest {
             json.decodeFromString<VehicleStatus>("\"available\"")
         )
         assertEquals(
-            VehicleStatus.RESERVED,
-            json.decodeFromString<VehicleStatus>("\"reserved\"")
+            VehicleStatus.BOOKED,
+            json.decodeFromString<VehicleStatus>("\"booked\"")
         )
         assertEquals(
-            VehicleStatus.IN_USE,
-            json.decodeFromString<VehicleStatus>("\"in_use\"")
+            VehicleStatus.RENTED,
+            json.decodeFromString<VehicleStatus>("\"rented\"")
         )
     }
 

@@ -27,6 +27,8 @@ enum class BookingStatus {
     ACTIVE,
     @SerialName("expired")
     EXPIRED,
-    @SerialName("converted_to_rental")
-    CONVERTED_TO_RENTAL
+    @SerialName("completed")
+    COMPLETED,
+    @SerialName("cancelled")
+    CANCELLED
 }

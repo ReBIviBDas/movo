@@ -19,14 +19,18 @@ data class Issue(
 
 @Serializable
 enum class IssueCategory {
-    @SerialName("technical")
-    TECHNICAL,
-    @SerialName("damage")
-    DAMAGE,
-    @SerialName("battery")
-    BATTERY,
-    @SerialName("cleanliness")
-    CLEANLINESS,
+    @SerialName("vehicle_damage")
+    VEHICLE_DAMAGE,
+    @SerialName("vehicle_malfunction")
+    VEHICLE_MALFUNCTION,
+    @SerialName("accident")
+    ACCIDENT,
+    @SerialName("parking_issue")
+    PARKING_ISSUE,
+    @SerialName("app_issue")
+    APP_ISSUE,
+    @SerialName("payment_issue")
+    PAYMENT_ISSUE,
     @SerialName("other")
     OTHER
 }

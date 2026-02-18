@@ -67,10 +67,14 @@ data class VehicleSearchResult(
 enum class VehicleStatus {
     @SerialName("available")
     AVAILABLE,
-    @SerialName("reserved")
-    RESERVED,
-    @SerialName("in_use")
-    IN_USE
+    @SerialName("booked")
+    BOOKED,
+    @SerialName("rented")
+    RENTED,
+    @SerialName("maintenance")
+    MAINTENANCE,
+    @SerialName("charging")
+    CHARGING
 }
 
 @Serializable

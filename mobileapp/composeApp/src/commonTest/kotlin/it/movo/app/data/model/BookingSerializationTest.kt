@@ -77,8 +77,12 @@ class BookingSerializationTest {
             json.decodeFromString<BookingStatus>("\"expired\"")
         )
         assertEquals(
-            BookingStatus.CONVERTED_TO_RENTAL,
-            json.decodeFromString<BookingStatus>("\"converted_to_rental\"")
+            BookingStatus.COMPLETED,
+            json.decodeFromString<BookingStatus>("\"completed\"")
+        )
+        assertEquals(
+            BookingStatus.CANCELLED,
+            json.decodeFromString<BookingStatus>("\"cancelled\"")
         )
     }
 

@@ -63,11 +63,7 @@ import it.movo.app.composeapp.generated.resources.back
 import it.movo.app.composeapp.generated.resources.common_done
 import it.movo.app.composeapp.generated.resources.report_add_photo
 import it.movo.app.composeapp.generated.resources.report_category
-import it.movo.app.composeapp.generated.resources.report_category_battery
-import it.movo.app.composeapp.generated.resources.report_category_cleanliness
-import it.movo.app.composeapp.generated.resources.report_category_damage
 import it.movo.app.composeapp.generated.resources.report_category_other
-import it.movo.app.composeapp.generated.resources.report_category_technical
 import it.movo.app.composeapp.generated.resources.report_description
 import it.movo.app.composeapp.generated.resources.report_description_hint
 import it.movo.app.composeapp.generated.resources.report_max_photos
@@ -295,18 +291,22 @@ private fun CategoryDropdown(
     onSelect: (IssueCategory) -> Unit
 ) {
     val categories = listOf(
-        IssueCategory.TECHNICAL to Res.string.report_category_technical,
-        IssueCategory.DAMAGE to Res.string.report_category_damage,
-        IssueCategory.BATTERY to Res.string.report_category_battery,
-        IssueCategory.CLEANLINESS to Res.string.report_category_cleanliness,
-        IssueCategory.OTHER to Res.string.report_category_other
+        IssueCategory.VEHICLE_DAMAGE to "Vehicle Damage",
+        IssueCategory.VEHICLE_MALFUNCTION to "Vehicle Malfunction",
+        IssueCategory.ACCIDENT to "Accident",
+        IssueCategory.PARKING_ISSUE to "Parking Issue",
+        IssueCategory.APP_ISSUE to "App Issue",
+        IssueCategory.PAYMENT_ISSUE to "Payment Issue",
+        IssueCategory.OTHER to stringResource(Res.string.report_category_other)
     )
 
     val selectedLabel = when (selectedCategory) {
-        IssueCategory.TECHNICAL -> stringResource(Res.string.report_category_technical)
-        IssueCategory.DAMAGE -> stringResource(Res.string.report_category_damage)
-        IssueCategory.BATTERY -> stringResource(Res.string.report_category_battery)
-        IssueCategory.CLEANLINESS -> stringResource(Res.string.report_category_cleanliness)
+        IssueCategory.VEHICLE_DAMAGE -> "Vehicle Damage"
+        IssueCategory.VEHICLE_MALFUNCTION -> "Vehicle Malfunction"
+        IssueCategory.ACCIDENT -> "Accident"
+        IssueCategory.PARKING_ISSUE -> "Parking Issue"
+        IssueCategory.APP_ISSUE -> "App Issue"
+        IssueCategory.PAYMENT_ISSUE -> "Payment Issue"
         IssueCategory.OTHER -> stringResource(Res.string.report_category_other)
         null -> stringResource(Res.string.report_category)
     }
@@ -344,9 +344,9 @@ private fun CategoryDropdown(
             expanded = expanded,
             onDismissRequest = onDismiss
         ) {
-            categories.forEach { (category, stringRes) ->
+            categories.forEach { (category, label) ->
                 DropdownMenuItem(
-                    text = { Text(stringResource(stringRes)) },
+                    text = { Text(label) },
                     onClick = { onSelect(category) }
                 )
             }
@@ -396,7 +396,7 @@ private fun PhotoPlaceholders(
 private fun ReportIssueScreenPreview() {
     val mockUiState = ReportIssueUiState(
         vehicleId = "VEH123",
-        selectedCategory = IssueCategory.TECHNICAL,
+        selectedCategory = IssueCategory.VEHICLE_DAMAGE,
         description = "The scooter's brake seems to be not working properly. It makes a squeaking sound when applied.",
         photos = emptyList(),
         isCategoryMenuExpanded = false,

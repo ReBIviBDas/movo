@@ -8,6 +8,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.IconButton
@@ -699,8 +701,11 @@ private fun Step2PersonalDetails(
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = dateOfBirth,
-            onValueChange = onDateOfBirthChange,
-            modifier = Modifier.fillMaxWidth(),
+            onValueChange = {},
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showDatePicker = true },
             placeholder = { Text(stringResource(Res.string.register_date_format)) },
             trailingIcon = {
                 IconButton(onClick = { showDatePicker = true }) {
@@ -709,6 +714,15 @@ private fun Step2PersonalDetails(
                         contentDescription = "Select date",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            },
+            interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect { interaction ->
+                        if (interaction is PressInteraction.Release) {
+                            showDatePicker = true
+                        }
+                    }
                 }
             },
             singleLine = true,
