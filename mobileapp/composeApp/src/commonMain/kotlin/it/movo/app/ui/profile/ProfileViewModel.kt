@@ -2,12 +2,17 @@ package it.movo.app.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.movo.app.data.model.Language
 import it.movo.app.data.model.NotificationChannel
 import it.movo.app.data.model.NotificationChannelType
 import it.movo.app.data.model.NotificationPreferences
 import it.movo.app.data.model.UserProfileUpdate
 import it.movo.app.data.repository.AuthRepository
 import it.movo.app.data.repository.UserRepository
+import kotlinx.datetime.Instant
+import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,7 +60,13 @@ class ProfileViewModel(
             profileResult
                 .onSuccess { profile ->
                     val fullName = "${profile.firstName} ${profile.lastName}"
-                    val memberSince = profile.createdAt.take(4)
+                    val memberSince = try {
+                        val date = Instant.parse(profile.createdAt)
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                        "${localizedMonthName(date.month, profile.language)} ${date.year}"
+                    } catch (_: Exception) {
+                        profile.createdAt.take(7)
+                    }
                     _uiState.update { state ->
                         state.copy(
                             fullName = fullName,
@@ -230,4 +241,22 @@ class ProfileViewModel(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
+}
+
+private fun localizedMonthName(month: Month, language: Language): String {
+    val monthNames = when (language) {
+        Language.IT -> arrayOf(
+            "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+            "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+        )
+        Language.DE -> arrayOf(
+            "Januar", "Februar", "M\u00E4rz", "April", "Mai", "Juni",
+            "Juli", "August", "September", "Oktober", "November", "Dezember"
+        )
+        Language.EN -> arrayOf(
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        )
+    }
+    return monthNames[month.ordinal]
 }
