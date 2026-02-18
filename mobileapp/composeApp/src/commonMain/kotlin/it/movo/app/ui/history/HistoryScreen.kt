@@ -49,6 +49,7 @@ import it.movo.app.composeapp.generated.resources.history_empty
 import it.movo.app.composeapp.generated.resources.history_empty_subtitle
 import it.movo.app.composeapp.generated.resources.history_title
 import it.movo.app.composeapp.generated.resources.retry
+import it.movo.app.composeapp.generated.resources.ride_report_issue
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -227,9 +228,9 @@ private fun RentalHistoryCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Report,
-                    contentDescription = "Report issue"
+                    contentDescription = stringResource(Res.string.ride_report_issue)
                 )
-                Text("Report Issue")
+                Text(stringResource(Res.string.ride_report_issue))
             }
         }
     }

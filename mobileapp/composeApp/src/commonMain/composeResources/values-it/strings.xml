@@ -84,8 +84,8 @@
     <string name="register_error_passwords_mismatch">Le password non coincidono</string>
     <string name="register_continue">Continua</string>
     <string name="register_get_started">Inizia</string>
-    <string name="register_step_of">Passaggio %d di %d</string>
-    <string name="register_completed">%d%% Completato</string>
+    <string name="register_step_of">Passaggio %1$d di %2$d</string>
+    <string name="register_completed">%1$d%% Completato</string>
     <string name="register_step1_title">Crea il tuo account.</string>
     <string name="register_step1_subtitle">Inserisci la tua email e crea una password sicura.</string>
     <string name="register_step2_title">Prepariamoci a guidare.</string>
@@ -117,8 +117,8 @@
 
     <!-- Vehicle Details -->
     <string name="vehicle_details">Dettagli Veicolo</string>
-    <string name="vehicle_battery">%d%%</string>
-    <string name="vehicle_range">%dkm autonomia</string>
+    <string name="vehicle_battery">%1$d%%</string>
+    <string name="vehicle_range">%1$dkm autonomia</string>
     <string name="vehicle_price">Prezzo</string>
     <string name="vehicle_features">Caratteristiche</string>
     <string name="vehicle_book">Prenota Veicolo</string>
@@ -126,12 +126,12 @@
     <string name="vehicle_license_plate">Targa</string>
     <string name="vehicle_km">km</string>
     <string name="vehicle_available">Disponibile</string>
-    <string name="vehicle_price_per_min">€%.2f/min</string>
+    <string name="vehicle_price_per_min">€%1$.2f/min</string>
     <string name="vehicle_range_label">Autonomia</string>
     <string name="vehicle_distance_label">Distanza</string>
     <string name="vehicle_seats_label">Posti</string>
     <string name="vehicle_reserve_free">Prenota gratis</string>
-    <string name="vehicle_reserve_time">(%d min)</string>
+    <string name="vehicle_reserve_time">(%1$d min)</string>
     <string name="vehicle_reserve_later">Prenota per dopo</string>
     <string name="vehicle_split_friends">DIVIDI CON AMICI</string>
     <string name="vehicle_split_you">Tu</string>
@@ -147,9 +147,9 @@
     <string name="booking_minutes">min</string>
     <string name="booking_reservation_active">PRENOTAZIONE ATTIVA</string>
     <string name="booking_time_to_reach">Tempo per raggiungere il veicolo</string>
-    <string name="booking_plate">Targa: %s</string>
-    <string name="booking_walk_to">Cammina verso %s</string>
-    <string name="booking_walk_time">~%d min a piedi (%dm)</string>
+    <string name="booking_plate">Targa: %1$s</string>
+    <string name="booking_walk_to">Cammina verso %1$s</string>
+    <string name="booking_walk_time">~%1$d min a piedi (%2$dm)</string>
     <string name="booking_check_damages">Controlla eventuali danni</string>
     <string name="booking_unlock_app">Sblocca con l'App</string>
     <string name="booking_unlock_vehicle">Sblocca Veicolo</string>
@@ -187,7 +187,7 @@
     <string name="split_request_sent">Richiesta di divisione inviata!</string>
     <string name="split_percentage">Percentuale</string>
     <string name="split_amount">Importo</string>
-    <string name="split_participant">Partecipante %d</string>
+    <string name="split_participant">Partecipante %1$d</string>
     <string name="split_remove">Rimuovi</string>
     <string name="split_user_id_email">ID utente o Email</string>
     <string name="split_cost_with_passengers">Dividi il costo con i tuoi passeggeri</string>
@@ -204,8 +204,8 @@
     <string name="history_duration">Durata</string>
     <string name="history_distance">Distanza</string>
     <string name="history_total_cost">Costo Totale</string>
-    <string name="history_minutes">%d min</string>
-    <string name="history_km">%.1f km</string>
+    <string name="history_minutes">%1$d min</string>
+    <string name="history_km">%1$.1f km</string>
 
     <!-- Profile -->
     <string name="profile_title">Profilo</string>
@@ -216,8 +216,8 @@
     <string name="profile_phone_number">Numero di Telefono</string>
     <string name="profile_drivers_license">Patente di Guida</string>
     <string name="profile_license_verified">VERIFICATA</string>
-    <string name="profile_license_valid_until">Valida fino a %s</string>
-    <string name="profile_member_since">Membro dal %s</string>
+    <string name="profile_license_valid_until">Valida fino a %1$s</string>
+    <string name="profile_member_since">Membro dal %1$s</string>
     <string name="profile_push_notifications">Notifiche Push</string>
     <string name="profile_push_subtitle">Aggiornamenti e avvisi sui viaggi</string>
     <string name="profile_email_updates">Aggiornamenti Email</string>
@@ -324,11 +324,11 @@
     <string name="subscription_auto_renew">Rinnovo Automatico</string>
     <string name="subscription_per_month">/mese</string>
     <string name="subscription_per_year">/anno</string>
-    <string name="subscription_minutes_included">%d min inclusi</string>
-    <string name="subscription_discount">%d%% di sconto</string>
-    <string name="subscription_minutes_used">%d min usati</string>
-    <string name="subscription_minutes_remaining">%d min rimanenti</string>
-    <string name="subscription_active_until">Attivo fino al %s</string>
+    <string name="subscription_minutes_included">%1$d min inclusi</string>
+    <string name="subscription_discount">%1$d%% di sconto</string>
+    <string name="subscription_minutes_used">%1$d min usati</string>
+    <string name="subscription_minutes_remaining">%1$d min rimanenti</string>
+    <string name="subscription_active_until">Attivo fino al %1$s</string>
     <string name="subscription_status_active">Attivo</string>
     <string name="subscription_status_cancelling">In cancellazione</string>
     <string name="subscription_billing_period">Periodo di Fatturazione</string>
@@ -343,9 +343,9 @@
     <string name="promotion_available">Promozioni Disponibili</string>
     <string name="promotion_empty">Nessuna promozione disponibile</string>
     <string name="promotion_empty_subtitle">Controlla più tardi per nuove offerte</string>
-    <string name="promotion_valid_until">Valida fino al %s</string>
-    <string name="promotion_discount_percent">%d%% di sconto</string>
-    <string name="promotion_discount_fixed">€%.2f di sconto</string>
+    <string name="promotion_valid_until">Valida fino al %1$s</string>
+    <string name="promotion_discount_percent">%1$d%% di sconto</string>
+    <string name="promotion_discount_fixed">€%1$.2f di sconto</string>
     <string name="promotion_code_applied">Codice promozionale applicato!</string>
     <string name="promotion_discount">Sconto</string>
     <string name="promotion_no_promotions">Nessuna promozione disponibile</string>
@@ -371,8 +371,8 @@
     <string name="penalty_type_traffic">Multa Stradale</string>
     <string name="penalty_type_late">Restituzione Tardiva</string>
     <string name="penalty_type_other">Altro</string>
-    <string name="penalty_due_date">Scadenza: %s</string>
-    <string name="penalty_amount">€%.2f</string>
+    <string name="penalty_due_date">Scadenza: %1$s</string>
+    <string name="penalty_amount">€%1$.2f</string>
     <string name="penalty_type">Tipo</string>
     <string name="penalty_retry">Riprova</string>
     <string name="penalty_cancel">Annulla</string>
@@ -388,9 +388,9 @@
 
     <!-- Filters -->
     <string name="filter_title">Filtri</string>
-    <string name="filter_min_battery">Batteria minima: %d%%</string>
-    <string name="filter_max_price">Prezzo massimo: €%.2f/min</string>
-    <string name="filter_max_distance">Distanza massima: %.1f km</string>
+    <string name="filter_min_battery">Batteria minima: %1$d%%</string>
+    <string name="filter_max_price">Prezzo massimo: €%1$.2f/min</string>
+    <string name="filter_max_distance">Distanza massima: %1$.1f km</string>
     <string name="filter_apply">Applica Filtri</string>
     <string name="filter_reset">Reset</string>
 
@@ -407,4 +407,5 @@
     <string name="profile_logout_all">Esci da tutti i dispositivi</string>
     <string name="profile_export_data">Esporta i miei dati</string>
     <string name="ride_estimated_range">Autonomia stimata</string>
+    <string name="driving_not_enabled">Non sei ancora abilitato alla guida. Verifica prima la tua patente.</string>
 </resources>

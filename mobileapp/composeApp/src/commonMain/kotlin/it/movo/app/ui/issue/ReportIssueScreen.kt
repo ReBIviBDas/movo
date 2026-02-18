@@ -75,6 +75,7 @@ import it.movo.app.composeapp.generated.resources.report_photos
 import it.movo.app.composeapp.generated.resources.report_submit
 import it.movo.app.composeapp.generated.resources.report_success
 import it.movo.app.composeapp.generated.resources.report_title
+import it.movo.app.composeapp.generated.resources.ride_report_issue
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -411,7 +412,7 @@ private fun ReportIssueScreenPreview() {
                     windowInsets = WindowInsets(0.dp),
                     title = {
                         Text(
-                            text = "Report Issue",
+                            text = stringResource(Res.string.ride_report_issue),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )

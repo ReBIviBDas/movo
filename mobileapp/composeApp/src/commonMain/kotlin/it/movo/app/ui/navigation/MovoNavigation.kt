@@ -19,6 +19,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import it.movo.app.composeapp.generated.resources.Res
+import it.movo.app.composeapp.generated.resources.forgot_success
+import it.movo.app.composeapp.generated.resources.nav_account
+import it.movo.app.composeapp.generated.resources.nav_explore
+import it.movo.app.composeapp.generated.resources.nav_trips
+import it.movo.app.composeapp.generated.resources.nav_wallet
 import it.movo.app.ui.auth.ForgotPasswordScreen
 import it.movo.app.ui.auth.ForgotPasswordViewModel
 import it.movo.app.ui.auth.LoginScreen
@@ -55,6 +61,7 @@ import it.movo.app.ui.wallet.WalletScreen
 import it.movo.app.ui.wallet.WalletViewModel
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 enum class BottomNavTab(val label: String) {
@@ -343,28 +350,28 @@ private fun MovoBottomBar(
                 val isSelected = currentRoute is MapRoute
                 Icon(
                     imageVector = Icons.Default.Map,
-                    contentDescription = "Explore"
+                    contentDescription = stringResource(Res.string.nav_explore)
                 )
             },
-            label = { Text("Explore") },
+            label = { Text(stringResource(Res.string.nav_explore)) },
             selected = currentRoute is MapRoute,
             onClick = { onTabSelected(BottomNavTab.EXPLORE) }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.History, contentDescription = "Trips") },
-            label = { Text("Trips") },
+            icon = { Icon(Icons.Default.History, contentDescription = stringResource(Res.string.nav_trips)) },
+            label = { Text(stringResource(Res.string.nav_trips)) },
             selected = currentRoute is HistoryRoute,
             onClick = { onTabSelected(BottomNavTab.TRIPS) }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Wallet, contentDescription = "Wallet") },
-            label = { Text("Wallet") },
+            icon = { Icon(Icons.Default.Wallet, contentDescription = stringResource(Res.string.nav_wallet)) },
+            label = { Text(stringResource(Res.string.nav_wallet)) },
             selected = currentRoute is WalletRoute,
             onClick = { onTabSelected(BottomNavTab.WALLET) }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
-            label = { Text("Account") },
+            icon = { Icon(Icons.Default.AccountCircle, contentDescription = stringResource(Res.string.nav_account)) },
+            label = { Text(stringResource(Res.string.nav_account)) },
             selected = currentRoute is ProfileRoute,
             onClick = { onTabSelected(BottomNavTab.ACCOUNT) }
         )
