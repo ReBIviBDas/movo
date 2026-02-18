@@ -56,7 +56,12 @@ class BookingViewModel(
             _uiState.update { it.copy(isLoading = true) }
             bookingRepository.getActiveBooking()
                 .onSuccess { booking ->
-                    val remainingSeconds = calculateRemainingSeconds(booking.expiresAt)
+                    if (booking == null) {
+                        _uiState.update { it.copy(isLoading = false) }
+                        return@launch
+                    }
+                    val remainingSeconds = booking.remainingSeconds
+                        ?: calculateRemainingSeconds(booking.expiresAt)
                     _uiState.update {
                         it.copy(
                             booking = booking,
@@ -91,7 +96,8 @@ class BookingViewModel(
             try {
                 bookingRepository.createBooking(vehicleId)
                     .onSuccess { booking ->
-                        val remainingSeconds = calculateRemainingSeconds(booking.expiresAt)
+                        val remainingSeconds = booking.remainingSeconds
+                            ?: calculateRemainingSeconds(booking.expiresAt)
                         _uiState.update {
                             it.copy(
                                 booking = booking,

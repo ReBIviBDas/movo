@@ -78,8 +78,6 @@ data class Penalty(
 enum class PenaltyType {
     @SerialName("parking_violation")
     PARKING_VIOLATION,
-    @SerialName("geofence_exit")
-    GEOFENCE_EXIT,
     @SerialName("damage")
     DAMAGE,
     @SerialName("traffic_fine")

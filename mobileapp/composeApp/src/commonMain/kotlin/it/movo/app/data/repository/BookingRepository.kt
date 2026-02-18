@@ -10,7 +10,7 @@ class BookingRepository(private val bookingApi: BookingApi) {
             bookingApi.createBooking(CreateBookingRequest(vehicleId, durationMinutes))
         }
 
-    suspend fun getActiveBooking(): Result<Booking> = runCatching {
+    suspend fun getActiveBooking(): Result<Booking?> = runCatching {
         bookingApi.getActiveBooking()
     }
 

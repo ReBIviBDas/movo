@@ -70,8 +70,8 @@ enum class PaymentType {
 enum class PaymentStatus {
     @SerialName("pending")
     PENDING,
-    @SerialName("completed")
-    COMPLETED,
+    @SerialName("charged")
+    CHARGED,
     @SerialName("failed")
     FAILED,
     @SerialName("refunded")

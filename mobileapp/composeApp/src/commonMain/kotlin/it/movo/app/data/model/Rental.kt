@@ -48,7 +48,9 @@ enum class RentalStatus {
     @SerialName("paused")
     PAUSED,
     @SerialName("completed")
-    COMPLETED
+    COMPLETED,
+    @SerialName("cancelled")
+    CANCELLED
 }
 
 @Serializable

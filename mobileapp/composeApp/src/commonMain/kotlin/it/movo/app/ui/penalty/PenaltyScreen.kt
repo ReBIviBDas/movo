@@ -270,7 +270,6 @@ private fun PenaltyCard(
 private fun TypeChip(type: PenaltyType) {
     val label = when (type) {
         PenaltyType.PARKING_VIOLATION -> stringResource(Res.string.penalty_type_parking)
-        PenaltyType.GEOFENCE_EXIT -> stringResource(Res.string.penalty_type_geofence_exit)
         PenaltyType.DAMAGE -> stringResource(Res.string.penalty_type_damage)
         PenaltyType.TRAFFIC_FINE -> stringResource(Res.string.penalty_type_traffic)
         PenaltyType.LATE_RETURN -> stringResource(Res.string.penalty_type_late)

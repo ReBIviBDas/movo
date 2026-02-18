@@ -61,6 +61,7 @@
     <string name="register_last_name">Last Name</string>
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
+    <string name="register_password_placeholder">Enter your password</string>
     <string name="register_confirm_password">Confirm Password</string>
     <string name="register_phone">Phone Number</string>
     <string name="register_date_of_birth">Date of Birth</string>
@@ -84,8 +85,8 @@
     <string name="register_error_passwords_mismatch">Passwords do not match</string>
     <string name="register_continue">Continue</string>
     <string name="register_get_started">Get Started</string>
-    <string name="register_step_of">Step %d of %d</string>
-    <string name="register_completed">%d%% Completed</string>
+    <string name="register_step_of">Step %1$d of %2$d</string>
+    <string name="register_completed">%1$d% Completed</string>
     <string name="register_step1_title">Create your account.</string>
     <string name="register_step1_subtitle">Enter your email and create a secure password.</string>
     <string name="register_step2_title">Let's get you driving.</string>
@@ -117,8 +118,8 @@
 
     <!-- Vehicle Details -->
     <string name="vehicle_details">Vehicle Details</string>
-    <string name="vehicle_battery">%d%%</string>
-    <string name="vehicle_range">%dkm range</string>
+    <string name="vehicle_battery">%1$d%%</string>
+    <string name="vehicle_range">%1$dkm range</string>
     <string name="vehicle_price">Price</string>
     <string name="vehicle_features">Features</string>
     <string name="vehicle_book">Book Vehicle</string>
@@ -126,12 +127,12 @@
     <string name="vehicle_license_plate">License Plate</string>
     <string name="vehicle_km">km</string>
     <string name="vehicle_available">Available</string>
-    <string name="vehicle_price_per_min">€%.2f/min</string>
+    <string name="vehicle_price_per_min">€%1$.2f/min</string>
     <string name="vehicle_range_label">Range</string>
     <string name="vehicle_distance_label">Distance</string>
     <string name="vehicle_seats_label">Seats</string>
     <string name="vehicle_reserve_free">Reserve for free</string>
-    <string name="vehicle_reserve_time">(%d min)</string>
+    <string name="vehicle_reserve_time">(%1$d min)</string>
     <string name="vehicle_reserve_later">Reserve for later</string>
     <string name="vehicle_split_friends">SPLIT WITH FRIENDS</string>
     <string name="vehicle_split_you">You</string>
@@ -147,9 +148,9 @@
     <string name="booking_minutes">min</string>
     <string name="booking_reservation_active">RESERVATION ACTIVE</string>
     <string name="booking_time_to_reach">Time to reach vehicle</string>
-    <string name="booking_plate">Plate: %s</string>
-    <string name="booking_walk_to">Walk to %s</string>
-    <string name="booking_walk_time">~%d min walk (%dm)</string>
+    <string name="booking_plate">Plate: %1$s</string>
+    <string name="booking_walk_to">Walk to %1$s</string>
+    <string name="booking_walk_time">~%1$d min walk (%2$dm)</string>
     <string name="booking_check_damages">Check for damages</string>
     <string name="booking_unlock_app">Unlock with App</string>
     <string name="booking_unlock_vehicle">Unlock Vehicle</string>
@@ -187,7 +188,7 @@
     <string name="split_request_sent">Split request sent!</string>
     <string name="split_percentage">Percentage</string>
     <string name="split_amount">Amount</string>
-    <string name="split_participant">Participant %d</string>
+    <string name="split_participant">Participant %1$d</string>
     <string name="split_remove">Remove</string>
     <string name="split_user_id_email">User ID or Email</string>
     <string name="split_cost_with_passengers">Split the cost with your passengers</string>
@@ -204,8 +205,8 @@
     <string name="history_duration">Duration</string>
     <string name="history_distance">Distance</string>
     <string name="history_total_cost">Total Cost</string>
-    <string name="history_minutes">%d min</string>
-    <string name="history_km">%.1f km</string>
+    <string name="history_minutes">%1$d min</string>
+    <string name="history_km">%1$.1f km</string>
 
     <!-- Profile -->
     <string name="profile_title">Profile</string>
@@ -216,8 +217,8 @@
     <string name="profile_phone_number">Phone Number</string>
     <string name="profile_drivers_license">Driver's License</string>
     <string name="profile_license_verified">VERIFIED</string>
-    <string name="profile_license_valid_until">Valid until %s</string>
-    <string name="profile_member_since">Member since %s</string>
+    <string name="profile_license_valid_until">Valid until %1$s</string>
+    <string name="profile_member_since">Member since %1$s</string>
     <string name="profile_push_notifications">Push Notifications</string>
     <string name="profile_push_subtitle">Trip updates and alerts</string>
     <string name="profile_email_updates">Email Updates</string>
@@ -262,10 +263,12 @@
     <!-- Report Issue -->
     <string name="report_title">Report an Issue</string>
     <string name="report_category">Category</string>
-    <string name="report_category_technical">Technical Issue</string>
-    <string name="report_category_damage">Damage</string>
-    <string name="report_category_cleanliness">Cleanliness</string>
-    <string name="report_category_battery">Dead Battery</string>
+    <string name="report_category_vehicle_damage">Vehicle Damage</string>
+    <string name="report_category_vehicle_malfunction">Vehicle Malfunction</string>
+    <string name="report_category_accident">Accident</string>
+    <string name="report_category_parking_issue">Parking Issue</string>
+    <string name="report_category_app_issue">App Issue</string>
+    <string name="report_category_payment_issue">Payment Issue</string>
     <string name="report_category_other">Other</string>
     <string name="report_description">Description</string>
     <string name="report_description_hint">Describe the issue...</string>
@@ -324,11 +327,11 @@
     <string name="subscription_auto_renew">Auto Renew</string>
     <string name="subscription_per_month">/month</string>
     <string name="subscription_per_year">/year</string>
-    <string name="subscription_minutes_included">%d min included</string>
-    <string name="subscription_discount">%d%% discount</string>
-    <string name="subscription_minutes_used">%d min used</string>
-    <string name="subscription_minutes_remaining">%d min remaining</string>
-    <string name="subscription_active_until">Active until %s</string>
+    <string name="subscription_minutes_included">%1$d min included</string>
+    <string name="subscription_discount">%1$d%% discount</string>
+    <string name="subscription_minutes_used">%1$d min used</string>
+    <string name="subscription_minutes_remaining">%1$d min remaining</string>
+    <string name="subscription_active_until">Active until %1$s</string>
     <string name="subscription_status_active">Active</string>
     <string name="subscription_status_cancelling">Cancelling</string>
     <string name="subscription_billing_period">Billing Period</string>
@@ -343,9 +346,9 @@
     <string name="promotion_available">Available Promotions</string>
     <string name="promotion_empty">No promotions available</string>
     <string name="promotion_empty_subtitle">Check back later for new offers</string>
-    <string name="promotion_valid_until">Valid until %s</string>
-    <string name="promotion_discount_percent">%d%% off</string>
-    <string name="promotion_discount_fixed">€%.2f off</string>
+    <string name="promotion_valid_until">Valid until %1$s</string>
+    <string name="promotion_discount_percent">%1$d%% off</string>
+    <string name="promotion_discount_fixed">€%1$.2f off</string>
     <string name="promotion_code_applied">Promo code applied!</string>
     <string name="promotion_discount">Discount</string>
     <string name="promotion_no_promotions">No promotions available</string>
@@ -371,8 +374,8 @@
     <string name="penalty_type_traffic">Traffic Fine</string>
     <string name="penalty_type_late">Late Return</string>
     <string name="penalty_type_other">Other</string>
-    <string name="penalty_due_date">Due: %s</string>
-    <string name="penalty_amount">€%.2f</string>
+    <string name="penalty_due_date">Due: %1$s</string>
+    <string name="penalty_amount">€%1$.2f</string>
     <string name="penalty_type">Type</string>
     <string name="penalty_retry">Retry</string>
     <string name="penalty_cancel">Cancel</string>
@@ -388,9 +391,9 @@
 
     <!-- Filters -->
     <string name="filter_title">Filters</string>
-    <string name="filter_min_battery">Min Battery: %d%%</string>
-    <string name="filter_max_price">Max Price: €%.2f/min</string>
-    <string name="filter_max_distance">Max Distance: %.1f km</string>
+    <string name="filter_min_battery">Min Battery: %1$d%%</string>
+    <string name="filter_max_price">Max Price: €%1$.2f/min</string>
+    <string name="filter_max_distance">Max Distance: %1$.1f km</string>
     <string name="filter_apply">Apply Filters</string>
     <string name="filter_reset">Reset</string>
 
@@ -407,4 +410,5 @@
     <string name="profile_logout_all">Logout from all devices</string>
     <string name="profile_export_data">Export my data</string>
     <string name="ride_estimated_range">Estimated range</string>
+    <string name="driving_not_enabled">You are not allowed to drive yet. Please verify your driving license first.</string>
 </resources>

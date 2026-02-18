@@ -6,6 +6,7 @@ import it.movo.app.data.model.ParkingArea
 import it.movo.app.data.model.Vehicle
 import it.movo.app.data.model.VehicleMapItem
 import it.movo.app.data.repository.ParkingAreaRepository
+import it.movo.app.data.repository.UserRepository
 import it.movo.app.data.repository.VehicleRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -29,13 +30,15 @@ data class MapUiState(
     val showFilterSheet: Boolean = false,
     val isLoading: Boolean = false,
     val showVehicleDetails: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val drivingEnabled: Boolean = true
 )
 
 @OptIn(FlowPreview::class)
 class MapViewModel(
     private val vehicleRepository: VehicleRepository,
-    private val parkingAreaRepository: ParkingAreaRepository
+    private val parkingAreaRepository: ParkingAreaRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
@@ -44,6 +47,7 @@ class MapViewModel(
     init {
         loadVehicles()
         loadParkingAreas()
+        loadDrivingStatus()
         observeSearchQuery()
         startPeriodicRefresh()
     }
@@ -54,6 +58,15 @@ class MapViewModel(
                 delay(30_000L)
                 loadVehicles()
             }
+        }
+    }
+
+    private fun loadDrivingStatus() {
+        viewModelScope.launch {
+            userRepository.getProfile()
+                .onSuccess { profile ->
+                    _uiState.update { it.copy(drivingEnabled = profile.drivingEnabled) }
+                }
         }
     }
 
