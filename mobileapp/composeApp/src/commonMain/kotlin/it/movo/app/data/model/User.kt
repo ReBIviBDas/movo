@@ -25,7 +25,7 @@ enum class NotificationChannelType {
 
 @Serializable
 data class UserProfile(
-    val id: String,
+    @SerialName("_id") val id: String,
     val email: String,
     @SerialName("first_name") val firstName: String,
     @SerialName("last_name") val lastName: String,

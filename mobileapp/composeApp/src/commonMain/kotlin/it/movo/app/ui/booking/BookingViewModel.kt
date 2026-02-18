@@ -26,7 +26,8 @@ data class BookingUiState(
     val isUnlocking: Boolean = false,
     val errorMessage: String? = null,
     val rentalStarted: Boolean = false,
-    val bookingCancelled: Boolean = false
+    val bookingCancelled: Boolean = false,
+    val bookingFailed: Boolean = false
 ) {
     val timerMinutes: Int get() = remainingSeconds / 60
     val timerSeconds: Int get() = remainingSeconds % 60
@@ -104,7 +105,8 @@ class BookingViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                errorMessage = e.message
+                                errorMessage = e.message,
+                                bookingFailed = true
                             )
                         }
                     }

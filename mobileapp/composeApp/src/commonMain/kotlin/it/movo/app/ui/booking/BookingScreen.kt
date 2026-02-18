@@ -51,7 +51,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import it.movo.app.data.model.ParkingArea
 import it.movo.app.data.model.VehicleMapItem
+import it.movo.app.ui.map.PlatformMap
 import it.movo.app.ui.theme.MovoOnSurface
 import it.movo.app.ui.theme.MovoOnSurfaceVariant
 import it.movo.app.ui.theme.MovoOutline
@@ -102,6 +104,9 @@ fun BookingScreen(
         uiState.errorMessage?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
+            if (uiState.bookingFailed) {
+                onBookingCancelled()
+            }
         }
     }
 
@@ -131,16 +136,16 @@ private fun BookingContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(0.45f)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    MovoTeal.copy(alpha = 0.3f),
-                                    MovoTeal.copy(alpha = 0.1f),
-                                    MovoWhite
-                                )
-                            )
-                        )
                 ) {
+                    val vehicleForMap = uiState.booking?.vehicle?.let { listOf(it) } ?: emptyList()
+
+                    PlatformMap(
+                        vehicles = vehicleForMap,
+                        parkingAreas = emptyList(),
+                        onVehicleClick = { },
+                        modifier = Modifier.fillMaxSize()
+                    )
+
                     IconButton(
                         onClick = onNavigateBack,
                         modifier = Modifier
@@ -156,31 +161,6 @@ private fun BookingContent(
                             tint = MovoOnSurface
                         )
                     }
-
-                    FloatingActionButton(
-                        onClick = { },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(16.dp)
-                            .size(40.dp),
-                        containerColor = MovoWhite,
-                        shape = CircleShape
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Navigation,
-                            contentDescription = "Navigate",
-                            tint = MovoTeal
-                        )
-                    }
-
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = MovoTeal,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(64.dp)
-                    )
                 }
 
                 Surface(

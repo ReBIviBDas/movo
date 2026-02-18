@@ -143,13 +143,12 @@ class ProfileViewModel(
                 )
             )
 
-            val prefsResult = userRepository.updateNotificationPreferences(notificationPrefs)
+            userRepository.updateNotificationPreferences(notificationPrefs)
 
-            if (profileResult.isSuccess && prefsResult.isSuccess) {
+            if (profileResult.isSuccess) {
                 _uiState.update { it.copy(isSaving = false, profileSaved = true) }
             } else {
                 val error = profileResult.exceptionOrNull()?.message
-                    ?: prefsResult.exceptionOrNull()?.message
                 _uiState.update { it.copy(isSaving = false, errorMessage = error) }
             }
         }
