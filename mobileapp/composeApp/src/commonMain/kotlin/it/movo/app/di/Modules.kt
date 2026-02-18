@@ -83,7 +83,7 @@ val appModule = module {
     viewModel { LoginViewModel(get()) }
     viewModel { RegisterViewModel(get(), get()) }
     viewModel { ForgotPasswordViewModel(get()) }
-    viewModel { MapViewModel(get(), get()) }
+    viewModel { MapViewModel(get(), get(), get()) }
     viewModel { BookingViewModel(get(), get(), get()) }
     viewModel { ActiveRideViewModel(get(), get()) }
     viewModel { TripSummaryViewModel(get()) }

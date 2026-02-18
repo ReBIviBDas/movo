@@ -44,6 +44,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,16 +83,28 @@ fun MapScreen(
     onNavigateToVehicleDetail: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val drivingNotEnabledMsg = "Driving is not enabled for your account. Please verify your license."
+
+    val guardedOnBookVehicle: (String) -> Unit = { vehicleId ->
+        if (uiState.drivingEnabled) {
+            onBookVehicle(vehicleId)
+        } else {
+            scope.launch { snackbarHostState.showSnackbar(drivingNotEnabledMsg) }
+        }
+    }
 
     MapContent(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onVehicleMarkerClick = viewModel::onVehicleMarkerClick,
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onToggleFilterSheet = viewModel::toggleFilterSheet,
         onVehiclePreviewDismiss = viewModel::onVehiclePreviewDismiss,
         onShowVehicleDetails = viewModel::onShowVehicleDetails,
         onVehicleDetailsDismiss = viewModel::onVehicleDetailsDismiss,
-        onBookVehicle = onBookVehicle,
+        onBookVehicle = guardedOnBookVehicle,
         onReserveVehicle = onReserveVehicle,
         onNavigateToVehicleDetail = onNavigateToVehicleDetail,
         onMinBatteryChange = viewModel::onMinBatteryChange,
@@ -106,6 +120,7 @@ fun MapScreen(
 @Composable
 private fun MapContent(
     uiState: MapUiState,
+    snackbarHostState: SnackbarHostState,
     onVehicleMarkerClick: (VehicleMapItem) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onToggleFilterSheet: () -> Unit,
@@ -122,7 +137,6 @@ private fun MapContent(
     onResetFilters: () -> Unit,
     onClearError: () -> Unit
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
     val sheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(uiState.errorMessage) {
@@ -565,6 +579,7 @@ private fun MapScreenPreview() {
                 showVehicleDetails = false,
                 errorMessage = null
             ),
+            snackbarHostState = remember { SnackbarHostState() },
             onVehicleMarkerClick = {},
             onSearchQueryChange = {},
             onToggleFilterSheet = {},
