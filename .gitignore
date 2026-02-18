@@ -4,3 +4,6 @@ coverage
 course_context
 mongodb-credentials.txt
 backend/uploads/
+frontend/dist/
+frontend/.vite/
+backend/test_output.txt

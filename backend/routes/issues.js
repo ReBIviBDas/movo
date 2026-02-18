@@ -29,7 +29,6 @@ router.post('/',
         try {
             const { category, description, vehicle_id, rental_id, lat, lng } = req.body;
             
-            console.log('Creating report with:', { category, description: description?.substring(0, 50) });
             
             // Validate required fields
             if (!category || !description) {
@@ -64,7 +63,6 @@ router.post('/',
             
             // Generate unique reference ID
             const referenceId = await Report.generateReferenceId();
-            console.log('Generated reference ID:', referenceId);
             
             // Build report object
             const reportData = {
@@ -90,7 +88,6 @@ router.post('/',
             const report = new Report(reportData);
             await report.save();
             
-            console.log('Report created successfully:', report._id);
             
             res.status(201).json({
                 message: 'Segnalazione inviata con successo',

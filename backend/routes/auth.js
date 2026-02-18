@@ -259,7 +259,7 @@ router.post('/login/google', async (req, res) => {
         const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
         const payload = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
         
-        console.log('Google login payload decoded:', { email: payload.email, sub: payload.sub });
+
 
         const { email, given_name, family_name, sub: googleId } = payload;
 
