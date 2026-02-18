@@ -35,9 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import it.movo.app.data.model.GeoPoint
+
 import it.movo.app.data.model.RentalSummary
-import it.movo.app.data.model.VehicleMapItem
+import it.movo.app.data.model.VehicleSummary
 import it.movo.app.ui.theme.MovoSurface
 import it.movo.app.ui.theme.MovoTeal
 import it.movo.app.ui.theme.MovoTheme
@@ -56,7 +56,7 @@ import org.jetbrains.compose.resources.stringResource
 fun HistoryScreen(
     viewModel: HistoryViewModel,
     onRentalClick: (String) -> Unit,
-    onReportIssue: (String) -> Unit = {}
+    onReportIssue: (rentalId: String, vehicleId: String?) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -84,7 +84,7 @@ private fun HistoryContent(
     snackbarHostState: SnackbarHostState,
     onRetry: () -> Unit,
     onRentalClick: (String) -> Unit,
-    onReportIssue: (String) -> Unit
+    onReportIssue: (rentalId: String, vehicleId: String?) -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -157,7 +157,7 @@ private fun HistoryContent(
                             RentalHistoryCard(
                                 rental = rental,
                                 onClick = { onRentalClick(rental.id) },
-                                onReportIssue = { onReportIssue(rental.id) }
+                                onReportIssue = { onReportIssue(rental.id, rental.vehicleId) }
                             )
                         }
                     }
@@ -260,13 +260,11 @@ private fun HistoryScreenPreview() {
             id = "1",
             userId = "user1",
             vehicleId = "v1",
-            vehicle = VehicleMapItem(
+            vehicle = VehicleSummary(
                 id = "v1",
                 model = "Fiat 500e",
-                licensePlate = "AB123CD",
-                location = GeoPoint(coordinates = listOf(12.5, 41.9)),
-                batteryLevel = 85,
-                basePricePerMinute = 25
+                plate = "AB123CD",
+                batteryLevel = 85
             ),
             startedAt = "2026-02-10T14:30:00Z",
             durationMinutes = 45,
@@ -276,13 +274,11 @@ private fun HistoryScreenPreview() {
             id = "2",
             userId = "user1",
             vehicleId = "v2",
-            vehicle = VehicleMapItem(
+            vehicle = VehicleSummary(
                 id = "v2",
                 model = "Vespa Elettrica",
-                licensePlate = "EF456GH",
-                location = GeoPoint(coordinates = listOf(12.6, 41.8)),
-                batteryLevel = 72,
-                basePricePerMinute = 20
+                plate = "EF456GH",
+                batteryLevel = 72
             ),
             startedAt = "2026-02-08T09:15:00Z",
             durationMinutes = 120,
@@ -292,13 +288,11 @@ private fun HistoryScreenPreview() {
             id = "3",
             userId = "user1",
             vehicleId = "v3",
-            vehicle = VehicleMapItem(
+            vehicle = VehicleSummary(
                 id = "v3",
                 model = "Renault Zoe",
-                licensePlate = "IJ789KL",
-                location = GeoPoint(coordinates = listOf(12.4, 42.0)),
-                batteryLevel = 90,
-                basePricePerMinute = 28
+                plate = "IJ789KL",
+                batteryLevel = 90
             ),
             startedAt = "2026-02-05T16:45:00Z",
             durationMinutes = 30,
@@ -316,7 +310,7 @@ private fun HistoryScreenPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             onRetry = {},
             onRentalClick = {},
-            onReportIssue = {}
+            onReportIssue = { _, _ -> }
         )
     }
 }

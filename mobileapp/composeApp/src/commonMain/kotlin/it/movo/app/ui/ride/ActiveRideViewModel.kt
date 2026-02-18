@@ -113,7 +113,7 @@ class ActiveRideViewModel(
                     _uiState.update {
                         it.copy(
                             vehicleName = rental.vehicle?.model ?: "",
-                            vehicleId = rental.vehicleId,
+                            vehicleId = rental.vehicleId.orEmpty(),
                             batteryLevel = rental.vehicle?.batteryLevel ?: 0,
                             estimatedRangeKm = (rental.vehicle?.batteryLevel
                                 ?: 0) * RANGE_FACTOR_KM,

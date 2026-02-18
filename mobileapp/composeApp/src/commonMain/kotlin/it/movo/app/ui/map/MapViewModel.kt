@@ -107,24 +107,16 @@ class MapViewModel(
         viewModelScope.launch {
             val state = _uiState.value
             _uiState.update { it.copy(isLoading = true) }
-            vehicleRepository.searchVehicles(
-                model = query,
-                minBattery = if (state.minBattery > 0) state.minBattery else null,
-                maxPricePerMinute = if (state.maxPrice < Double.MAX_VALUE) (state.maxPrice * 100).toInt() else null,
-                maxDistance = if (state.maxDistance < Double.MAX_VALUE) state.maxDistance.toInt() else null
+            vehicleRepository.getVehiclesOnMap(
+                minBattery = if (state.minBattery > 0) state.minBattery else null
             )
-                .onSuccess { results ->
-                    val vehicles = results.map { result ->
-                        VehicleMapItem(
-                            id = result.id,
-                            model = result.model,
-                            licensePlate = result.licensePlate,
-                            location = result.location,
-                            batteryLevel = result.batteryLevel,
-                            status = result.status
-                        )
+                .onSuccess { allVehicles ->
+                    val lowerQuery = query.lowercase()
+                    val filtered = allVehicles.filter { vehicle ->
+                        vehicle.model.lowercase().contains(lowerQuery) ||
+                            vehicle.licensePlate?.lowercase()?.contains(lowerQuery) == true
                     }
-                    _uiState.update { it.copy(vehicles = vehicles, isLoading = false) }
+                    _uiState.update { it.copy(vehicles = filtered, isLoading = false) }
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -213,7 +205,7 @@ class MapViewModel(
         viewModelScope.launch {
             parkingAreaRepository.getParkingAreas(bounds)
                 .onSuccess { areas -> _uiState.update { it.copy(parkingAreas = areas) } }
-                .onFailure { e -> _uiState.update { it.copy(errorMessage = e.message) } }
+                .onFailure { _uiState.update { it.copy(parkingAreas = emptyList()) } }
         }
     }
 

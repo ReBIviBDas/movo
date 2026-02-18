@@ -7,11 +7,12 @@ import kotlinx.serialization.Serializable
 data class PaymentMethod(
     val id: String,
     val type: PaymentMethodType = PaymentMethodType.CARD,
-    val brand: String? = null,
+    @SerialName("card_type") val brand: String? = null,
     @SerialName("last_four") val lastFour: String = "",
     @SerialName("expiry_month") val expiryMonth: Int? = null,
     @SerialName("expiry_year") val expiryYear: Int? = null,
     @SerialName("is_default") val isDefault: Boolean = false,
+    val nickname: String? = null,
     @SerialName("created_at") val createdAt: String? = null
 )
 
@@ -34,7 +35,10 @@ data class AddPaymentMethodRequest(
 )
 
 @Serializable
-data class PaymentMethodsResponse(val methods: List<PaymentMethod>)
+data class PaymentMethodsResponse(
+    @SerialName("payment_methods") val methods: List<PaymentMethod>,
+    val count: Int = 0
+)
 
 @Serializable
 data class Payment(

@@ -1,17 +1,18 @@
 package it.movo.app.data.remote
 
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
@@ -30,8 +31,7 @@ fun parseErrorMessage(exception: Exception): String {
 }
 
 fun createHttpClient(
-    tokenProvider: suspend () -> BearerTokens?,
-    tokenRefresher: suspend () -> BearerTokens?
+    tokenProvider: () -> String?
 ): HttpClient {
     val json = Json {
         ignoreUnknownKeys = true
@@ -49,26 +49,17 @@ fun createHttpClient(
             level = LogLevel.BODY
         }
 
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    tokenProvider()
-                }
-                refreshTokens {
-                    tokenRefresher()
-                }
-            }
-        }
-
         HttpResponseValidator {
             validateResponse { response: HttpResponse ->
                 if (!response.status.isSuccess()) {
+                    val body = response.bodyAsText()
                     try {
-                        val details = response.body<ProblemDetails>()
+                        val details = Json.decodeFromString<ProblemDetails>(body)
                         throw ProblemDetailsException(details)
-                    } catch (e: Exception) {
-                        if (e is ProblemDetailsException) throw e
-                        // Fallback for non-ProblemDetails errors
+                    } catch (e: ProblemDetailsException) {
+                        throw e
+                    } catch (_: Exception) {
+                        throw Exception("HTTP ${response.status.value}: $body")
                     }
                 }
             }
@@ -77,6 +68,12 @@ fun createHttpClient(
         defaultRequest {
             url(BuildConfig.API_BASE_URL)
             contentType(ContentType.Application.Json)
+            val token = tokenProvider()
+            if (token != null) {
+                header(HttpHeaders.Authorization, "Bearer $token")
+            } else {
+                Napier.w("No auth token available for request: ${url.buildString()}")
+            }
         }
     }
 }

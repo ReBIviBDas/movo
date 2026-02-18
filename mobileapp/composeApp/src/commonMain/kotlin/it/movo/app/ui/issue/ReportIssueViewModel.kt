@@ -63,14 +63,19 @@ class ReportIssueViewModel(
         _uiState.update { it.copy(vehicleId = vehicleId) }
     }
 
-    fun setRentalId(rentalId: String?) {
-        _uiState.update { it.copy(rentalId = rentalId) }
+    fun setRentalId(rentalId: String?, vehicleId: String? = null) {
+        _uiState.update {
+            it.copy(
+                rentalId = rentalId,
+                vehicleId = vehicleId ?: it.vehicleId
+            )
+        }
 
         if (rentalId != null && _uiState.value.vehicleId.isEmpty()) {
             viewModelScope.launch {
                 rentalRepository.getRental(rentalId)
                     .onSuccess { rental ->
-                        _uiState.update { it.copy(vehicleId = rental.vehicleId) }
+                        _uiState.update { it.copy(vehicleId = rental.vehicleId.orEmpty()) }
                     }
                     .onFailure { e ->
                         _uiState.update {

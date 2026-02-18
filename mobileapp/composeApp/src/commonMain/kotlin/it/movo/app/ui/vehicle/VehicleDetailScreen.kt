@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -101,7 +102,8 @@ fun VehicleDetailScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MovoSurface
-                )
+                ),
+                windowInsets = WindowInsets(0.dp)
             )
         }
     ) { paddingValues ->
@@ -237,8 +239,9 @@ private fun VehicleStatsRow(vehicle: Vehicle) {
         StatItem(
             icon = Icons.Default.Speed,
             value = run {
-                val cents = vehicle.basePricePerMinute.toLong()
-                "€${cents / 100}.${(cents % 100).toString().padStart(2, '0')}/min"
+                val euros = vehicle.basePricePerMinute.toInt()
+                val cents = ((vehicle.basePricePerMinute - euros) * 100).toInt()
+                "€${euros}.${cents.toString().padStart(2, '0')}/min"
             },
             color = MovoOnSurface
         )

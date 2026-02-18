@@ -39,7 +39,7 @@ class RentalRepository(private val rentalApi: RentalApi) {
         cursor: String? = null,
         limit: Int? = null
     ): Result<List<RentalSummary>> = runCatching {
-        rentalApi.getRentalHistory(from, to, cursor, limit).data
+        rentalApi.getRentalHistory(from, to, cursor, limit).rentals
     }
 
     suspend fun getRental(id: String): Result<RentalSummary> = runCatching {

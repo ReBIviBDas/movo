@@ -8,6 +8,7 @@ import it.movo.app.data.model.SplitParticipant
 import it.movo.app.data.model.SplitRequest
 import it.movo.app.data.remote.api.PaymentApi
 
+
 class PaymentRepository(private val paymentApi: PaymentApi) {
     suspend fun getPaymentMethods(): Result<List<PaymentMethod>> = runCatching {
         paymentApi.getPaymentMethods().methods
@@ -16,7 +17,7 @@ class PaymentRepository(private val paymentApi: PaymentApi) {
     suspend fun addPaymentMethod(
         stripeToken: String,
         setAsDefault: Boolean? = null
-    ): Result<PaymentMethod> = runCatching {
+    ): Result<Unit> = runCatching {
         paymentApi.addPaymentMethod(AddPaymentMethodRequest(stripeToken, setAsDefault))
     }
 
@@ -24,7 +25,7 @@ class PaymentRepository(private val paymentApi: PaymentApi) {
         paymentApi.deletePaymentMethod(id)
     }
 
-    suspend fun setDefaultPaymentMethod(id: String): Result<PaymentMethod> = runCatching {
+    suspend fun setDefaultPaymentMethod(id: String): Result<Unit> = runCatching {
         paymentApi.setDefaultPaymentMethod(id)
     }
 

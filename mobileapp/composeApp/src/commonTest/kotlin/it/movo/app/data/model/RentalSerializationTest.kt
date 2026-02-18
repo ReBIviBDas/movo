@@ -113,30 +113,29 @@ class RentalSerializationTest {
     fun rentalHistoryResponseDeserializes() {
         val raw = """
         {
-            "data": [
+            "rentals": [
                 {
                     "id": "r1",
-                    "user_id": "u1",
                     "vehicle_id": "v1",
                     "status": "completed",
                     "started_at": "2025-06-01T10:00:00Z",
-                    "total_cost_cents": 500,
-                    "final_cost_cents": 500
+                    "total_cost": 5.00
                 }
             ],
             "pagination": {
-                "next_cursor": "abc123",
-                "has_more": true,
-                "limit": 20
+                "page": 1,
+                "limit": 10,
+                "total": 1,
+                "pages": 1
             }
         }
         """.trimIndent()
 
         val response = json.decodeFromString<RentalHistoryResponse>(raw)
 
-        assertEquals(1, response.data.size)
-        assertEquals("r1", response.data[0].id)
-        assertEquals("abc123", response.pagination?.nextCursor)
-        assertEquals(true, response.pagination?.hasMore)
+        assertEquals(1, response.rentals.size)
+        assertEquals("r1", response.rentals[0].id)
+        assertEquals(1, response.pagination?.page)
+        assertEquals(1, response.pagination?.total)
     }
 }

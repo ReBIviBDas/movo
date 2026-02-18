@@ -13,9 +13,11 @@ class TokenManager(private val settings: Settings) {
     val accessToken: String? get() = settings.getStringOrNull(KEY_ACCESS_TOKEN)
     val refreshToken: String? get() = settings.getStringOrNull(KEY_REFRESH_TOKEN)
 
-    fun saveTokens(accessToken: String, refreshToken: String) {
+    fun saveTokens(accessToken: String, refreshToken: String?) {
         settings[KEY_ACCESS_TOKEN] = accessToken
-        settings[KEY_REFRESH_TOKEN] = refreshToken
+        if (refreshToken != null) {
+            settings[KEY_REFRESH_TOKEN] = refreshToken
+        }
         _isLoggedIn.value = true
     }
 

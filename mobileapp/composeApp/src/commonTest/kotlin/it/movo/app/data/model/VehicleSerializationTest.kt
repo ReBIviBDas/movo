@@ -19,7 +19,7 @@ class VehicleSerializationTest {
             "location": { "type": "Point", "coordinates": [11.12, 46.07] },
             "battery_level": 85,
             "status": "available",
-            "price_per_minute": 25
+            "price_per_minute": 0.25
         }
         """.trimIndent()
 
@@ -30,7 +30,7 @@ class VehicleSerializationTest {
         assertEquals("AB123CD", item.licensePlate)
         assertEquals(85, item.batteryLevel)
         assertEquals(VehicleStatus.AVAILABLE, item.status)
-        assertEquals(25, item.basePricePerMinute)
+        assertEquals(0.25, item.basePricePerMinute)
         assertEquals(11.12, item.location.longitude, 0.001)
         assertEquals(46.07, item.location.latitude, 0.001)
     }
@@ -51,7 +51,7 @@ class VehicleSerializationTest {
 
         assertNull(item.licensePlate)
         assertEquals("v2", item.id)
-        assertEquals(0, item.basePricePerMinute)
+        assertEquals(0.0, item.basePricePerMinute)
     }
 
     @Test
@@ -64,7 +64,7 @@ class VehicleSerializationTest {
             "location": { "type": "Point", "coordinates": [11.12, 46.07] },
             "battery_level": 92,
             "status": "in_use",
-            "price_per_minute": 30,
+            "price_per_minute": 0.30,
             "year": 2023,
             "color": "white",
             "features": ["gps", "heated_seats"],
@@ -80,7 +80,7 @@ class VehicleSerializationTest {
         assertEquals("EF456GH", vehicle.licensePlate)
         assertEquals(92, vehicle.batteryLevel)
         assertEquals(VehicleStatus.IN_USE, vehicle.status)
-        assertEquals(30, vehicle.basePricePerMinute)
+        assertEquals(0.30, vehicle.basePricePerMinute)
         assertEquals(2023, vehicle.year)
         assertEquals("white", vehicle.color)
         assertEquals(listOf("gps", "heated_seats"), vehicle.features)
@@ -104,7 +104,7 @@ class VehicleSerializationTest {
         assertEquals("v4", vehicle.id)
         assertNull(vehicle.licensePlate)
         assertEquals(VehicleStatus.AVAILABLE, vehicle.status)
-        assertEquals(0, vehicle.basePricePerMinute)
+        assertEquals(0.0, vehicle.basePricePerMinute)
         assertNull(vehicle.year)
         assertNull(vehicle.color)
         assertEquals(emptyList(), vehicle.features)
@@ -138,7 +138,7 @@ class VehicleSerializationTest {
             "location": { "type": "Point", "coordinates": [11.12, 46.07] },
             "battery_level": 77,
             "status": "available",
-            "price_per_minute": 40,
+            "price_per_minute": 0.40,
             "distance_meters": 350
         }
         """.trimIndent()
@@ -147,7 +147,7 @@ class VehicleSerializationTest {
 
         assertEquals("IJ789KL", result.licensePlate)
         assertEquals(350, result.distanceMeters)
-        assertEquals(40, result.basePricePerMinute)
+        assertEquals(0.40, result.basePricePerMinute)
     }
 
     @Test
@@ -168,6 +168,37 @@ class VehicleSerializationTest {
 
         assertEquals(0.0, point.longitude, 0.0001)
         assertEquals(0.0, point.latitude, 0.0001)
+    }
+
+    @Test
+    fun geoPointDeserializesFromLatLngFormat() {
+        val raw = """{ "lat": 46.0678, "lng": 11.1234 }"""
+
+        val point = json.decodeFromString<GeoPoint>(raw)
+
+        assertEquals(11.1234, point.longitude, 0.0001)
+        assertEquals(46.0678, point.latitude, 0.0001)
+    }
+
+    @Test
+    fun vehicleMapItemDeserializesFromBackendFormat() {
+        val raw = """
+        {
+            "id": "v1",
+            "model": "Fiat 500e",
+            "plate": "AB123CD",
+            "location": { "lat": 46.07, "lng": 11.12 },
+            "battery_level": 85,
+            "status": "available",
+            "price_per_minute": 0.25
+        }
+        """.trimIndent()
+
+        val item = json.decodeFromString<VehicleMapItem>(raw)
+
+        assertEquals("v1", item.id)
+        assertEquals(11.12, item.location.longitude, 0.001)
+        assertEquals(46.07, item.location.latitude, 0.001)
     }
 
     @Test

@@ -67,7 +67,7 @@ fun VehicleDetailsSheet(
     onBookClick: () -> Unit,
     onReserveClick: () -> Unit
 ) {
-    val pricePerMinute = vehicle.basePricePerMinute / 100.0
+    val pricePerMinute = vehicle.basePricePerMinute
 
     Card(
         modifier = Modifier
@@ -166,11 +166,10 @@ fun VehicleDetailsSheet(
                 )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    val priceCents = (pricePerMinute * 100).toInt()
-                    val priceEuros = priceCents / 100
-                    val priceRemCents = priceCents % 100
+                    val priceEuros = pricePerMinute.toInt()
+                    val priceCents = ((pricePerMinute - priceEuros) * 100).toInt()
                     Text(
-                        text = "€$priceEuros.${priceRemCents.toString().padStart(2, '0')}/min",
+                        text = "€$priceEuros.${priceCents.toString().padStart(2, '0')}/min",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MovoTeal
