@@ -61,7 +61,7 @@ data class RegisterUiState(
 
     companion object {
         private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
-        private val DOB_REGEX = Regex("^\\d{4}-\\d{2}-\\d{2}$")
+        private val DOB_REGEX = Regex("^\\d{2}/\\d{2}/\\d{4}$")
 
         fun isValidEmail(email: String): Boolean {
             return EMAIL_REGEX.matches(email)
@@ -75,7 +75,9 @@ data class RegisterUiState(
         fun isAtLeast18(dateOfBirth: String): Boolean {
             if (!DOB_REGEX.matches(dateOfBirth)) return false
             return try {
-                val dob = LocalDate.parse(dateOfBirth)
+                val parts = dateOfBirth.split("/")
+                val isoDate = "${parts[2]}-${parts[1]}-${parts[0]}"
+                val dob = LocalDate.parse(isoDate)
                 val now = Clock.System.now()
                 val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
                 val age = today.year - dob.year -

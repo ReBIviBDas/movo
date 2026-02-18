@@ -80,12 +80,12 @@ class RegisterValidationTest {
 
     @Test
     fun isAtLeast18ReturnsTrueForAdult() {
-        assertTrue(RegisterUiState.isAtLeast18("2000-01-01"))
+        assertTrue(RegisterUiState.isAtLeast18("01/01/2000"))
     }
 
     @Test
     fun isAtLeast18ReturnsFalseForMinor() {
-        assertTrue(!RegisterUiState.isAtLeast18("2020-01-01"))
+        assertTrue(!RegisterUiState.isAtLeast18("01/01/2020"))
     }
 
     @Test
@@ -160,7 +160,7 @@ class RegisterValidationTest {
             currentStep = 2,
             firstName = "Mario",
             lastName = "",
-            dateOfBirth = "2000-01-01",
+            dateOfBirth = "01/01/2000",
             fiscalCode = "RSSMRA00A01H501A",
             phone = "+39 333 1234567"
         )
@@ -170,7 +170,7 @@ class RegisterValidationTest {
             currentStep = 2,
             firstName = "Mario",
             lastName = "Rossi",
-            dateOfBirth = "2000-01-01",
+            dateOfBirth = "01/01/2000",
             fiscalCode = "RSSMRA00A01H501A",
             phone = "+39 333 1234567"
         )
@@ -183,7 +183,7 @@ class RegisterValidationTest {
             currentStep = 2,
             firstName = "Mario",
             lastName = "Rossi",
-            dateOfBirth = "2020-01-01",
+            dateOfBirth = "01/01/2020",
             fiscalCode = "RSSMRA20A01H501A",
             phone = "+39 333 1234567"
         )
@@ -223,10 +223,10 @@ class RegisterValidationTest {
 
     @Test
     fun isUnder18ComputesFromDateOfBirth() {
-        val minor = RegisterUiState(dateOfBirth = "2020-06-15")
+        val minor = RegisterUiState(dateOfBirth = "15/06/2020")
         assertTrue(minor.isUnder18)
 
-        val adult = RegisterUiState(dateOfBirth = "2000-06-15")
+        val adult = RegisterUiState(dateOfBirth = "15/06/2000")
         assertFalse(adult.isUnder18)
 
         val empty = RegisterUiState(dateOfBirth = "")
