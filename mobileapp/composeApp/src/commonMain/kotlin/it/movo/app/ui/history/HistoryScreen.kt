@@ -56,7 +56,7 @@ import org.jetbrains.compose.resources.stringResource
 fun HistoryScreen(
     viewModel: HistoryViewModel,
     onRentalClick: (String) -> Unit,
-    onReportIssue: (String) -> Unit = {}
+    onReportIssue: (rentalId: String, vehicleId: String?) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -84,7 +84,7 @@ private fun HistoryContent(
     snackbarHostState: SnackbarHostState,
     onRetry: () -> Unit,
     onRentalClick: (String) -> Unit,
-    onReportIssue: (String) -> Unit
+    onReportIssue: (rentalId: String, vehicleId: String?) -> Unit
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -157,7 +157,7 @@ private fun HistoryContent(
                             RentalHistoryCard(
                                 rental = rental,
                                 onClick = { onRentalClick(rental.id) },
-                                onReportIssue = { onReportIssue(rental.id) }
+                                onReportIssue = { onReportIssue(rental.id, rental.vehicleId) }
                             )
                         }
                     }
@@ -310,7 +310,7 @@ private fun HistoryScreenPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             onRetry = {},
             onRentalClick = {},
-            onReportIssue = {}
+            onReportIssue = { _, _ -> }
         )
     }
 }

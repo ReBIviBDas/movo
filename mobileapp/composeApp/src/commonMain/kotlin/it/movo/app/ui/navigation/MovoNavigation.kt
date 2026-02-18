@@ -252,8 +252,8 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                         onRentalClick = { rentalId ->
                             backStack.add(TripSummaryRoute(rentalId))
                         },
-                        onReportIssue = { rentalId ->
-                            backStack.add(ReportIssueRoute(rentalId = rentalId))
+                        onReportIssue = { rentalId, vehicleId ->
+                            backStack.add(ReportIssueRoute(rentalId = rentalId, vehicleId = vehicleId))
                         }
                     )
                 }
@@ -291,9 +291,8 @@ fun MovoNavigation(isLoggedIn: Boolean) {
                 }
                 entry<ReportIssueRoute> { route ->
                     val viewModel = koinViewModel<ReportIssueViewModel>()
-                    LaunchedEffect(route.rentalId) {
-                        route.vehicleId?.let { viewModel.setVehicleId(it) }
-                        route.rentalId?.let { viewModel.setRentalId(it) }
+                    LaunchedEffect(route.rentalId, route.vehicleId) {
+                        route.rentalId?.let { viewModel.setRentalId(it, route.vehicleId) }
                     }
                     ReportIssueScreen(
                         viewModel = viewModel,
