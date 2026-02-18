@@ -8,6 +8,11 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,6 +60,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,6 +109,7 @@ import it.movo.app.composeapp.generated.resources.register_license_front
 import it.movo.app.composeapp.generated.resources.register_license_hint
 import it.movo.app.composeapp.generated.resources.register_license_tap
 import it.movo.app.composeapp.generated.resources.register_password
+import it.movo.app.composeapp.generated.resources.register_password_placeholder
 import it.movo.app.composeapp.generated.resources.register_phone
 import it.movo.app.composeapp.generated.resources.register_skip_license
 import it.movo.app.composeapp.generated.resources.register_step1_subtitle
@@ -519,7 +527,7 @@ private fun Step1AccountSetup(
             value = password,
             onValueChange = onPasswordChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Enter your password") },
+            placeholder = { Text(stringResource(Res.string.register_password_placeholder)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
@@ -563,7 +571,7 @@ private fun Step1AccountSetup(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Confirm your password") },
+            placeholder = { Text(stringResource(Res.string.register_confirm_password)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
@@ -596,6 +604,7 @@ private fun Step1AccountSetup(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Step2PersonalDetails(
     firstName: String,
@@ -616,6 +625,8 @@ private fun Step2PersonalDetails(
     onLicenseClick: () -> Unit,
     onSkipLicense: () -> Unit
 ) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
     Column {
         Text(
             text = stringResource(Res.string.register_step2_title),
@@ -692,11 +703,13 @@ private fun Step2PersonalDetails(
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(stringResource(Res.string.register_date_format)) },
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = "Select date",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                IconButton(onClick = { showDatePicker = true }) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = "Select date",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
@@ -707,6 +720,37 @@ private fun Step2PersonalDetails(
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
+
+        if (showDatePicker) {
+            val datePickerState = rememberDatePickerState()
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                val days = (millis / 86_400_000).toInt()
+                                val date = kotlinx.datetime.LocalDate.fromEpochDays(days)
+                                val formatted = "${date.dayOfMonth.toString().padStart(2, '0')}/${
+                                    date.monthNumber.toString().padStart(2, '0')
+                                }/${date.year}"
+                                onDateOfBirthChange(formatted)
+                            }
+                            showDatePicker = false
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
+        }
 
         if (isUnder18) {
             Spacer(modifier = Modifier.height(4.dp))

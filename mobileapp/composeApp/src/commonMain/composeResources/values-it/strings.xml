@@ -61,6 +61,7 @@
     <string name="register_last_name">Cognome</string>
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
+    <string name="register_password_placeholder">Inserisci la tua password</string>
     <string name="register_confirm_password">Conferma Password</string>
     <string name="register_phone">Numero di Telefono</string>
     <string name="register_date_of_birth">Data di Nascita</string>
